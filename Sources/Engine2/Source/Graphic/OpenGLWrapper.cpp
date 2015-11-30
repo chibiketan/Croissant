@@ -1,3 +1,6 @@
+#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
+#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
+#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
 /*
  * OpenGLWrapper.cpp
  *
@@ -45,6 +48,9 @@
 #define GLFUNCINDEX_MAP_BUFFER				24
 #define GLFUNCINDEX_UNMAP_BUFFER			25
 #define GLFUNCINDEX_GET_INTEGERV			26
+#define GLFUNCINDEX_SHADER_SOURCE			27
+#define GLFUNCINDEX_ATTACH_SHADER			28
+#define GLFUNCINDEX_COMPILE_SHADER			29
 
 using OpenGLRendererException = Croissant::Exception::CroissantException;
 
@@ -510,6 +516,63 @@ namespace Croissant
 				}
 			}
 
+			template<>
+			inline void glThrowOnError<GLFUNCINDEX_SHADER_SOURCE>(GLint err)
+			{
+				switch (err)
+				{
+				case GL_NO_ERROR:
+					break;
+				case GL_INVALID_VALUE:
+					throw OpenGLRendererException("Erreur lors de l'appel à glShaderSource : identifiant de shader n'existe pas, ou count est inférieur à 0.");
+					break;
+				case GL_INVALID_OPERATION:
+					throw OpenGLRendererException("Erreur lors de l'appel à glShaderSource : l'identifiant n'est pas un shader.");
+					break;
+				default:
+					throw OpenGLRendererException("Erreur lors de l'appel à glShaderSource : Erreur non identifiée.");
+					break;
+				}
+			}
+
+			template<>
+			inline void glThrowOnError<GLFUNCINDEX_ATTACH_SHADER>(GLint err)
+			{
+				switch (err)
+				{
+				case GL_NO_ERROR:
+					break;
+				case GL_INVALID_VALUE:
+					throw OpenGLRendererException("Erreur lors de l'appel à glAttachShader : l'identifiant de programme ou de shader n'existe pas.");
+					break;
+				case GL_INVALID_OPERATION:
+					throw OpenGLRendererException("Erreur lors de l'appel à glAttachShader : program n'est pas un program ou shader n'est pas un shader ou shader est déjà attaché à program.");
+					break;
+				default:
+					throw OpenGLRendererException("Erreur lors de l'appel à glAttachShader : Erreur non identifiée.");
+					break;
+				}
+			}
+
+			template<>
+			inline void glThrowOnError<GLFUNCINDEX_COMPILE_SHADER>(GLint err)
+			{
+				switch (err)
+				{
+				case GL_NO_ERROR:
+					break;
+				case GL_INVALID_VALUE:
+					throw OpenGLRendererException("Erreur lors de l'appel à glCompileShader : l'identifiant de shader n'existe pas.");
+					break;
+				case GL_INVALID_OPERATION:
+					throw OpenGLRendererException("Erreur lors de l'appel à glCompileShader : L'identifiant n'est pas celui d'un shader.");
+					break;
+				default:
+					throw OpenGLRendererException("Erreur lors de l'appel à glCompileShader : Erreur non identifiée.");
+					break;
+				}
+			}
+
 			using LogManager = Croissant::Core::LogManager;
 			using string = std::string;
 
@@ -675,6 +738,7 @@ namespace Croissant
 			ext_glDrawElements = LoadGLSymbol<glDrawElements_t>("glDrawElements");
 			ext_glMapBuffer = LoadGLSymbol<glMapBuffer_t>("glMapBuffer");
 			ext_glUnmapBuffer = LoadGLSymbol<glUnmapBuffer_t>("glUnmapBuffer");
+			ext_glCompileShader = LoadGLSymbol<glCompileShader_t>("glCompileShader");
 
 			int NumberOfExtensions;
 			glGetIntegerv(GL_NUM_EXTENSIONS, &NumberOfExtensions);
@@ -752,6 +816,21 @@ namespace Croissant
 
 			glCheckForError<GLFUNCINDEX_CREATE_PROGRAM>(*this);
 			return programId;
+		}
+
+		void OpenGLWrapper::AttachShader(uint32_t programId, uint32_t shaderId) const
+		{
+			ext_glAttachShader(programId, shaderId);
+			glCheckForError<GLFUNCINDEX_ATTACH_SHADER>(*this);
+		}
+
+		void OpenGLWrapper::ShaderSource(uint32_t shaderId, std::string const & source) const
+		{
+			auto cStr = source.c_str();
+			int length = source.length();
+
+			ext_glShaderSource(shaderId, 1, &cStr, &length);
+			glCheckForError<GLFUNCINDEX_SHADER_SOURCE>(*this);
 		}
 
 		uint32_t OpenGLWrapper::CreateShader(GLenum shaderType) const
@@ -899,6 +978,12 @@ namespace Croissant
 			glGetIntegerv(enumValue, &val);
 			glCheckForError<GLFUNCINDEX_GET_INTEGERV>(*this);
 			return val;
+		}
+
+		void OpenGLWrapper::CompileShader(uint32_t shaderId) const
+		{
+			ext_glCompileShader(shaderId);
+			glCheckForError<GLFUNCINDEX_COMPILE_SHADER>(*this);
 		}
 
 		GLenum OpenGLWrapper::s_valueNames[] {

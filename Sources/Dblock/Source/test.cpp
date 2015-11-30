@@ -79,43 +79,80 @@ int main(int, char**)
 		Time lastFrameTime { firstFrameTime };
 
 		// --------------------------------------------------------------------------- begin initialisation
-		auto vertexShaderContent = R"(
+		auto vertexShaderContent = std::string(R"(
+#version 140
 
-)";
+/********************Entrant********************/
+in vec3 VertexPosition;
 
+/********************Uniformes********************/
+uniform mat4 WorldViewProjMatrix;
+
+/********************Fonctions********************/
+void main()
+{
+	gl_Position = WorldViewProjMatrix * vec4(VertexPosition, 1.0);
+}
+)");
+		auto fragmentShaderContent = std::string(R"(
+#version 140
+
+/********************Sortant********************/
+/*out vec4 RenderTarget0;*/
+/********************Uniformes********************/
+uniform vec4 Color;
+
+/********************Fonctions********************/
+void main()
+{
+	gl_FragColor = Color;
+/*	RenderTarget0 = Color;*/
+}
+)");
+
+		// see exemple code in http://docs.gl/gl3/glCompileShader
 		auto programId = opengl.CreateProgram();
 		auto vertexShaderId = opengl.CreateShader(GL_VERTEX_SHADER);
+		opengl.ShaderSource(vertexShaderId,vertexShaderContent);
+		opengl.CompileShader(vertexShaderId);
+		// TODO check shader compilation status
+		opengl.AttachShader(programId, vertexShaderId);
 
+		auto fragmentShaderId = opengl.CreateShader(GL_VERTEX_SHADER);
+		opengl.ShaderSource(fragmentShaderId, fragmentShaderContent);
+		opengl.CompileShader(fragmentShaderId);
+		// TODO check shader compilation status
+		opengl.AttachShader(programId, fragmentShaderId);
 
 		// --------------------------------------------------------------------------- end   initialisation
 
-		while (1)
-		{
-			++fps;
-			Time currentFrameTime { Clock::now() };
-			durationSecond secondSinceFirstFrame { currentFrameTime - firstFrameTime };
-			if (secondSinceFirstFrame.count() >= 1.0f) {
-				durationNanoSecond nanoS = std::chrono::duration_cast<durationNanoSecond>(secondSinceFirstFrame);
-				uint32_t tempsMoyenParFrame = nanoS.count() / fps;
+		//while (1)
+		//{
+		//	++fps;
+		//	Time currentFrameTime { Clock::now() };
+		//	durationSecond secondSinceFirstFrame { currentFrameTime - firstFrameTime };
+		//	if (secondSinceFirstFrame.count() >= 1.0f) {
+		//		durationNanoSecond nanoS = std::chrono::duration_cast<durationNanoSecond>(secondSinceFirstFrame);
+		//		uint32_t tempsMoyenParFrame = nanoS.count() / fps;
 
-				win.SetTitle(baseTitle + std::to_string(fps) + ", temps moyen par frame : " + std::to_string(tempsMoyenParFrame) + "us");
-				fps = 0;
-				firstFrameTime = Clock::now();
-				lastFrameTime = firstFrameTime;
-			}
+		//		win.SetTitle(baseTitle + std::to_string(fps) + ", temps moyen par frame : " + std::to_string(tempsMoyenParFrame) + "us");
+		//		fps = 0;
+		//		firstFrameTime = Clock::now();
+		//		lastFrameTime = firstFrameTime;
+		//	}
 
 
 
-			auto evt = win.PeekEvent();
+		//	auto evt = win.PeekEvent();
 
-			if (evt->GetType() == Croissant::Graphic::WindowEventType::CLOSE)
-			{
-				win.Close();
-				break;
-			}
+		//	if (evt->GetType() == Croissant::Graphic::WindowEventType::CLOSE)
+		//	{
+		//		win.Close();
+		//		break;
+		//	}
 
-			renderer.Render();
-		}
+		//	renderer.Render();
+		//}
 	}
 	catch (std::exception& e)
 	{

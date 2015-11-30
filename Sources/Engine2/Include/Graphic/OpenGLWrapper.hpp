@@ -64,6 +64,7 @@ namespace Croissant
 		using glDrawElements_t = void (APIENTRY *)(GLenum, GLsizei, GLenum, GLvoid const*);
 		using glMapBuffer_t = void* (APIENTRY *)(GLenum, GLenum);
 		using glUnmapBuffer_t = GLboolean (APIENTRY *)(GLenum);
+		using glCompileShader_t = void (APIENTRY *)(GLuint);
 
 		// ---------------------------------------- fin alias pour OpenGL
 
@@ -79,7 +80,7 @@ namespace Croissant
 			uint32_t	CreateProgram(void) const;
 			void		LinkProgram(uint32_t programId) const;
 			void		AttachShader(uint32_t programId, uint32_t shaderId) const;
-			void		ShaderSource(uint32_t shaderId, size_t count, std::string stringList[], int32_t const* length) const;
+			void		ShaderSource(uint32_t shaderId, std::string const& source) const;
 			void		BindAttribLocation(uint32_t programId, uint32_t index, std::string const name) const;
 			void		UseProgram(uint32_t programId) const;
 			void		DeleteProgram(uint32_t programId) const;
@@ -106,6 +107,7 @@ namespace Croissant
 			void*		MapBuffer(GLenum target, GLenum access) const;
 			GLboolean	UnmapBuffer(GLenum target) const;
 			int32_t		GetInteger(OpenGLValueNameEnum valueName) const;
+			void		CompileShader(uint32_t shaderId) const;
 
 		private:
 			Core::LogManager&			m_logManager;
@@ -142,6 +144,7 @@ namespace Croissant
 			glDrawElements_t			ext_glDrawElements = nullptr;
 			glMapBuffer_t				ext_glMapBuffer = nullptr;
 			glUnmapBuffer_t				ext_glUnmapBuffer = nullptr;
+			glCompileShader_t			ext_glCompileShader = nullptr;
 			static GLenum				s_valueNames[static_cast<int>(OpenGLValueNameEnum::MAX_ELEMENT) + 1];
 		};
 	}
