@@ -1,0 +1,5 @@
+Nécessitée de modifier le fichier D:\CMake\share\cmake-3.1\Modules\Compiler\GNU-CXX.cmake :
+Retirer la condition sur UNIX pour la détection des features de compilateur
+
+exemple de commande pour cmake :
+cmake -G"Eclipse CDT4 - MinGW Makefiles" -DCMAKE_ECLIPSE_GENERATE_SOURCE_PROJECT=TRUE -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -D_CMAKE_TOOLCHAIN_PREFIX=llvm- -DCMAKE_ECLIPSE_VERSION=4.5  -DCMAKE_CXX_COMPILER_ARG1=-std=gnu++11 ..\for_cmake

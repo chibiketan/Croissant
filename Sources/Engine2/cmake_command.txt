@@ -1,0 +1,1 @@
+cmake -G "MinGW Makefiles" -DCMAKE_MAKE_PROGRAM=make -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ ..\Engine2
