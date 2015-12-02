@@ -48,7 +48,7 @@ namespace Croissant
 
 			char g_applicationPath[MAX_PATH] = "";
 
-#if defined(__linux)
+#if defined(CROISSANT_LINUX)
 
 			char *GetFileRelativeToApp(const char* fileName)
 			{
@@ -69,7 +69,7 @@ namespace Croissant
 					::strcpy(g_applicationPath, folderPath);
 				}
 
-                char* result = static_cast<char*>(::malloc(MAX_PATH * sizeof(char)));
+                char* result = static_cast<char*>(std::malloc(MAX_PATH * sizeof(char)));
 
 				::memset(result, 0, MAX_PATH * sizeof(char));
                 ::strcpy(result, g_applicationPath);
@@ -84,7 +84,7 @@ namespace Croissant
 				file = fopen(path, mode);
 			}
 
-#elif defined(_WIN32) || defined(__WIN64)
+#elif defined(CROISSANT_WINDOWS)
 
 			template<typename C, size_t size, size_t size2>
 			void CopyString(C (&output)[size], const C (&source)[size2])
@@ -139,7 +139,7 @@ namespace Croissant
 				}
 
 				auto size = MAX_PATH * sizeof(char);
-				char* result = static_cast<char*>(::malloc(size));
+				char* result = static_cast<char*>(std::malloc(size));
 
 				CopyString(result, size, g_applicationPath);
 				CatString(result, size, fileName);
@@ -181,8 +181,8 @@ namespace Croissant
 				}
 
 				file.close();
-				::free(filePath);
-				::free(strTime);
+				std::free(filePath);
+				std::free(strTime);
 			}
 
 			//std::ofstream g_allocationFile;
@@ -198,7 +198,7 @@ namespace Croissant
 			//			char* filePath = GetFileRelativeToApp(fileName);
 			//
 			//			g_allocationFile.open(filePath, std::ios::app);
-			//			::free(filePath);
+			//			std::free(filePath);
 			//		}
 			//
 			//		if (NULL != node->File && node->IsArray)
@@ -218,7 +218,7 @@ namespace Croissant
 			//			g_allocationFile << strDate << " : " << std::left << std::setw(7) << "DEBUG" << " : " << std::setw(50) << caller << " : new with size " << node->Size << std::endl;
 			//		}
 			//
-			//		::free(strDate);
+			//		std::free(strDate);
 			//	}
 			//}
 
@@ -231,7 +231,7 @@ namespace Croissant
 			//			char* filePath = GetFileRelativeToApp(fileName);
 			//
 			//			g_allocationFile.open(filePath, std::ios::app);
-			//			::free(filePath);
+			//			std::free(filePath);
 			//		}
 			//
 			//		if (g_allocationFile.is_open())
@@ -255,7 +255,7 @@ namespace Croissant
 			//				g_allocationFile << strDate << " : " << std::left << std::setw(7) << "DEBUG" << " : " << std::setw(50) << caller << " : delete with size " << node->Size << std::endl;
 			//			}
 			//
-			//			::free(strDate);
+			//			std::free(strDate);
 			//		}
 			//	}
 			//}
@@ -300,7 +300,7 @@ namespace Croissant
 							}
 						}
 
-						::free(filePath);
+						std::free(filePath);
 					}
 
 					if (NULL != node->File && node->IsArray)
@@ -324,7 +324,7 @@ namespace Croissant
 						//g_allocationFile << strDate << " : " << std::left << std::setw(7) << "DEBUG" << " : " << std::setw(50) << caller << " : new with size " << node->Size << std::endl;
 					}
 
-					::free(strDate);
+					std::free(strDate);
 				}
 			}
 
@@ -337,7 +337,7 @@ namespace Croissant
 						char* filePath = GetFileRelativeToApp(g_allocationFile.Name);
 
 						OpenFile(g_allocationFile.fd, filePath, "a");
-						::free(filePath);
+						std::free(filePath);
 					}
 
 					char* strDate = MemoryManager::GetCurrentDate();
@@ -363,7 +363,7 @@ namespace Croissant
 						//g_allocationFile << strDate << " : " << std::left << std::setw(7) << "DEBUG" << " : " << std::setw(50) << caller << " : delete with size " << node->Size << std::endl;
 					}
 
-					::free(strDate);
+					std::free(strDate);
 				}
 			}
 
@@ -377,7 +377,7 @@ namespace Croissant
 			//return instance;
 			if (NULL == sm_instance)
 			{
-				sm_instance = new (::malloc(sizeof(MemoryManager))) MemoryManager();
+				sm_instance = new (std::malloc(sizeof(MemoryManager))) MemoryManager();
 				atexit(MemoryManager::FreeManager);
 			}
 
@@ -386,7 +386,7 @@ namespace Croissant
 
 		char* MemoryManager::GetCurrentDate()
 		{
-			char* str = static_cast<char*>(::malloc(20 * sizeof(char)));
+			char* str = static_cast<char*>(std::malloc(20 * sizeof(char)));
 			time_t t = time(NULL);
 			tm* tt;
 
@@ -413,14 +413,14 @@ namespace Croissant
 			if (NULL != sm_instance)
 			{
 				sm_instance->~MemoryManager();
-				::free(sm_instance);
+				std::free(sm_instance);
 				sm_instance = NULL;
 			}
 		}
 
 		MemoryManager::MemoryManager()
 		{
-			s_memory = static_cast<MemoryNode*>(::malloc(sizeof(MemoryNode)));
+			s_memory = static_cast<MemoryNode*>(std::malloc(sizeof(MemoryNode)));
 
 			s_memory->File = NULL;
 			s_memory->IsArray = false;
@@ -447,7 +447,7 @@ namespace Croissant
 				fclose(fd);
 			}
 
-			::free(fileName);
+			std::free(fileName);
 			fileName = nullptr;
 
 			fileName = GetFileRelativeToApp(g_allocationFile.Name);
@@ -459,7 +459,7 @@ namespace Croissant
 				fputs("=========================================\n", fd);
 			}
 
-			::free(fileName);
+			std::free(fileName);
 			fileName = nullptr;
 
 			fileName = GetFileRelativeToApp(LOG_FILE_FOr_ERRORS);
@@ -469,7 +469,7 @@ namespace Croissant
 				fclose(fd);
 			}
 
-			::free(fileName);
+			std::free(fileName);
 			fileName = nullptr;
 
 		}
@@ -485,12 +485,12 @@ namespace Croissant
 					MemoryNode* next = node->Next;
 
 					PrintMemoryNotFree("DebugMemoryManager::~DebugMemoryManager", m_logFileNameForLeak, node);
-					::free(node);
+					std::free(node);
 					node = next;
 				} while (node != s_memory);
 			}
 
-			::free(s_memory);
+			std::free(s_memory);
 		}
 
 		void* MemoryManager::Allocate(std::size_t size, const char* file, unsigned int line, bool isArray)
@@ -525,7 +525,7 @@ namespace Croissant
 				return NULL;
 			}
 
-			MemoryNode* node = static_cast<MemoryNode*>(::malloc(size + sizeof(MemoryNode)));
+			MemoryNode* node = static_cast<MemoryNode*>(std::malloc(size + sizeof(MemoryNode)));
 
 			if (NULL == node)
 			{
@@ -650,7 +650,7 @@ namespace Croissant
 			next->Previous = prev;
 			node->Previous = NULL;
 			node->Next = NULL;
-			::free(node);
+			std::free(node);
 		}
 
 		void MemoryManager::SetNextFree( const char* file, unsigned int line )

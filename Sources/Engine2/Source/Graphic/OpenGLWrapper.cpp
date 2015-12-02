@@ -827,7 +827,7 @@ namespace Croissant
 		void OpenGLWrapper::ShaderSource(uint32_t shaderId, std::string const & source) const
 		{
 			auto cStr = source.c_str();
-			int length = source.length();
+			auto length = static_cast<int>(source.length());
 
 			ext_glShaderSource(shaderId, 1, &cStr, &length);
 			glCheckForError<GLFUNCINDEX_SHADER_SOURCE>(*this);
