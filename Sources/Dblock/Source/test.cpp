@@ -115,14 +115,32 @@ void main()
 		auto vertexShaderId = opengl.CreateShader(GL_VERTEX_SHADER);
 		opengl.ShaderSource(vertexShaderId,vertexShaderContent);
 		opengl.CompileShader(vertexShaderId);
-		// TODO check shader compilation status
-		opengl.AttachShader(programId, vertexShaderId);
+		auto vertexShaderResult = opengl.GetShaderInteger(vertexShaderId, Croissant::Graphic::OpenGLShaderIntegerNameEnum::CompileStatus);
 
-		auto fragmentShaderId = opengl.CreateShader(GL_VERTEX_SHADER);
+		if (vertexShaderResult == 0)
+		{
+			throw std::exception( "Erreur lors de la compilation du vertex shader");
+		}
+
+		auto fragmentShaderId = opengl.CreateShader(GL_FRAGMENT_SHADER);
 		opengl.ShaderSource(fragmentShaderId, fragmentShaderContent);
 		opengl.CompileShader(fragmentShaderId);
-		// TODO check shader compilation status
+		auto fragmentShaderResult = opengl.GetShaderInteger(fragmentShaderId, Croissant::Graphic::OpenGLShaderIntegerNameEnum::CompileStatus);
+
+		if (fragmentShaderResult == 0)
+		{
+			throw std::exception("Erreur lors de la compilation du fragment shader");
+		}
+
+		// TODO : glBindAttribLocation pour associer les attributs des vertex à des valeurs
 		opengl.AttachShader(programId, fragmentShaderId);
+		opengl.AttachShader(programId, vertexShaderId);
+
+		// TODO : glLinkProgram pour associer définitivement les shader au programme
+		// TODO : glGetProgramiv(program, GL_LINK_STATUS, &program_linked); pour vérifier que la commande linkprogram est OK
+
+		// TODO : configurer les sommets pour l'affichage
+		// TODO : 
 
 		// --------------------------------------------------------------------------- end   initialisation
 
@@ -171,6 +189,8 @@ void main()
 
     app.Shutdown();
 //	system("PAUSE");
+	std::cout << "Appuyez sur une touche" << std::endl;
+	std::getchar();
 	return result;
 }
 

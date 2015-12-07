@@ -189,6 +189,17 @@ namespace Croissant
 
 			MAX_ELEMENT = Viewport
 		};
+
+		enum class OpenGLShaderIntegerNameEnum
+		{
+			ShaderType,
+			DeleteStatus,
+			CompileStatus,
+			InfoLogLength,
+			ShaderSourceLength,
+
+			MAX_ELEMENT = ShaderSourceLength
+		};
 	}
 }
 

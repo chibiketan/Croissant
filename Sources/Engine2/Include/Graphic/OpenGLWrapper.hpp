@@ -65,6 +65,7 @@ namespace Croissant
 		using glMapBuffer_t = void* (APIENTRY *)(GLenum, GLenum);
 		using glUnmapBuffer_t = GLboolean (APIENTRY *)(GLenum);
 		using glCompileShader_t = void (APIENTRY *)(GLuint);
+		using glGetShaderiv_t = void (APIENTRY *)(GLuint, GLenum, GLint*);
 
 		// ---------------------------------------- fin alias pour OpenGL
 
@@ -108,6 +109,7 @@ namespace Croissant
 			GLboolean	UnmapBuffer(GLenum target) const;
 			int32_t		GetInteger(OpenGLValueNameEnum valueName) const;
 			void		CompileShader(uint32_t shaderId) const;
+			int32_t		GetShaderInteger(uint32_t shaderId, OpenGLShaderIntegerNameEnum name) const;
 
 		private:
 			Core::LogManager&			m_logManager;
@@ -145,7 +147,9 @@ namespace Croissant
 			glMapBuffer_t				ext_glMapBuffer = nullptr;
 			glUnmapBuffer_t				ext_glUnmapBuffer = nullptr;
 			glCompileShader_t			ext_glCompileShader = nullptr;
+			glGetShaderiv_t				ext_glGetShaderiv = nullptr;
 			static GLenum				s_valueNames[static_cast<int>(OpenGLValueNameEnum::MAX_ELEMENT) + 1];
+			static GLenum				s_shaderIntegerNames[static_cast<int>(OpenGLShaderIntegerNameEnum::MAX_ELEMENT) + 1];
 		};
 	}
 }

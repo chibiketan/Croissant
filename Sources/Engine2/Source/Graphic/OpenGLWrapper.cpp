@@ -1,6 +1,7 @@
 #include "..\..\Include\Graphic\OpenGLWrapper.hpp"
 #include "..\..\Include\Graphic\OpenGLWrapper.hpp"
 #include "..\..\Include\Graphic\OpenGLWrapper.hpp"
+#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
 /*
  * OpenGLWrapper.cpp
  *
@@ -51,6 +52,7 @@
 #define GLFUNCINDEX_SHADER_SOURCE			27
 #define GLFUNCINDEX_ATTACH_SHADER			28
 #define GLFUNCINDEX_COMPILE_SHADER			29
+#define	GLFUNCINDEX_GET_SHADER_IV			30
 
 using OpenGLRendererException = Croissant::Exception::CroissantException;
 
@@ -573,6 +575,28 @@ namespace Croissant
 				}
 			}
 
+			template<>
+			inline void glThrowOnError<GLFUNCINDEX_GET_SHADER_IV>(GLint err)
+			{
+				switch (err)
+				{
+				case GL_NO_ERROR:
+					break;
+				case GL_INVALID_VALUE:
+					throw OpenGLRendererException("Erreur lors de l'appel à glGetShaderiv : l'identifiant de shader n'existe pas.");
+					break;
+				case GL_INVALID_OPERATION:
+					throw OpenGLRendererException("Erreur lors de l'appel à glGetShaderiv : L'identifiant n'est pas celui d'un shader.");
+					break;
+				case GL_INVALID_ENUM:
+					throw OpenGLRendererException("Erreur lors de l'appel à glGetShaderiv : La valeur du paramète pname n'existe pas.");
+					break;
+				default:
+					throw OpenGLRendererException("Erreur lors de l'appel à glGetShaderiv : Erreur non identifiée.");
+					break;
+				}
+			}
+
 			using LogManager = Croissant::Core::LogManager;
 			using string = std::string;
 
@@ -739,6 +763,7 @@ namespace Croissant
 			ext_glMapBuffer = LoadGLSymbol<glMapBuffer_t>("glMapBuffer");
 			ext_glUnmapBuffer = LoadGLSymbol<glUnmapBuffer_t>("glUnmapBuffer");
 			ext_glCompileShader = LoadGLSymbol<glCompileShader_t>("glCompileShader");
+			ext_glGetShaderiv = LoadGLSymbol<glGetShaderiv_t>("glGetShaderiv");
 
 			int NumberOfExtensions;
 			glGetIntegerv(GL_NUM_EXTENSIONS, &NumberOfExtensions);
@@ -986,6 +1011,15 @@ namespace Croissant
 			glCheckForError<GLFUNCINDEX_COMPILE_SHADER>(*this);
 		}
 
+		int32_t OpenGLWrapper::GetShaderInteger(uint32_t shaderId, OpenGLShaderIntegerNameEnum name) const
+		{
+			int32_t val;
+
+			ext_glGetShaderiv(shaderId, s_shaderIntegerNames[static_cast<size_t>(name)], &val);
+			glCheckForError<GLFUNCINDEX_GET_SHADER_IV>(*this);
+			return val;
+		}
+
 		GLenum OpenGLWrapper::s_valueNames[] {
 				GL_ACTIVE_TEXTURE,					// ActiveTexture
 				GL_ALIASED_LINE_WIDTH_RANGE,		// AliasedLineWidthRange
@@ -1166,6 +1200,14 @@ namespace Croissant
 				GL_MINOR_VERSION,								// MinorVersion,
 				GL_CONTEXT_FLAGS,								// ContextFlags,
 				GL_VIEWPORT										// Viewport
+		};
+
+		GLenum OpenGLWrapper::s_shaderIntegerNames[]{
+			GL_SHADER_TYPE,				// ShaderType
+			GL_DELETE_STATUS,			// DeleteStatus
+			GL_COMPILE_STATUS,			// CompileStatus
+			GL_INFO_LOG_LENGTH,			// InfoLogLength
+			GL_SHADER_SOURCE_LENGTH	// ShaderSourceLength
 		};
 	} // !namespace Graphic
 } // !namespace Croissant
