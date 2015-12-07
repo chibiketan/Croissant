@@ -132,11 +132,15 @@ void main()
 			throw std::exception("Erreur lors de la compilation du fragment shader");
 		}
 
-		// TODO : glBindAttribLocation pour associer les attributs des vertex à des valeurs
+		// on associe à chaque nom de variable des shader un index pour y faire référence plus tard à partir du vertexbuffer 
+		opengl.BindAttribLocation(programId, 0, "VertexPosition");
+		
+		// on marque les shader comme à attacher au programme
 		opengl.AttachShader(programId, fragmentShaderId);
 		opengl.AttachShader(programId, vertexShaderId);
 
-		// TODO : glLinkProgram pour associer définitivement les shader au programme
+		// on lie le programme et les shaders
+		opengl.LinkProgram(programId);
 		// TODO : glGetProgramiv(program, GL_LINK_STATUS, &program_linked); pour vérifier que la commande linkprogram est OK
 
 		// TODO : configurer les sommets pour l'affichage

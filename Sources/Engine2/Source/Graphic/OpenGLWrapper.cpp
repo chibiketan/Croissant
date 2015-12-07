@@ -2,6 +2,8 @@
 #include "..\..\Include\Graphic\OpenGLWrapper.hpp"
 #include "..\..\Include\Graphic\OpenGLWrapper.hpp"
 #include "..\..\Include\Graphic\OpenGLWrapper.hpp"
+#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
+#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
 /*
  * OpenGLWrapper.cpp
  *
@@ -53,6 +55,8 @@
 #define GLFUNCINDEX_ATTACH_SHADER			28
 #define GLFUNCINDEX_COMPILE_SHADER			29
 #define	GLFUNCINDEX_GET_SHADER_IV			30
+#define GLFUNCINDEX_BIND_ATTRIB_LOCATION	31
+#define GLFUNCINDEX_LINK_PROGRAM			32
 
 using OpenGLRendererException = Croissant::Exception::CroissantException;
 
@@ -597,6 +601,44 @@ namespace Croissant
 				}
 			}
 
+			template<>
+			inline void glThrowOnError<GLFUNCINDEX_BIND_ATTRIB_LOCATION>(GLint err)
+			{
+				switch (err)
+				{
+				case GL_NO_ERROR:
+					break;
+				case GL_INVALID_VALUE:
+					throw OpenGLRendererException("Erreur lors de l'appel à glBindAttribLocation : l'identifiant de programme n'existe pas ou l'index est plus grand que la valeur de GL_MAX_VERTEX_ATTRIBS.");
+					break;
+				case GL_INVALID_OPERATION:
+					throw OpenGLRendererException("Erreur lors de l'appel à glBindAttribLocation : Le nom commence part 'gl_' ce qui est interdit ou l'identifiant de programme n'est pas celui d'un programme.");
+					break;
+				default:
+					throw OpenGLRendererException("Erreur lors de l'appel à glBindAttribLocation : Erreur non identifiée.");
+					break;
+				}
+			}
+
+			template<>
+			inline void glThrowOnError<GLFUNCINDEX_LINK_PROGRAM>(GLint err)
+			{
+				switch (err)
+				{
+				case GL_NO_ERROR:
+					break;
+				case GL_INVALID_VALUE:
+					throw OpenGLRendererException("Erreur lors de l'appel à glLinkProgram : l'identifiant de programme n'existe pas.");
+					break;
+				case GL_INVALID_OPERATION:
+					throw OpenGLRendererException("Erreur lors de l'appel à glLinkProgram : l'identifiant de programme n'est pas celui d'un programme ou le programme est actuellement le programme actif et le mode de retour sur transformation est activé.");
+					break;
+				default:
+					throw OpenGLRendererException("Erreur lors de l'appel à glLinkProgram : Erreur non identifiée.");
+					break;
+				}
+			}
+
 			using LogManager = Croissant::Core::LogManager;
 			using string = std::string;
 
@@ -742,7 +784,6 @@ namespace Croissant
 			ext_glLinkProgram = LoadGLSymbol<glLinkProgram_t>("glLinkProgram");
 			ext_glAttachShader = LoadGLSymbol<glAttachShader_t>("glAttachShader");
 			ext_glShaderSource = LoadGLSymbol<glShaderSource_t>("glShaderSource");
-			ext_glBindAttribLocation = LoadGLSymbol<glBindAttribLocation_t>("glBindAttribLocation");
 			ext_glUseProgram = LoadGLSymbol<glUseProgram_t>("glUseProgram");
 			ext_glDeleteProgram = LoadGLSymbol<glDeleteProgram_t>("glDeleteProgram");;
 			ext_glDeleteShader = LoadGLSymbol<glDeleteShader_t>("glDeleteShader");;
@@ -764,6 +805,7 @@ namespace Croissant
 			ext_glUnmapBuffer = LoadGLSymbol<glUnmapBuffer_t>("glUnmapBuffer");
 			ext_glCompileShader = LoadGLSymbol<glCompileShader_t>("glCompileShader");
 			ext_glGetShaderiv = LoadGLSymbol<glGetShaderiv_t>("glGetShaderiv");
+			ext_glBindAttribLocation = LoadGLSymbol<glBindAttribLocation_t>("glBindAttribLocation");
 
 			int NumberOfExtensions;
 			glGetIntegerv(GL_NUM_EXTENSIONS, &NumberOfExtensions);
@@ -841,6 +883,12 @@ namespace Croissant
 
 			glCheckForError<GLFUNCINDEX_CREATE_PROGRAM>(*this);
 			return programId;
+		}
+
+		void OpenGLWrapper::LinkProgram(uint32_t programId) const
+		{
+			ext_glLinkProgram(programId);
+			glCheckForError<GLFUNCINDEX_LINK_PROGRAM>(*this);
 		}
 
 		void OpenGLWrapper::AttachShader(uint32_t programId, uint32_t shaderId) const
@@ -1018,6 +1066,12 @@ namespace Croissant
 			ext_glGetShaderiv(shaderId, s_shaderIntegerNames[static_cast<size_t>(name)], &val);
 			glCheckForError<GLFUNCINDEX_GET_SHADER_IV>(*this);
 			return val;
+		}
+
+		void OpenGLWrapper::BindAttribLocation(uint32_t programId, uint32_t index, std::string const & name) const
+		{
+			ext_glBindAttribLocation(programId, index, name.c_str());
+			glCheckForError<GLFUNCINDEX_BIND_ATTRIB_LOCATION>(*this);
 		}
 
 		GLenum OpenGLWrapper::s_valueNames[] {
