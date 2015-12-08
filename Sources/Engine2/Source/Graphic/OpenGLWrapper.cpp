@@ -4,6 +4,7 @@
 #include "..\..\Include\Graphic\OpenGLWrapper.hpp"
 #include "..\..\Include\Graphic\OpenGLWrapper.hpp"
 #include "..\..\Include\Graphic\OpenGLWrapper.hpp"
+#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
 /*
  * OpenGLWrapper.cpp
  *
@@ -57,6 +58,7 @@
 #define	GLFUNCINDEX_GET_SHADER_IV			30
 #define GLFUNCINDEX_BIND_ATTRIB_LOCATION	31
 #define GLFUNCINDEX_LINK_PROGRAM			32
+#define GLFUNCINDEX_GET_PROGRAM_IV			33
 
 using OpenGLRendererException = Croissant::Exception::CroissantException;
 
@@ -639,6 +641,28 @@ namespace Croissant
 				}
 			}
 
+			template<>
+			inline void glThrowOnError<GLFUNCINDEX_GET_PROGRAM_IV>(GLint err)
+			{
+				switch (err)
+				{
+				case GL_NO_ERROR:
+					break;
+				case GL_INVALID_VALUE:
+					throw OpenGLRendererException("Erreur lors de l'appel à glGetProgramiv : l'identifiant de programme n'existe pas.");
+					break;
+				case GL_INVALID_OPERATION:
+					throw OpenGLRendererException("Erreur lors de l'appel à glGetProgramiv : l'identifiant de programme n'est pas celui d'un programme ou le programme ne contient pas de geomtry shader pour les names GL_GEOMETRY_VERTICES_OUT, GL_GEOMETRY_INPUT_TYPE, or GL_GEOMETRY_OUTPUT_TYPE.");
+					break;
+				case GL_INVALID_ENUM:
+					throw OpenGLRendererException("Erreur lors de l'appel à glGetProgramiv : La valeur du paramète name n'existe pas.");
+					break;
+				default:
+					throw OpenGLRendererException("Erreur lors de l'appel à glGetProgramiv : Erreur non identifiée.");
+					break;
+				}
+			}
+
 			using LogManager = Croissant::Core::LogManager;
 			using string = std::string;
 
@@ -806,6 +830,7 @@ namespace Croissant
 			ext_glCompileShader = LoadGLSymbol<glCompileShader_t>("glCompileShader");
 			ext_glGetShaderiv = LoadGLSymbol<glGetShaderiv_t>("glGetShaderiv");
 			ext_glBindAttribLocation = LoadGLSymbol<glBindAttribLocation_t>("glBindAttribLocation");
+			ext_glGetProgramiv = LoadGLSymbol<glGetProgramiv_t>("glGetProgramiv");
 
 			int NumberOfExtensions;
 			glGetIntegerv(GL_NUM_EXTENSIONS, &NumberOfExtensions);
@@ -1074,6 +1099,15 @@ namespace Croissant
 			glCheckForError<GLFUNCINDEX_BIND_ATTRIB_LOCATION>(*this);
 		}
 
+		int32_t OpenGLWrapper::GetProgramInteger(uint32_t programId, OpenGLProgramIntegerNameEnum name) const
+		{
+			int32_t result;
+
+			ext_glGetProgramiv(programId, s_programIntegerNames[static_cast<size_t>(name)], &result);
+			glCheckForError<GLFUNCINDEX_GET_PROGRAM_IV>(*this);
+			return result;
+		}
+
 		GLenum OpenGLWrapper::s_valueNames[] {
 				GL_ACTIVE_TEXTURE,					// ActiveTexture
 				GL_ALIASED_LINE_WIDTH_RANGE,		// AliasedLineWidthRange
@@ -1261,7 +1295,28 @@ namespace Croissant
 			GL_DELETE_STATUS,			// DeleteStatus
 			GL_COMPILE_STATUS,			// CompileStatus
 			GL_INFO_LOG_LENGTH,			// InfoLogLength
-			GL_SHADER_SOURCE_LENGTH	// ShaderSourceLength
+			GL_SHADER_SOURCE_LENGTH		// ShaderSourceLength
 		};
+
+		GLenum OpenGLWrapper::s_programIntegerNames[]{
+			GL_DELETE_STATUS,							//
+			GL_LINK_STATUS,								//
+			GL_VALIDATE_STATUS,							//
+			GL_INFO_LOG_LENGTH,							//
+			GL_ATTACHED_SHADERS,						//
+			GL_ACTIVE_ATTRIBUTES,						//
+			GL_ACTIVE_ATTRIBUTE_MAX_LENGTH,				//
+			GL_ACTIVE_UNIFORMS,							//
+			GL_ACTIVE_UNIFORM_BLOCKS,					//
+			GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH,	//
+			GL_ACTIVE_UNIFORM_MAX_LENGTH,				//
+			GL_TRANSFORM_FEEDBACK_BUFFER_MODE,			//
+			GL_TRANSFORM_FEEDBACK_VARYINGS,				//
+			GL_TRANSFORM_FEEDBACK_VARYING_MAX_LENGTH,	//
+			GL_GEOMETRY_VERTICES_OUT,					//
+			GL_GEOMETRY_INPUT_TYPE,						//
+			GL_GEOMETRY_OUTPUT_TYPE						//
+		};
+
 	} // !namespace Graphic
 } // !namespace Croissant

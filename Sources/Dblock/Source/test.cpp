@@ -139,9 +139,16 @@ void main()
 		opengl.AttachShader(programId, fragmentShaderId);
 		opengl.AttachShader(programId, vertexShaderId);
 
-		// on lie le programme et les shaders
+		// on lie le programme et les shaders (création du programme dans la CG)
 		opengl.LinkProgram(programId);
-		// TODO : glGetProgramiv(program, GL_LINK_STATUS, &program_linked); pour vérifier que la commande linkprogram est OK
+		auto programLinked = opengl.GetProgramInteger(programId, Croissant::Graphic::OpenGLProgramIntegerNameEnum::LinkStatus);
+
+		if (programLinked == 0)
+		{
+			throw std::exception("Une erreur est survenue lors de l'étape de linkage du programme.");
+		}
+
+		// TODO supprimer les shaders ?
 
 		// TODO : configurer les sommets pour l'affichage
 		// TODO : 

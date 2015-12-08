@@ -200,6 +200,29 @@ namespace Croissant
 
 			MAX_ELEMENT = ShaderSourceLength
 		};
+
+		enum class OpenGLProgramIntegerNameEnum
+		{
+			DeleteStatus,
+			LinkStatus,
+			ValidateStatus,
+			InfoLogLength,
+			AttachedShaders,
+			ActiveAttributes,
+			ActiveAttributeMaxLength,
+			ActiveUniforms,
+			ActiveUniformBlocks,
+			ActiveUniformBlockMaxNameLength,
+			ActiveUniformMaxLength,
+			TransformFeedbackBufferMode,
+			TransformFeedbackVaryings,
+			TransformFeedbackVaryingMaxLength,
+			GeometryVerticesOut,
+			GeometryInputType,
+			GeometryOutputType,
+
+			MAX_ELEMENT = GeometryOutputType
+		};
 	}
 }
 

@@ -66,6 +66,7 @@ namespace Croissant
 		using glCompileShader_t = void (APIENTRY *)(GLuint);
 		using glGetShaderiv_t = void (APIENTRY *)(GLuint, GLenum, GLint*);
 		using glBindAttribLocation_t = void (APIENTRY *)(GLuint, GLuint, GLchar const*);
+		using glGetProgramiv_t = void (APIENTRY *)(GLuint, GLenum, GLint*);
 
 		// ---------------------------------------- fin alias pour OpenGL
 
@@ -111,6 +112,7 @@ namespace Croissant
 			int32_t		GetShaderInteger(uint32_t shaderId, OpenGLShaderIntegerNameEnum name) const;
 			/// <summary>Bind a named variable to an index for use into shader</summary>
 			void		BindAttribLocation(uint32_t programId, uint32_t index, std::string const& name) const;
+			int32_t		GetProgramInteger(uint32_t programId, OpenGLProgramIntegerNameEnum name) const;
 
 		private:
 			Core::LogManager&			m_logManager;
@@ -149,8 +151,10 @@ namespace Croissant
 			glCompileShader_t			ext_glCompileShader = nullptr;
 			glGetShaderiv_t				ext_glGetShaderiv = nullptr;
 			glBindAttribLocation_t		ext_glBindAttribLocation = nullptr;
+			glGetProgramiv_t			ext_glGetProgramiv = nullptr;
 			static GLenum				s_valueNames[static_cast<int>(OpenGLValueNameEnum::MAX_ELEMENT) + 1];
 			static GLenum				s_shaderIntegerNames[static_cast<int>(OpenGLShaderIntegerNameEnum::MAX_ELEMENT) + 1];
+			static GLenum				s_programIntegerNames[static_cast<int>(OpenGLProgramIntegerNameEnum::MAX_ELEMENT) + 1];
 		};
 	}
 }
