@@ -111,31 +111,6 @@ namespace Croissant
 			m_wrapper.BindBuffer(GL_ARRAY_BUFFER, 0);
 			indexesSize = sizeof(indexes);
 
-			programId = m_wrapper.CreateProgram();
-
-			if (0u == programId)
-			{
-				throw Croissant::Exception::CroissantException("Impossible de créer un programme openGL");
-			}
-
-			vertexShaderId = m_wrapper.CreateShader(GL_VERTEX_SHADER);
-
-			if (0 == vertexShaderId)
-			{
-				throw Croissant::Exception::CroissantException("Impossible de créer un vertex shader");
-			}
-
-			pixelShaderId = m_wrapper.CreateShader(GL_FRAGMENT_SHADER);
-
-			if (0 == pixelShaderId)
-			{
-				throw Croissant::Exception::CroissantException("Impossible de créer un fragment shader");
-			}
-
-
-
-
-
 		}
 
 
@@ -280,7 +255,7 @@ namespace Croissant
 			lastFrameTime = currentFrameTime;
 
 
-			m_logManager.Write("call to render");
+			//m_logManager.Write("call to render");
 			static float pos = 0.0f;
 			static UINT64 frameCount = 0ull;
 
@@ -302,60 +277,60 @@ namespace Croissant
 		    latitude2 += (-120 * secondSinceFirstFrame.count());
 		    longitude2 += (-120 * secondSinceFirstFrame.count());
 		    //}
-		    m_wrapper.Clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-		    m_wrapper.PushMatrix();
+		    //m_wrapper.Clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+		    //m_wrapper.PushMatrix();
 
-		        polarView( radius, 0, latitude, longitude );
+		    //    polarView( radius, 0, latitude, longitude );
 
-		        m_wrapper.BindBuffer(GL_ARRAY_BUFFER, verticesBufferId);
-		        m_wrapper.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexesBufferId);
+		        //m_wrapper.BindBuffer(GL_ARRAY_BUFFER, verticesBufferId);
+		        //m_wrapper.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexesBufferId);
 
-		        m_wrapper.EnableClientState(GL_VERTEX_ARRAY);
-		        m_wrapper.EnableClientState(GL_COLOR_ARRAY);
+		        //m_wrapper.EnableClientState(GL_VERTEX_ARRAY);
+		        //m_wrapper.EnableClientState(GL_COLOR_ARRAY);
 
-		        m_wrapper.VertexPointer(3, GL_FLOAT, sizeof(vertexProp), 0);
-		        m_wrapper.ColorPointer(3, GL_UNSIGNED_BYTE, sizeof(vertexProp), BUFFER_OFFSET(sizeof(vertexProp::m_coord)));
+		        //m_wrapper.VertexPointer(3, GL_FLOAT, sizeof(vertexProp), 0);
+		        //m_wrapper.ColorPointer(3, GL_UNSIGNED_BYTE, sizeof(vertexProp), BUFFER_OFFSET(sizeof(vertexProp::m_coord)));
 
-		        m_wrapper.PolygonMode(GL_FRONT, GL_LINE);
-		        m_wrapper.DrawElements(GL_TRIANGLES, static_cast<GLsizei>(indexesSize), GL_UNSIGNED_INT, 0);
-		        m_wrapper.PolygonMode(GL_FRONT, GL_FILL);
+		        //m_wrapper.PolygonMode(GL_FRONT, GL_LINE);
+		        //m_wrapper.DrawElements(GL_TRIANGLES, static_cast<GLsizei>(indexesSize), GL_UNSIGNED_INT, 0);
+		        //m_wrapper.PolygonMode(GL_FRONT, GL_FILL);
 
-		        m_wrapper.DisableClientState(GL_COLOR_ARRAY);
-		        m_wrapper.DisableClientState(GL_VERTEX_ARRAY);
+		        //m_wrapper.DisableClientState(GL_COLOR_ARRAY);
+		        //m_wrapper.DisableClientState(GL_VERTEX_ARRAY);
 
-		        m_wrapper.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		        m_wrapper.BindBuffer(GL_ARRAY_BUFFER, 0);
-
-
-
-		    m_wrapper.PopMatrix();
-
-		    m_wrapper.PushMatrix();
-
-		        polarView( radius + 2, 0, latitude2, longitude2 );
-
-		        m_wrapper.BindBuffer(GL_ARRAY_BUFFER, verticesBufferId);
-		        m_wrapper.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexesBufferId);
-
-		        m_wrapper.EnableClientState(GL_VERTEX_ARRAY);
-		        m_wrapper.EnableClientState(GL_COLOR_ARRAY);
-
-		        m_wrapper.VertexPointer(3, GL_FLOAT, sizeof(vertexProp), 0);
-		        m_wrapper.ColorPointer(3, GL_UNSIGNED_BYTE, sizeof(vertexProp), BUFFER_OFFSET(sizeof(vertexProp::m_coord)));
-
-		        m_wrapper.PolygonMode(GL_FRONT, GL_FILL);
-		        m_wrapper.DrawElements(GL_TRIANGLES, static_cast<GLsizei>(indexesSize), GL_UNSIGNED_INT, 0);
-		        m_wrapper.PolygonMode(GL_FRONT, GL_FILL);
-
-		        m_wrapper.DisableClientState(GL_COLOR_ARRAY);
-		        m_wrapper.DisableClientState(GL_VERTEX_ARRAY);
-
-		        m_wrapper.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		        m_wrapper.BindBuffer(GL_ARRAY_BUFFER, 0);
+		        //m_wrapper.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		        //m_wrapper.BindBuffer(GL_ARRAY_BUFFER, 0);
 
 
 
-		    m_wrapper.PopMatrix();
+		    //m_wrapper.PopMatrix();
+
+		    //m_wrapper.PushMatrix();
+
+		    //    polarView( radius + 2, 0, latitude2, longitude2 );
+
+		    //    m_wrapper.BindBuffer(GL_ARRAY_BUFFER, verticesBufferId);
+		    //    m_wrapper.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexesBufferId);
+
+		    //    m_wrapper.EnableClientState(GL_VERTEX_ARRAY);
+		    //    m_wrapper.EnableClientState(GL_COLOR_ARRAY);
+
+		    //    m_wrapper.VertexPointer(3, GL_FLOAT, sizeof(vertexProp), 0);
+		    //    m_wrapper.ColorPointer(3, GL_UNSIGNED_BYTE, sizeof(vertexProp), BUFFER_OFFSET(sizeof(vertexProp::m_coord)));
+
+		    //    m_wrapper.PolygonMode(GL_FRONT, GL_FILL);
+		    //    m_wrapper.DrawElements(GL_TRIANGLES, static_cast<GLsizei>(indexesSize), GL_UNSIGNED_INT, 0);
+		    //    m_wrapper.PolygonMode(GL_FRONT, GL_FILL);
+
+		    //    m_wrapper.DisableClientState(GL_COLOR_ARRAY);
+		    //    m_wrapper.DisableClientState(GL_VERTEX_ARRAY);
+
+		    //    m_wrapper.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		    //    m_wrapper.BindBuffer(GL_ARRAY_BUFFER, 0);
+
+
+
+		    //m_wrapper.PopMatrix();
 
 		    SWAPBUFFERS;
 		    //first_frame = false;

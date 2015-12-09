@@ -40,7 +40,6 @@ namespace Croissant
 		using glLinkProgram_t = void (APIENTRY *)(GLuint);
 		using glAttachShader_t = void (APIENTRY *)(GLuint, GLuint);
 		using glShaderSource_t = void (APIENTRY *)(GLuint, GLsizei, GLchar const**, GLint const*);
-		using glUseProgram_t = void (APIENTRY *)(GLuint);
 		using glDeleteProgram_t = void (APIENTRY *)(GLuint);
 		using glDeleteShader_t = void (APIENTRY *)(GLuint);
 		using glDetachShader_t = void (APIENTRY *)(GLuint, GLuint);
@@ -67,6 +66,9 @@ namespace Croissant
 		using glGetShaderiv_t = void (APIENTRY *)(GLuint, GLenum, GLint*);
 		using glBindAttribLocation_t = void (APIENTRY *)(GLuint, GLuint, GLchar const*);
 		using glGetProgramiv_t = void (APIENTRY *)(GLuint, GLenum, GLint*);
+		using glUseProgram_t = void (APIENTRY *)(GLuint);
+		using glEnableVertexAttribArray_t = void (APIENTRY *)(GLuint);
+		using glDisableVertexAttribArray_t = void (APIENTRY *)(GLuint);
 
 		// ---------------------------------------- fin alias pour OpenGL
 
@@ -83,7 +85,6 @@ namespace Croissant
 			void		LinkProgram(uint32_t programId) const;
 			void		AttachShader(uint32_t programId, uint32_t shaderId) const;
 			void		ShaderSource(uint32_t shaderId, std::string const& source) const;
-			void		UseProgram(uint32_t programId) const;
 			void		DeleteProgram(uint32_t programId) const;
 			void		DeleteShader(uint32_t shaderId) const;
 			void		DetachShader(uint32_t programId, uint32_t shaderId) const;
@@ -113,48 +114,53 @@ namespace Croissant
 			/// <summary>Bind a named variable to an index for use into shader</summary>
 			void		BindAttribLocation(uint32_t programId, uint32_t index, std::string const& name) const;
 			int32_t		GetProgramInteger(uint32_t programId, OpenGLProgramIntegerNameEnum name) const;
+			void		UseProgram(uint32_t programId) const;
+			void		EnableVertexAttribArray(uint32_t index) const;
+			void		DisableVertexAttribArray(uint32_t index) const;
 
 		private:
-			Core::LogManager&			m_logManager;
+			Core::LogManager&				m_logManager;
 
-			mutable GLint				m_lastGLError = 0;
-			glBindBuffer_t				ext_glBindBuffer = nullptr;
-			glGenBuffers_t				ext_glGenBuffers = nullptr;
-			glBufferData_t				ext_glBufferData = nullptr;
-			glDebugMessageCallbackARB_t	ext_glDebugMessageCallbackARB = nullptr;
-			glDeleteBuffers_t			ext_glDeleteBuffers = nullptr;
-			wglSwapIntervalEXT_t		ext_wglSwapIntervalEXT = nullptr;
-			glCreateShader_t			ext_glCreateShader = nullptr;
-			glCreateProgram_t			ext_glCreateProgram = nullptr;
-			glLinkProgram_t				ext_glLinkProgram = nullptr;
-			glAttachShader_t			ext_glAttachShader = nullptr;
-			glShaderSource_t			ext_glShaderSource = nullptr;
-			glUseProgram_t 				ext_glUseProgram = nullptr;
-			glDeleteProgram_t			ext_glDeleteProgram = nullptr;
-			glDeleteShader_t			ext_glDeleteShader = nullptr;
-			glDetachShader_t			ext_glDetachShader = nullptr;
-			glGetStringi_t				ext_glGetStringi = nullptr;
-			glClearIndex_t				ext_glClearIndex = nullptr;
-			glClearDepth_t				ext_glClearDepth = nullptr;
-			glMatrixMode_t				ext_glMatrixMode = nullptr;
-			glClear_t					ext_glClear = nullptr;
-			glPushMatrix_t				ext_glPushMatrix = nullptr;
-			glPopMatrix_t				ext_glPopMatrix = nullptr;
-			glEnableClientState_t		ext_glEnableClientState = nullptr;
-			glDisableClientState_t		ext_glDisableClientState = nullptr;
-			glVertexPointer_t			ext_glVertexPointer = nullptr;
-			glColorPointer_t			ext_glColorPointer = nullptr;
-			glPolygonMode_t				ext_glPolygonMode = nullptr;
-			glDrawElements_t			ext_glDrawElements = nullptr;
-			glMapBuffer_t				ext_glMapBuffer = nullptr;
-			glUnmapBuffer_t				ext_glUnmapBuffer = nullptr;
-			glCompileShader_t			ext_glCompileShader = nullptr;
-			glGetShaderiv_t				ext_glGetShaderiv = nullptr;
-			glBindAttribLocation_t		ext_glBindAttribLocation = nullptr;
-			glGetProgramiv_t			ext_glGetProgramiv = nullptr;
-			static GLenum				s_valueNames[static_cast<int>(OpenGLValueNameEnum::MAX_ELEMENT) + 1];
-			static GLenum				s_shaderIntegerNames[static_cast<int>(OpenGLShaderIntegerNameEnum::MAX_ELEMENT) + 1];
-			static GLenum				s_programIntegerNames[static_cast<int>(OpenGLProgramIntegerNameEnum::MAX_ELEMENT) + 1];
+			mutable GLint					m_lastGLError = 0;
+			glBindBuffer_t					ext_glBindBuffer = nullptr;
+			glGenBuffers_t					ext_glGenBuffers = nullptr;
+			glBufferData_t					ext_glBufferData = nullptr;
+			glDebugMessageCallbackARB_t		ext_glDebugMessageCallbackARB = nullptr;
+			glDeleteBuffers_t				ext_glDeleteBuffers = nullptr;
+			wglSwapIntervalEXT_t			ext_wglSwapIntervalEXT = nullptr;
+			glCreateShader_t				ext_glCreateShader = nullptr;
+			glCreateProgram_t				ext_glCreateProgram = nullptr;
+			glLinkProgram_t					ext_glLinkProgram = nullptr;
+			glAttachShader_t				ext_glAttachShader = nullptr;
+			glShaderSource_t				ext_glShaderSource = nullptr;
+			glDeleteProgram_t				ext_glDeleteProgram = nullptr;
+			glDeleteShader_t				ext_glDeleteShader = nullptr;
+			glDetachShader_t				ext_glDetachShader = nullptr;
+			glGetStringi_t					ext_glGetStringi = nullptr;
+			glClearIndex_t					ext_glClearIndex = nullptr;
+			glClearDepth_t					ext_glClearDepth = nullptr;
+			glMatrixMode_t					ext_glMatrixMode = nullptr;
+			glClear_t						ext_glClear = nullptr;
+			glPushMatrix_t					ext_glPushMatrix = nullptr;
+			glPopMatrix_t					ext_glPopMatrix = nullptr;
+			glEnableClientState_t			ext_glEnableClientState = nullptr;
+			glDisableClientState_t			ext_glDisableClientState = nullptr;
+			glVertexPointer_t				ext_glVertexPointer = nullptr;
+			glColorPointer_t				ext_glColorPointer = nullptr;
+			glPolygonMode_t					ext_glPolygonMode = nullptr;
+			glDrawElements_t				ext_glDrawElements = nullptr;
+			glMapBuffer_t					ext_glMapBuffer = nullptr;
+			glUnmapBuffer_t					ext_glUnmapBuffer = nullptr;
+			glCompileShader_t				ext_glCompileShader = nullptr;
+			glGetShaderiv_t					ext_glGetShaderiv = nullptr;
+			glBindAttribLocation_t			ext_glBindAttribLocation = nullptr;
+			glGetProgramiv_t				ext_glGetProgramiv = nullptr;
+			glUseProgram_t					ext_glUseProgram = nullptr;
+			glEnableVertexAttribArray_t		ext_glEnableVertexAttribArray = nullptr;
+			glDisableVertexAttribArray_t	ext_glDisableVertexAttribArray = nullptr;
+			static GLenum					s_valueNames[static_cast<int>(OpenGLValueNameEnum::MAX_ELEMENT) + 1];
+			static GLenum					s_shaderIntegerNames[static_cast<int>(OpenGLShaderIntegerNameEnum::MAX_ELEMENT) + 1];
+			static GLenum					s_programIntegerNames[static_cast<int>(OpenGLProgramIntegerNameEnum::MAX_ELEMENT) + 1];
 		};
 	}
 }

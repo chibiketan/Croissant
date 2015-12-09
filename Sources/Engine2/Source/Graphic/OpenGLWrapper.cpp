@@ -5,6 +5,9 @@
 #include "..\..\Include\Graphic\OpenGLWrapper.hpp"
 #include "..\..\Include\Graphic\OpenGLWrapper.hpp"
 #include "..\..\Include\Graphic\OpenGLWrapper.hpp"
+#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
+#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
+#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
 /*
  * OpenGLWrapper.cpp
  *
@@ -25,40 +28,43 @@
 #define DUMMY_WINDOW_CLASS_NAME             "oglversionchecksample"
 #define LOGGER_NAME "OpenGL"
 
-#define GLFUNCINDEX_GEN_BUFFERS				 0
-#define GLFUNCINDEX_CLEAR_INDEX				 1
-#define GLFUNCINDEX_BIND_BUFFER				 2
-#define GLFUNCINDEX_BUFFER_DATA				 3
-#define GLFUNCINDEX_CREATE_PROGRAM			 4
-#define GLFUNCINDEX_CREATE_SHADER			 5
-#define GLFUNCINDEX_CLEAR_DEPTH				 6
-#define GLFUNCINDEX_ENABLE					 7
-#define GLFUNCINDEX_MATRIX_MODEL			 8
-#define GLFUNCINDEX_SWAP_INTERVAL			 9
-#define GLFUNCINDEX_DEBUG_MESSAGE_CALLBACK	10
-#define GLFUNCINDEX_ENABLE_CLIENT_STATE		11
-#define GLFUNCINDEX_VERTEX_POINTER			12
-#define GLFUNCINDEX_COLOR_POINTER			13
-#define GLFUNCINDEX_POLYGON_MODE			14
-#define GLFUNCINDEX_DRAW_ELEMENTS			15
-#define GLFUNCINDEX_DELETE_BUFFERS			16
-#define GLFUNCINDEX_DELETE_PROGRAM			17
-#define GLFUNCINDEX_DELETE_SHADER			18
-#define GLFUNCINDEX_MATRIX_MODE				19
-#define GLFUNCINDEX_CLEAR					20
-#define GLFUNCINDEX_PUSH_MATRIX				21
-#define GLFUNCINDEX_POP_MATRIX				22
-#define GLFUNCINDEX_DISABLE_CLIENT_STATE	23
-#define GLFUNCINDEX_MAP_BUFFER				24
-#define GLFUNCINDEX_UNMAP_BUFFER			25
-#define GLFUNCINDEX_GET_INTEGERV			26
-#define GLFUNCINDEX_SHADER_SOURCE			27
-#define GLFUNCINDEX_ATTACH_SHADER			28
-#define GLFUNCINDEX_COMPILE_SHADER			29
-#define	GLFUNCINDEX_GET_SHADER_IV			30
-#define GLFUNCINDEX_BIND_ATTRIB_LOCATION	31
-#define GLFUNCINDEX_LINK_PROGRAM			32
-#define GLFUNCINDEX_GET_PROGRAM_IV			33
+#define GLFUNCINDEX_GEN_BUFFERS					 0
+#define GLFUNCINDEX_CLEAR_INDEX					 1
+#define GLFUNCINDEX_BIND_BUFFER					 2
+#define GLFUNCINDEX_BUFFER_DATA					 3
+#define GLFUNCINDEX_CREATE_PROGRAM				 4
+#define GLFUNCINDEX_CREATE_SHADER				 5
+#define GLFUNCINDEX_CLEAR_DEPTH					 6
+#define GLFUNCINDEX_ENABLE						 7
+#define GLFUNCINDEX_MATRIX_MODEL				 8
+#define GLFUNCINDEX_SWAP_INTERVAL				 9
+#define GLFUNCINDEX_DEBUG_MESSAGE_CALLBACK		10
+#define GLFUNCINDEX_ENABLE_CLIENT_STATE			11
+#define GLFUNCINDEX_VERTEX_POINTER				12
+#define GLFUNCINDEX_COLOR_POINTER				13
+#define GLFUNCINDEX_POLYGON_MODE				14
+#define GLFUNCINDEX_DRAW_ELEMENTS				15
+#define GLFUNCINDEX_DELETE_BUFFERS				16
+#define GLFUNCINDEX_DELETE_PROGRAM				17
+#define GLFUNCINDEX_DELETE_SHADER				18
+#define GLFUNCINDEX_MATRIX_MODE					19
+#define GLFUNCINDEX_CLEAR						20
+#define GLFUNCINDEX_PUSH_MATRIX					21
+#define GLFUNCINDEX_POP_MATRIX					22
+#define GLFUNCINDEX_DISABLE_CLIENT_STATE		23
+#define GLFUNCINDEX_MAP_BUFFER					24
+#define GLFUNCINDEX_UNMAP_BUFFER				25
+#define GLFUNCINDEX_GET_INTEGERV				26
+#define GLFUNCINDEX_SHADER_SOURCE				27
+#define GLFUNCINDEX_ATTACH_SHADER				28
+#define GLFUNCINDEX_COMPILE_SHADER				29
+#define	GLFUNCINDEX_GET_SHADER_IV				30
+#define GLFUNCINDEX_BIND_ATTRIB_LOCATION		31
+#define GLFUNCINDEX_LINK_PROGRAM				32
+#define GLFUNCINDEX_GET_PROGRAM_IV				33
+#define GLFUNCINDEX_USE_PROGRAM					34
+#define GLFUNCINDEX_ENABLE_VERTEX_ATTRIB_ARRAY	35
+#define GLFUNCINDEX_DISABLE_VERTEX_ATTRIB_ARRAY	35
 
 using OpenGLRendererException = Croissant::Exception::CroissantException;
 
@@ -663,6 +669,57 @@ namespace Croissant
 				}
 			}
 
+			template<>
+			inline void glThrowOnError<GLFUNCINDEX_USE_PROGRAM>(GLint err)
+			{
+				switch (err)
+				{
+				case GL_NO_ERROR:
+					break;
+				case GL_INVALID_VALUE:
+					throw OpenGLRendererException("Erreur lors de l'appel à glUseProgram : l'identifiant de programme n'existe pas et ne vaut pas 0.");
+					break;
+				case GL_INVALID_OPERATION:
+					throw OpenGLRendererException("Erreur lors de l'appel à glUseProgram : l'identifiant de programme n'est pas celui d'un programme OU le programme ne peut pas être mis dans l'état courant OU le retour de transformation est activé.");
+					break;
+				default:
+					throw OpenGLRendererException("Erreur lors de l'appel à glUseProgram : Erreur non identifiée.");
+					break;
+				}
+			}
+
+			template<>
+			inline void glThrowOnError<GLFUNCINDEX_ENABLE_VERTEX_ATTRIB_ARRAY>(GLint err)
+			{
+				switch (err)
+				{
+				case GL_NO_ERROR:
+					break;
+				case GL_INVALID_VALUE:
+					throw OpenGLRendererException("Erreur lors de l'appel à glEnableVertexAttribArray : l'index est plus grand ou égal à la valeur de GL_MAX_VERTEX_ATTRIBS.");
+					break;
+				default:
+					throw OpenGLRendererException("Erreur lors de l'appel à glEnableVertexAttribArray : Erreur non identifiée.");
+					break;
+				}
+			}
+
+			template<>
+			inline void glThrowOnError<GLFUNCINDEX_DISABLE_VERTEX_ATTRIB_ARRAY>(GLint err)
+			{
+				switch (err)
+				{
+				case GL_NO_ERROR:
+					break;
+				case GL_INVALID_VALUE:
+					throw OpenGLRendererException("Erreur lors de l'appel à glDisableVertexAttribArray : l'index est plus grand ou égal à la valeur de GL_MAX_VERTEX_ATTRIBS.");
+					break;
+				default:
+					throw OpenGLRendererException("Erreur lors de l'appel à glDisableVertexAttribArray : Erreur non identifiée.");
+					break;
+				}
+			}
+
 			using LogManager = Croissant::Core::LogManager;
 			using string = std::string;
 
@@ -808,7 +865,6 @@ namespace Croissant
 			ext_glLinkProgram = LoadGLSymbol<glLinkProgram_t>("glLinkProgram");
 			ext_glAttachShader = LoadGLSymbol<glAttachShader_t>("glAttachShader");
 			ext_glShaderSource = LoadGLSymbol<glShaderSource_t>("glShaderSource");
-			ext_glUseProgram = LoadGLSymbol<glUseProgram_t>("glUseProgram");
 			ext_glDeleteProgram = LoadGLSymbol<glDeleteProgram_t>("glDeleteProgram");;
 			ext_glDeleteShader = LoadGLSymbol<glDeleteShader_t>("glDeleteShader");;
 			ext_glDetachShader = LoadGLSymbol<glDetachShader_t>("glDetachShader");;
@@ -831,6 +887,9 @@ namespace Croissant
 			ext_glGetShaderiv = LoadGLSymbol<glGetShaderiv_t>("glGetShaderiv");
 			ext_glBindAttribLocation = LoadGLSymbol<glBindAttribLocation_t>("glBindAttribLocation");
 			ext_glGetProgramiv = LoadGLSymbol<glGetProgramiv_t>("glGetProgramiv");
+			ext_glUseProgram = LoadGLSymbol<glUseProgram_t>("glUseProgram");
+			ext_glEnableVertexAttribArray = LoadGLSymbol<glEnableVertexAttribArray_t>("glEnableVertexAttribArray");
+			ext_glDisableVertexAttribArray = LoadGLSymbol<glDisableVertexAttribArray_t>("glDisableVertexAttribArray");
 
 			int NumberOfExtensions;
 			glGetIntegerv(GL_NUM_EXTENSIONS, &NumberOfExtensions);
@@ -1106,6 +1165,24 @@ namespace Croissant
 			ext_glGetProgramiv(programId, s_programIntegerNames[static_cast<size_t>(name)], &result);
 			glCheckForError<GLFUNCINDEX_GET_PROGRAM_IV>(*this);
 			return result;
+		}
+
+		void OpenGLWrapper::UseProgram(uint32_t programId) const
+		{
+			ext_glUseProgram(programId);
+			glCheckForError<GLFUNCINDEX_USE_PROGRAM>(*this);
+		}
+
+		void OpenGLWrapper::EnableVertexAttribArray(uint32_t index) const
+		{
+			ext_glEnableVertexAttribArray(index);
+			glCheckForError<GLFUNCINDEX_ENABLE_VERTEX_ATTRIB_ARRAY>(*this);
+		}
+
+		void OpenGLWrapper::DisableVertexAttribArray(uint32_t index) const
+		{
+			ext_glDisableVertexAttribArray(index);
+			glCheckForError<GLFUNCINDEX_DISABLE_VERTEX_ATTRIB_ARRAY>(*this);
 		}
 
 		GLenum OpenGLWrapper::s_valueNames[] {

@@ -56,6 +56,15 @@ using Time = Clock::time_point;
 using durationSecond = std::chrono::duration<float>;
 using durationNanoSecond = std::chrono::duration<uint32_t, std::micro>;
 
+struct vertexProp
+{
+	float m_coord[3];
+	uint8_t m_color[3];
+};
+
+#define BUFFER_OFFSET(val) reinterpret_cast<void*>(val)
+
+
 int main(int, char**)
 {
 	Croissant::Core::Application app;
@@ -86,17 +95,20 @@ int main(int, char**)
 in vec3 VertexPosition;
 
 /********************Uniformes********************/
-uniform mat4 WorldViewProjMatrix;
+/*uniform mat4 WorldViewProjMatrix;*/
 
 /********************Fonctions********************/
 void main()
 {
-	gl_Position = WorldViewProjMatrix * vec4(VertexPosition, 1.0);
+	/*gl_Position = WorldViewProjMatrix * vec4(VertexPosition, 1.0);*/
+	gl_Position = vec4(VertexPosition, 1.0);
 }
 )");
 		auto fragmentShaderContent = std::string(R"(
 #version 140
 
+/********************Entrant********************/
+in vec3 VertexColor;
 /********************Sortant********************/
 /*out vec4 RenderTarget0;*/
 /********************Uniformes********************/
@@ -105,7 +117,7 @@ uniform vec4 Color;
 /********************Fonctions********************/
 void main()
 {
-	gl_FragColor = Color;
+	gl_FragColor = vec4(VertexColor, 1.0);
 /*	RenderTarget0 = Color;*/
 }
 )");
@@ -134,6 +146,7 @@ void main()
 
 		// on associe à chaque nom de variable des shader un index pour y faire référence plus tard à partir du vertexbuffer 
 		opengl.BindAttribLocation(programId, 0, "VertexPosition");
+		opengl.BindAttribLocation(programId, 1, "VertexColor");
 		
 		// on marque les shader comme à attacher au programme
 		opengl.AttachShader(programId, fragmentShaderId);
@@ -151,37 +164,106 @@ void main()
 		// TODO supprimer les shaders ?
 
 		// TODO : configurer les sommets pour l'affichage
+		vertexProp vertices[] = {
+			vertexProp{ { -0.5, 0.5, 0.5 },{ 255, 0, 0 } },
+			vertexProp{ { 0.5, 0.5, 0.5 },{ 255, 255, 255 } },
+			vertexProp{ { -0.5, 0.5, -0.5 },{ 0, 255, 0 } },
+			vertexProp{ { 0.5, 0.5, -0.5 },{ 255, 255, 255 } },
+			vertexProp{ { -0.5, -0.5, 0.5 },{ 0, 0, 255 } },
+			vertexProp{ { 0.5, -0.5, 0.5 },{ 255, 255, 255 } },
+			vertexProp{ { -0.5, -0.5, -0.5 },{ 255, 0, 255 } },
+			vertexProp{ { 0.5, -0.5, -0.5 },{ 255, 255, 255 } }
+		};
+		uint32_t verticesBufferId;
+		uint32_t indexesBufferId;
+
+		opengl.GenBuffers(1, &verticesBufferId);
+		opengl.BindBuffer(GL_ARRAY_BUFFER, verticesBufferId);
+		opengl.BufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+		auto verticesSize = sizeof(vertices);
+		//std::cout << "sizeof(vertices) : " << sizeof(vertices) << std::endl;
+
+		// cube indexes
+
+		uint32_t indexes[] = {
+			0, 2, 4, // demi face gauche (-x)
+			4, 2, 6, // demi face gauche (-x)
+			3, 1, 7, // demi face droit (x)
+			7, 1, 5, // demi face droit (x)
+			0, 1, 2, // demi face dessus (y)
+			2, 1, 3, // demi face dessus (y)
+			4, 1, 0, // demi face fond (z)
+			5, 1, 4, // demi face fond (z)
+			6, 2, 3, // demi face devant (-z)
+			6, 3, 7, // demi face devant (-z)
+			6, 5, 4, // demi face dessous (-y)
+			7, 5, 6 // demi face dessous (-y)
+		};
+
+		opengl.GenBuffers(1, &indexesBufferId);
+		opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexesBufferId);
+		opengl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexes), indexes, GL_STATIC_DRAW);
+
+		opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		opengl.BindBuffer(GL_ARRAY_BUFFER, 0);
+		auto indexesSize = sizeof(indexes);
+
 		// TODO : 
 
 		// --------------------------------------------------------------------------- end   initialisation
 
-		//while (1)
-		//{
-		//	++fps;
-		//	Time currentFrameTime { Clock::now() };
-		//	durationSecond secondSinceFirstFrame { currentFrameTime - firstFrameTime };
-		//	if (secondSinceFirstFrame.count() >= 1.0f) {
-		//		durationNanoSecond nanoS = std::chrono::duration_cast<durationNanoSecond>(secondSinceFirstFrame);
-		//		uint32_t tempsMoyenParFrame = nanoS.count() / fps;
+		while (1)
+		{
+			++fps;
+			Time currentFrameTime { Clock::now() };
+			durationSecond secondSinceFirstFrame { currentFrameTime - firstFrameTime };
+			if (secondSinceFirstFrame.count() >= 1.0f) {
+				durationNanoSecond nanoS = std::chrono::duration_cast<durationNanoSecond>(secondSinceFirstFrame);
+				uint32_t tempsMoyenParFrame = nanoS.count() / fps;
 
-		//		win.SetTitle(baseTitle + std::to_string(fps) + ", temps moyen par frame : " + std::to_string(tempsMoyenParFrame) + "us");
-		//		fps = 0;
-		//		firstFrameTime = Clock::now();
-		//		lastFrameTime = firstFrameTime;
-		//	}
+				win.SetTitle(baseTitle + std::to_string(fps) + ", temps moyen par frame : " + std::to_string(tempsMoyenParFrame) + "us");
+				fps = 0;
+				firstFrameTime = Clock::now();
+				lastFrameTime = firstFrameTime;
+			}
 
 
 
-		//	auto evt = win.PeekEvent();
+			auto evt = win.PeekEvent();
 
-		//	if (evt->GetType() == Croissant::Graphic::WindowEventType::CLOSE)
-		//	{
-		//		win.Close();
-		//		break;
-		//	}
+			if (evt->GetType() == Croissant::Graphic::WindowEventType::CLOSE)
+			{
+				win.Close();
+				break;
+			}
 
-		//	renderer.Render();
-		//}
+			// clear
+			opengl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			opengl.UseProgram(programId);
+			// render
+			opengl.BindBuffer(GL_ARRAY_BUFFER, verticesBufferId);
+			opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexesBufferId);
+
+			opengl.EnableVertexAttribArray(0);
+			opengl.EnableVertexAttribArray(1);
+
+			opengl.VertexPointer(3, GL_FLOAT, sizeof(vertexProp), 0);
+			opengl.ColorPointer(3, GL_UNSIGNED_BYTE, sizeof(vertexProp), BUFFER_OFFSET(sizeof(vertexProp::m_coord)));
+
+			opengl.PolygonMode(GL_FRONT, GL_LINE);
+			opengl.DrawElements(GL_TRIANGLES, static_cast<GLsizei>(indexesSize), GL_UNSIGNED_INT, 0);
+			opengl.PolygonMode(GL_FRONT, GL_FILL);
+
+			opengl.DisableVertexAttribArray(0);
+			opengl.DisableVertexAttribArray(1);
+
+			opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			opengl.BindBuffer(GL_ARRAY_BUFFER, 0);
+
+
+			renderer.Render();
+		}
 	}
 	catch (std::exception& e)
 	{
