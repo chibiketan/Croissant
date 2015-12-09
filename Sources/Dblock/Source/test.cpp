@@ -93,22 +93,25 @@ int main(int, char**)
 
 /********************Entrant********************/
 in vec3 VertexPosition;
+in vec3 VertexColor;
 
 /********************Uniformes********************/
 /*uniform mat4 WorldViewProjMatrix;*/
 
 /********************Fonctions********************/
+out vec3 vcolor;
 void main()
 {
 	/*gl_Position = WorldViewProjMatrix * vec4(VertexPosition, 1.0);*/
 	gl_Position = vec4(VertexPosition, 1.0);
+	vcolor = VertexColor;
 }
 )");
 		auto fragmentShaderContent = std::string(R"(
 #version 140
 
 /********************Entrant********************/
-in vec3 VertexColor;
+in vec3 vcolor;
 /********************Sortant********************/
 /*out vec4 RenderTarget0;*/
 /********************Uniformes********************/
@@ -117,7 +120,7 @@ uniform vec4 Color;
 /********************Fonctions********************/
 void main()
 {
-	gl_FragColor = vec4(VertexColor, 1.0);
+	gl_FragColor = vec4(vcolor, 1.0);
 /*	RenderTarget0 = Color;*/
 }
 )");
@@ -158,7 +161,14 @@ void main()
 
 		if (programLinked == 0)
 		{
-			throw std::exception("Une erreur est survenue lors de l'étape de linkage du programme.");
+			auto log = opengl.GetProgramInfoLog(programId);
+
+			if (log.empty())
+			{
+				throw std::exception("Une erreur est survenue lors de l'étape de linkage du programme.");
+			}
+
+			throw std::exception(log.c_str());
 		}
 
 		// TODO supprimer les shaders ?
@@ -248,8 +258,10 @@ void main()
 			opengl.EnableVertexAttribArray(0);
 			opengl.EnableVertexAttribArray(1);
 
-			opengl.VertexPointer(3, GL_FLOAT, sizeof(vertexProp), 0);
-			opengl.ColorPointer(3, GL_UNSIGNED_BYTE, sizeof(vertexProp), BUFFER_OFFSET(sizeof(vertexProp::m_coord)));
+			//opengl.VertexPointer(3, GL_FLOAT, sizeof(vertexProp), 0);
+			//opengl.ColorPointer(3, GL_UNSIGNED_BYTE, sizeof(vertexProp), BUFFER_OFFSET(sizeof(vertexProp::m_coord)));
+			opengl.VertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vertexProp), 0);
+			opengl.VertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, false, sizeof(vertexProp), BUFFER_OFFSET(sizeof(vertexProp::m_coord)));
 
 			opengl.PolygonMode(GL_FRONT, GL_LINE);
 			opengl.DrawElements(GL_TRIANGLES, static_cast<GLsizei>(indexesSize), GL_UNSIGNED_INT, 0);

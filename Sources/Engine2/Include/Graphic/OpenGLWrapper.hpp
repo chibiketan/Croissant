@@ -69,6 +69,8 @@ namespace Croissant
 		using glUseProgram_t = void (APIENTRY *)(GLuint);
 		using glEnableVertexAttribArray_t = void (APIENTRY *)(GLuint);
 		using glDisableVertexAttribArray_t = void (APIENTRY *)(GLuint);
+		using glVertexAttribPointer_t = void (APIENTRY *)(GLuint, GLint, GLenum, GLboolean, GLsizei, GLvoid const*);
+		using glGetProgramInfoLog_t = void (APIENTRY *)(GLuint, GLsizei, GLsizei*, GLchar*);
 
 		// ---------------------------------------- fin alias pour OpenGL
 
@@ -117,6 +119,8 @@ namespace Croissant
 			void		UseProgram(uint32_t programId) const;
 			void		EnableVertexAttribArray(uint32_t index) const;
 			void		DisableVertexAttribArray(uint32_t index) const;
+			void		VertexAttribPointer(uint32_t index, int32_t size, GLenum type, bool normalzed, size_t stride, void const* data) const;
+			std::string	GetProgramInfoLog(uint32_t programId) const;
 
 		private:
 			Core::LogManager&				m_logManager;
@@ -158,6 +162,8 @@ namespace Croissant
 			glUseProgram_t					ext_glUseProgram = nullptr;
 			glEnableVertexAttribArray_t		ext_glEnableVertexAttribArray = nullptr;
 			glDisableVertexAttribArray_t	ext_glDisableVertexAttribArray = nullptr;
+			glVertexAttribPointer_t			ext_glVertexAttribPointer = nullptr;
+			glGetProgramInfoLog_t			ext_glGetProgramInfoLog = nullptr;
 			static GLenum					s_valueNames[static_cast<int>(OpenGLValueNameEnum::MAX_ELEMENT) + 1];
 			static GLenum					s_shaderIntegerNames[static_cast<int>(OpenGLShaderIntegerNameEnum::MAX_ELEMENT) + 1];
 			static GLenum					s_programIntegerNames[static_cast<int>(OpenGLProgramIntegerNameEnum::MAX_ELEMENT) + 1];

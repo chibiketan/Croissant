@@ -8,6 +8,8 @@
 #include "..\..\Include\Graphic\OpenGLWrapper.hpp"
 #include "..\..\Include\Graphic\OpenGLWrapper.hpp"
 #include "..\..\Include\Graphic\OpenGLWrapper.hpp"
+#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
+#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
 /*
  * OpenGLWrapper.cpp
  *
@@ -64,7 +66,8 @@
 #define GLFUNCINDEX_GET_PROGRAM_IV				33
 #define GLFUNCINDEX_USE_PROGRAM					34
 #define GLFUNCINDEX_ENABLE_VERTEX_ATTRIB_ARRAY	35
-#define GLFUNCINDEX_DISABLE_VERTEX_ATTRIB_ARRAY	35
+#define GLFUNCINDEX_DISABLE_VERTEX_ATTRIB_ARRAY	36
+#define	GLFUNCINDEX_VERTEX_ATTRIB_POINTER		37
 
 using OpenGLRendererException = Croissant::Exception::CroissantException;
 
@@ -720,6 +723,28 @@ namespace Croissant
 				}
 			}
 
+			template<>
+			inline void glThrowOnError<GLFUNCINDEX_VERTEX_ATTRIB_POINTER>(GLint err)
+			{
+				switch (err)
+				{
+				case GL_NO_ERROR:
+					break;
+				case GL_INVALID_VALUE:
+					throw OpenGLRendererException("Erreur lors de l'appel à glVertexAttribPointer : l'index est plus grand ou égal à la valeur de GL_MAX_VERTEX_ATTRIBS OU la valeur de size n'est pas compris entre 1 et 4 OU la valeur de stride est négative.");
+					break;
+				case GL_INVALID_ENUM:
+					throw OpenGLRendererException("Erreur lors de l'appel à glVertexAttribPointer : la valeur de type n'est pas reconnue.");
+					break;
+				case GL_INVALID_OPERATION:
+					throw OpenGLRendererException("Erreur lors de l'appel à glVertexAttribPointer : Pas de vertex array lié au context.");
+					break;
+				default:
+					throw OpenGLRendererException("Erreur lors de l'appel à glVertexAttribPointer : Erreur non identifiée.");
+					break;
+				}
+			}
+
 			using LogManager = Croissant::Core::LogManager;
 			using string = std::string;
 
@@ -890,6 +915,8 @@ namespace Croissant
 			ext_glUseProgram = LoadGLSymbol<glUseProgram_t>("glUseProgram");
 			ext_glEnableVertexAttribArray = LoadGLSymbol<glEnableVertexAttribArray_t>("glEnableVertexAttribArray");
 			ext_glDisableVertexAttribArray = LoadGLSymbol<glDisableVertexAttribArray_t>("glDisableVertexAttribArray");
+			ext_glVertexAttribPointer = LoadGLSymbol<glVertexAttribPointer_t>("glVertexAttribPointer");
+			ext_glGetProgramInfoLog = LoadGLSymbol<glGetProgramInfoLog_t>("glGetProgramInfoLog");
 
 			int NumberOfExtensions;
 			glGetIntegerv(GL_NUM_EXTENSIONS, &NumberOfExtensions);
@@ -1183,6 +1210,30 @@ namespace Croissant
 		{
 			ext_glDisableVertexAttribArray(index);
 			glCheckForError<GLFUNCINDEX_DISABLE_VERTEX_ATTRIB_ARRAY>(*this);
+		}
+
+		void OpenGLWrapper::VertexAttribPointer(uint32_t index, int32_t size, GLenum type, bool normalzed, size_t stride, void const * data) const
+		{
+			ext_glVertexAttribPointer(index, size, type, normalzed ? GL_TRUE : GL_FALSE, stride, data);
+			glCheckForError<GLFUNCINDEX_VERTEX_ATTRIB_POINTER>(*this);
+		}
+
+		std::string OpenGLWrapper::GetProgramInfoLog(uint32_t programId) const
+		{
+			std::string result;
+			auto logLength = this->GetProgramInteger(programId, OpenGLProgramIntegerNameEnum::InfoLogLength);
+
+			if (0 == logLength)
+			{
+				return result;
+			}
+
+			GLsizei len;
+
+			result.resize(logLength);
+//			result.reserve(logLength);
+			ext_glGetProgramInfoLog(programId, logLength, &len, &result[0]);
+			return result;
 		}
 
 		GLenum OpenGLWrapper::s_valueNames[] {
