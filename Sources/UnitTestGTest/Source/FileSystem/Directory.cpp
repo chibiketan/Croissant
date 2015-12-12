@@ -171,7 +171,7 @@ TEST_F(DirectoryTest, CheckIfCanGetAllFilesFromDirectory)
 	Croissant::FileSystem::Directory dir(Croissant::FileSystem::DEFAULT_DIRECTORY::CURRENT_DIRECTORY);
 	Croissant::FileSystem::Directory::Filelist fileList = dir.Files();
 
-	ASSERT_NE(0, fileList.size());
+	ASSERT_NE(0UL, fileList.size());
 	auto begin = fileList.begin();
 	auto end = fileList.end();
 
@@ -184,9 +184,9 @@ TEST_F(DirectoryTest, CheckIfCanGetAllFilesFromDirectory)
 TEST_F(DirectoryTest, CheckIfCanSearchFilesFromDirectory)
 {
 	Croissant::FileSystem::Directory dir(Croissant::FileSystem::DEFAULT_DIRECTORY::PROGRAM_DIRECTORY);
-	Croissant::FileSystem::Directory::Filelist fileList = dir.Parent().Child("Sources").Child("Engine").Child("Source").Search("*.cpp");
+	Croissant::FileSystem::Directory::Filelist fileList = dir.Parent().Parent().Child("Sources").Child("Engine2").Child("Source").Child("Core").Search("*.cpp");
 
-	ASSERT_NE(0, fileList.size());
+	ASSERT_NE(0UL, fileList.size());
 	auto begin = fileList.begin();
 	auto end = fileList.end();
 

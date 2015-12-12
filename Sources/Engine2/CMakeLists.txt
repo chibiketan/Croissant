@@ -81,6 +81,7 @@ target_compile_features(${PROJECT_NAME}
 
 
 
+set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CROISSANT_ROOT_DIR}/Bin)
 
 # cmake_minimum_required(VERSION 3.1)
 # project(ENGINE)

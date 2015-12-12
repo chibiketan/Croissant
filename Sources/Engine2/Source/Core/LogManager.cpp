@@ -93,9 +93,9 @@ namespace Croissant
 		// --------------------------------------------- LogManager::Impl implementation
 
 		LogManager::LogManager(std::string appName)
-		:	m_logs {}, m_run { true }
+		:	m_run { true }
 			, m_init { false }, m_exitRequested { false }, m_shuttedDown { false }, m_appName { appName },
-			m_thread{ MethodBinderHelper(&LogManager::ThreadEntry, this) }, m_event{}
+			 m_logs {}, m_event{}, m_thread{ MethodBinderHelper(&LogManager::ThreadEntry, this) }
 		{
 		}
 

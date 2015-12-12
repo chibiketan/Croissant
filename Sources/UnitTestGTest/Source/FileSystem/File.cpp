@@ -58,8 +58,9 @@ TEST_F(FileTest, LoadFileWithAbsolutePathOnInvalidFile)
 
 TEST_F(FileTest, LoadFileWithRelativePath)
 {
-	Croissant::FileSystem::File file("Logs/MemoryLeak.log");
-	Croissant::FileSystem::Directory dir = Croissant::FileSystem::Directory(Croissant::FileSystem::DEFAULT_DIRECTORY::CURRENT_DIRECTORY).Child("Logs");
+	auto baseDir = Croissant::FileSystem::Directory(Croissant::FileSystem::DEFAULT_DIRECTORY::PROGRAM_DIRECTORY);
+	Croissant::FileSystem::File file("Logs/MemoryLeak.log", baseDir);
+	Croissant::FileSystem::Directory dir = Croissant::FileSystem::Directory(Croissant::FileSystem::DEFAULT_DIRECTORY::PROGRAM_DIRECTORY).Child("Logs");
 
 	ASSERT_TRUE(file.Exist());
 	ASSERT_EQ(dir.FullPath() + SEPARATOR "MemoryLeak.log", file.FullPath());

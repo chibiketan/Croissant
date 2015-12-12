@@ -401,5 +401,5 @@ target_link_libraries(DBlock
 	PUBLIC ENGINE
 )
 
+
 set_target_properties(DBlock PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CROISSANT_ROOT_DIR}/Bin)
-set_target_properties(ENGINE PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CROISSANT_ROOT_DIR}/Bin)

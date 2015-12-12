@@ -10,6 +10,7 @@
 #include "Debug/MemoryManager.hpp"
 #include "Core/Application.hpp"
 
+#include <Exception/CroissantException.hpp>
 #include "Graphic/Window.hpp"
 #include "Graphic/WindowEvent.hpp"
 #include <iostream>
@@ -100,10 +101,17 @@ in vec3 VertexColor;
 
 /********************Fonctions********************/
 out vec3 vcolor;
+mat4 matrix = mat4(
+	1, 0, 0, 0,
+	0, 1, 0, 0,
+	0, 0, 1, 0,
+	0, 0, 0, 1
+);
+
 void main()
 {
 	/*gl_Position = WorldViewProjMatrix * vec4(VertexPosition, 1.0);*/
-	gl_Position = vec4(VertexPosition, 1.0);
+	gl_Position = matrix * vec4(VertexPosition, 1.0);
 	vcolor = VertexColor;
 }
 )");
@@ -134,7 +142,7 @@ void main()
 
 		if (vertexShaderResult == 0)
 		{
-			throw std::exception( "Erreur lors de la compilation du vertex shader");
+			throw Croissant::Exception::CroissantException( "Erreur lors de la compilation du vertex shader");
 		}
 
 		auto fragmentShaderId = opengl.CreateShader(GL_FRAGMENT_SHADER);
@@ -144,18 +152,18 @@ void main()
 
 		if (fragmentShaderResult == 0)
 		{
-			throw std::exception("Erreur lors de la compilation du fragment shader");
+			throw Croissant::Exception::CroissantException("Erreur lors de la compilation du fragment shader");
 		}
 
-		// on associe à chaque nom de variable des shader un index pour y faire référence plus tard à partir du vertexbuffer 
+		// on associe ï¿½ chaque nom de variable des shader un index pour y faire rï¿½fï¿½rence plus tard ï¿½ partir du vertexbuffer 
 		opengl.BindAttribLocation(programId, 0, "VertexPosition");
 		opengl.BindAttribLocation(programId, 1, "VertexColor");
 		
-		// on marque les shader comme à attacher au programme
+		// on marque les shader comme ï¿½ attacher au programme
 		opengl.AttachShader(programId, fragmentShaderId);
 		opengl.AttachShader(programId, vertexShaderId);
 
-		// on lie le programme et les shaders (création du programme dans la CG)
+		// on lie le programme et les shaders (crï¿½ation du programme dans la CG)
 		opengl.LinkProgram(programId);
 		auto programLinked = opengl.GetProgramInteger(programId, Croissant::Graphic::OpenGLProgramIntegerNameEnum::LinkStatus);
 
@@ -165,10 +173,10 @@ void main()
 
 			if (log.empty())
 			{
-				throw std::exception("Une erreur est survenue lors de l'étape de linkage du programme.");
+				throw Croissant::Exception::CroissantException("Une erreur est survenue lors de l'ï¿½tape de linkage du programme.");
 			}
 
-			throw std::exception(log.c_str());
+			throw Croissant::Exception::CroissantException(log.c_str());
 		}
 
 		// TODO supprimer les shaders ?
@@ -261,11 +269,11 @@ void main()
 			//opengl.VertexPointer(3, GL_FLOAT, sizeof(vertexProp), 0);
 			//opengl.ColorPointer(3, GL_UNSIGNED_BYTE, sizeof(vertexProp), BUFFER_OFFSET(sizeof(vertexProp::m_coord)));
 			opengl.VertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vertexProp), 0);
-			opengl.VertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, false, sizeof(vertexProp), BUFFER_OFFSET(sizeof(vertexProp::m_coord)));
+			opengl.VertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, true, sizeof(vertexProp), BUFFER_OFFSET(sizeof(vertices[0].m_coord)));
 
-			opengl.PolygonMode(GL_FRONT, GL_LINE);
-			opengl.DrawElements(GL_TRIANGLES, static_cast<GLsizei>(indexesSize), GL_UNSIGNED_INT, 0);
-			opengl.PolygonMode(GL_FRONT, GL_FILL);
+//			opengl.PolygonMode(GL_FRONT, GL_LINE);
+			opengl.DrawElements(GL_TRIANGLES, static_cast<GLsizei>(indexesSize), GL_UNSIGNED_INT, nullptr);
+//			opengl.PolygonMode(GL_FRONT, GL_FILL);
 
 			opengl.DisableVertexAttribArray(0);
 			opengl.DisableVertexAttribArray(1);

@@ -69,6 +69,7 @@ namespace
 			sh.IsFirst = false;
 			if (0 == (sh.Data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
+				fileName = sh.Data.cFileName;
 				return true;
 			}
 		}
