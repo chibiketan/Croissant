@@ -39,6 +39,7 @@ croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
 	Graphic/WindowEvent.hpp
 	Graphic/WindowEventClose.hpp
 	Graphic/WindowEventNone.hpp
+	Math/Matrix.hpp
 	Module/ServiceProvider.hpp
 	Module/ServiceProviderInternal.hpp
 	Threading/AutoResetEvent.hpp

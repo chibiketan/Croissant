@@ -15,6 +15,7 @@
 #include "Graphic/WindowEvent.hpp"
 #include <iostream>
 #include <chrono>
+#include "Math/Matrix.hpp"
 
 //#include <iostream>
 
@@ -228,6 +229,7 @@ void main()
 		auto indexesSize = sizeof(indexes);
 
 		// TODO : 
+		auto projection = Croissant::Math::Matrix4f::Identity();
 
 		// --------------------------------------------------------------------------- end   initialisation
 

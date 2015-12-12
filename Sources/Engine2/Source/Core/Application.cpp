@@ -1,4 +1,4 @@
-#include "Debug/MemoryManager.hpp"
+﻿#include "Debug/MemoryManager.hpp"
 #include "Core/Application.hpp"
 #include "Module/ServiceProvider.hpp"
 #include "Module/ServiceProviderInternal.hpp"
@@ -182,7 +182,7 @@ namespace Croissant
 //				SetSceneManager(std::unique_ptr<Croissant::Scene::SceneManager>(CROISSANT_NEW Croissant::Scene::SceneManager()));
 //			}
 
-//			if (!m_moduleManager->Init(m_eventManager.get(), m_serviceProvider))
+//			if (!m_moduleManager->InitializeToZero(m_eventManager.get(), m_serviceProvider))
 //			{
 //				return false;
 //			}
