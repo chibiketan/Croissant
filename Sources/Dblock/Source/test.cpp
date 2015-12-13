@@ -98,7 +98,7 @@ in vec3 VertexPosition;
 in vec3 VertexColor;
 
 /********************Uniformes********************/
-/*uniform mat4 WorldViewProjMatrix;*/
+uniform mat4 WorldViewProjMatrix;
 
 /********************Fonctions********************/
 out vec3 vcolor;
@@ -111,8 +111,8 @@ mat4 matrix = mat4(
 
 void main()
 {
-	/*gl_Position = WorldViewProjMatrix * vec4(VertexPosition, 1.0);*/
-	gl_Position = matrix * vec4(VertexPosition, 1.0);
+	gl_Position = WorldViewProjMatrix * vec4(VertexPosition, 1.0);
+	/*gl_Position = matrix * vec4(VertexPosition, 1.0);*/
 	vcolor = VertexColor;
 }
 )");
@@ -230,6 +230,7 @@ void main()
 
 		// TODO : 
 		auto projection = Croissant::Math::Matrix4f::Identity();
+		auto uniformWorldViewProjMatrix = opengl.GetUniformLocation(programId, "WorldViewProjMatrix");
 
 		// --------------------------------------------------------------------------- end   initialisation
 
@@ -268,6 +269,8 @@ void main()
 			opengl.EnableVertexAttribArray(0);
 			opengl.EnableVertexAttribArray(1);
 
+			opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, false, projection);
+
 			//opengl.VertexPointer(3, GL_FLOAT, sizeof(vertexProp), 0);
 			//opengl.ColorPointer(3, GL_UNSIGNED_BYTE, sizeof(vertexProp), BUFFER_OFFSET(sizeof(vertexProp::m_coord)));
 			opengl.VertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vertexProp), 0);
@@ -290,6 +293,8 @@ void main()
 	catch (std::exception& e)
 	{
 		std::cout << "Exception : " << e.what() << std::endl;
+		std::cout << "Appuyez sur une touche" << std::endl;
+		std::getchar();
 	}
 
 //	TraceEventListener listener;
@@ -304,8 +309,6 @@ void main()
 
     app.Shutdown();
 //	system("PAUSE");
-	std::cout << "Appuyez sur une touche" << std::endl;
-	std::getchar();
 	return result;
 }
 

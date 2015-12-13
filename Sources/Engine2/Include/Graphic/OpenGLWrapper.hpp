@@ -9,6 +9,7 @@
 #define OPENGLWRAPPER_HPP_INC
 
 #include "Engine.hpp"
+#include "Math/Matrix.hpp"
 #include <Graphic/Enums.hpp>
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -71,6 +72,8 @@ namespace Croissant
 		using glDisableVertexAttribArray_t = void (APIENTRY *)(GLuint);
 		using glVertexAttribPointer_t = void (APIENTRY *)(GLuint, GLint, GLenum, GLboolean, GLsizei, GLvoid const*);
 		using glGetProgramInfoLog_t = void (APIENTRY *)(GLuint, GLsizei, GLsizei*, GLchar*);
+		using glGetUniformLocation_t = GLint(APIENTRY *)(GLuint, GLchar const*);
+		using glUniformMatrix4fv_t = void (APIENTRY *)(GLint, GLsizei, GLboolean, GLvoid const*);
 
 		// ---------------------------------------- fin alias pour OpenGL
 
@@ -121,6 +124,8 @@ namespace Croissant
 			void		DisableVertexAttribArray(uint32_t index) const;
 			void		VertexAttribPointer(uint32_t index, int32_t size, GLenum type, bool normalzed, size_t stride, void const* data) const;
 			std::string	GetProgramInfoLog(uint32_t programId) const;
+			int32_t		GetUniformLocation(uint32_t programId, std::string const name) const;
+			void		SetUniformMatrix4f(int32_t location, int32_t count, bool transpose, Math::Matrix4f const& matrix) const;
 
 		private:
 			Core::LogManager&				m_logManager;
@@ -164,6 +169,8 @@ namespace Croissant
 			glDisableVertexAttribArray_t	ext_glDisableVertexAttribArray = nullptr;
 			glVertexAttribPointer_t			ext_glVertexAttribPointer = nullptr;
 			glGetProgramInfoLog_t			ext_glGetProgramInfoLog = nullptr;
+			glGetUniformLocation_t			ext_glGetUniformLocation = nullptr;
+			glUniformMatrix4fv_t			ext_glUniformMatrix4fv = nullptr;
 			static GLenum					s_valueNames[static_cast<int>(OpenGLValueNameEnum::MAX_ELEMENT) + 1];
 			static GLenum					s_shaderIntegerNames[static_cast<int>(OpenGLShaderIntegerNameEnum::MAX_ELEMENT) + 1];
 			static GLenum					s_programIntegerNames[static_cast<int>(OpenGLProgramIntegerNameEnum::MAX_ELEMENT) + 1];

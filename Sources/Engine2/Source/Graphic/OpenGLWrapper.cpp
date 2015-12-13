@@ -1,15 +1,3 @@
-#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
-#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
-#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
-#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
-#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
-#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
-#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
-#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
-#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
-#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
-#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
-#include "..\..\Include\Graphic\OpenGLWrapper.hpp"
 /*
  * OpenGLWrapper.cpp
  *
@@ -68,6 +56,8 @@
 #define GLFUNCINDEX_ENABLE_VERTEX_ATTRIB_ARRAY	35
 #define GLFUNCINDEX_DISABLE_VERTEX_ATTRIB_ARRAY	36
 #define	GLFUNCINDEX_VERTEX_ATTRIB_POINTER		37
+#define GLFUNCINDEX_GET_UNIFORM_LOCATION		38
+#define GLFUNCINDEX_UNIFORM_MATRIX_4FV			39
 
 using OpenGLRendererException = Croissant::Exception::CroissantException;
 
@@ -79,105 +69,90 @@ namespace Croissant
 		{
 
 			template<unsigned int funcIndex>
-			inline void glThrowOnError(GLint err);
+			void glThrowOnError(GLint err) = delete;
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_GEN_BUFFERS>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_GEN_BUFFERS>(GLint err)
 			{
 				switch (err)
 				{
+				case GL_NO_ERROR:
+					break;
 				case GL_INVALID_VALUE:
 					throw OpenGLRendererException("Erreur lors de la génération du buffer : Valeur du nombre de buffer à générer invalide.");
-					break;
-				case GL_NO_ERROR:
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de la génération du buffer : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_BIND_BUFFER>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_BIND_BUFFER>(GLint err)
 			{
 				switch (err)
 				{
+				case GL_NO_ERROR:
+					break;
 				case GL_INVALID_ENUM:
 					throw OpenGLRendererException("Erreur lors de l'appel à glBindBuffer : Valeur pour le paramètre target incorrecte.");
-					break;
 				case GL_INVALID_VALUE:
 					throw OpenGLRendererException("Erreur lors de l'appel à glBindBuffer : Le buffer fourni n'a pas été créée avec un appel à glGenBuffer.");
-					break;
-				case GL_NO_ERROR:
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glBindBuffer : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_BUFFER_DATA>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_BUFFER_DATA>(GLint err)
 			{
 				switch (err)
 				{
+				case GL_NO_ERROR:
+					break;
 				case GL_INVALID_ENUM:
 					throw OpenGLRendererException("Erreur lors de l'appel à glBufferData : Buffer invalide ou valeur du paramètre usage incorrecte.");
-					break;
 				case GL_INVALID_VALUE:
 					throw OpenGLRendererException("Erreur lors de l'appel à glBufferData : Le paramètre size est négatif.");
-					break;
 				case GL_INVALID_OPERATION:
 					throw OpenGLRendererException("Erreur lors de l'appel à glBufferData : Le buffer associé est 0 ou alors le buffer n'est pas modifiable.");
-					break;
 				case GL_OUT_OF_MEMORY:
 					throw OpenGLRendererException("Erreur lors de l'appel à glBufferData : Impossible de créer un buffer de la taille demandée.");
-					break;
-				case GL_NO_ERROR:
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glBufferData : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_CLEAR_INDEX>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_CLEAR_INDEX>(GLint err)
 			{
 				switch (err)
 				{
+				case GL_NO_ERROR:
+					break;
 				case GL_INVALID_OPERATION:
 					throw OpenGLRendererException("Erreur lors de l'appel à glClearIndex : appel entre 2 appel de glBegin et glEnd.");
-					break;
-				case GL_NO_ERROR:
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glClearIndex : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_MATRIX_MODEL>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_MATRIX_MODEL>(GLint err)
 			{
 				switch (err)
 				{
-				case GL_INVALID_OPERATION:
-					throw OpenGLRendererException("Erreur lors de l'appel à glMatrixModel : appel entre 2 appel de glBegin et glEnd.");
-					break;
-				case GLU_INVALID_ENUM:
-					throw OpenGLRendererException("Erreur lors de l'appel à glMatrixModel : Le mode fourni n'est pas una valeur valide.");
-					break;
 				case GL_NO_ERROR:
 					break;
+				case GL_INVALID_OPERATION:
+					throw OpenGLRendererException("Erreur lors de l'appel à glMatrixModel : appel entre 2 appel de glBegin et glEnd.");
+				case GLU_INVALID_ENUM:
+					throw OpenGLRendererException("Erreur lors de l'appel à glMatrixModel : Le mode fourni n'est pas una valeur valide.");
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glMatrixModel : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_SWAP_INTERVAL>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_SWAP_INTERVAL>(GLint err)
 			{
 				switch (err)
 				{
@@ -185,165 +160,143 @@ namespace Croissant
 					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à wglSwapIntervalExt : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_DRAW_ELEMENTS>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_DRAW_ELEMENTS>(GLint err)
 			{
 				switch (err)
 				{
+				case GL_NO_ERROR:
+					break;
 				case GL_INVALID_ENUM:
 					throw OpenGLRendererException("Erreur lors de l'appel à glDrawElements : Valeur de mode incorrecte.");
-					break;
 				case GL_INVALID_VALUE:
 					throw OpenGLRendererException("Erreur lors de l'appel à glDrawElements : La valeur pour count est invalide.");
-					break;
 				case GL_INVALID_OPERATION:
 					throw OpenGLRendererException("Erreur lors de l'appel à glDrawElements : La commande ne peut pas être effectuée dans l'état actuel du contexte.");
-					break;
-				case GL_NO_ERROR:
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glDrawElements : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_CREATE_PROGRAM>(GLint)
+			void glThrowOnError<GLFUNCINDEX_CREATE_PROGRAM>(GLint)
 			{
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_CREATE_SHADER>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_CREATE_SHADER>(GLint err)
 			{
 				switch (err)
 				{
+				case GL_NO_ERROR:
+					break;
 				case GL_INVALID_ENUM:
 					throw OpenGLRendererException("Erreur lors de l'appel à glCreateShader : Valeur de shaderType incorrecte.");
-					break;
-				case GL_NO_ERROR:
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glCreateShader : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_CLEAR_DEPTH>(GLint)
+			void glThrowOnError<GLFUNCINDEX_CLEAR_DEPTH>(GLint)
 			{
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_ENABLE>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_ENABLE>(GLint err)
 			{
 				switch (err)
 				{
+				case GL_NO_ERROR:
+					break;
 				case GL_INVALID_ENUM:
 					throw OpenGLRendererException("Erreur lors de l'appel à glEnable : Valeur de cap incorrecte.");
-					break;
 				case GL_INVALID_VALUE:
 					throw OpenGLRendererException("Erreur lors de l'appel à glEnable : La valeur pour index est plus grande ou égale à la limite maximum pour la capacité de cap.");
-					break;
-				case GL_NO_ERROR:
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glEnable : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_ENABLE_CLIENT_STATE>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_ENABLE_CLIENT_STATE>(GLint err)
 			{
 				switch (err)
 				{
+				case GL_NO_ERROR:
+					break;
 				case GL_INVALID_ENUM:
 					throw OpenGLRendererException("Erreur lors de l'appel à glEnableClientState : Valeur de cap incorrecte.");
-					break;
-				case GL_NO_ERROR:
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glEnableClientState : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_DISABLE_CLIENT_STATE>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_DISABLE_CLIENT_STATE>(GLint err)
 			{
 				switch (err)
 				{
+				case GL_NO_ERROR:
+					break;
 				case GL_INVALID_ENUM:
 					throw OpenGLRendererException("Erreur lors de l'appel à glDisableClientState : Valeur de cap incorrecte.");
-					break;
-				case GL_NO_ERROR:
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glDisableClientState : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_POLYGON_MODE>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_POLYGON_MODE>(GLint err)
 			{
 				switch (err)
 				{
+				case GL_NO_ERROR:
+					break;
 				case GL_INVALID_ENUM:
 					throw OpenGLRendererException("Erreur lors de l'appel à glPolygonMode : Valeur de face ou mode incorrecte.");
-					break;
-				case GL_NO_ERROR:
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glPolygonMode : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_COLOR_POINTER>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_COLOR_POINTER>(GLint err)
 			{
 				switch (err)
 				{
+				case GL_NO_ERROR:
+					break;
 				case GL_INVALID_ENUM:
 					throw OpenGLRendererException("Erreur lors de l'appel à glColorPointer  : Valeur de type incorrecte.");
-					break;
 				case GL_INVALID_VALUE:
 					throw OpenGLRendererException("Erreur lors de l'appel à glColorPointer  : Valeur de size différente de 3 ou 4 OU la valeur de stride est négative.");
-					break;
-				case GL_NO_ERROR:
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glColorPointer  : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_VERTEX_POINTER>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_VERTEX_POINTER>(GLint err)
 			{
 				switch (err)
 				{
-				case GL_INVALID_ENUM:
-					throw OpenGLRendererException("Erreur lors de l'appel à glVertexPointer : Valeur de type incorrecte.");
-					break;
-				case GL_INVALID_VALUE:
-					throw OpenGLRendererException("Erreur lors de l'appel à glVertexPointer : Valeur de size différente de 2, 3 ou 4 OU la valeur de stride est négative.");
-					break;
 				case GL_NO_ERROR:
 					break;
+				case GL_INVALID_ENUM:
+					throw OpenGLRendererException("Erreur lors de l'appel à glVertexPointer : Valeur de type incorrecte.");
+				case GL_INVALID_VALUE:
+					throw OpenGLRendererException("Erreur lors de l'appel à glVertexPointer : Valeur de size différente de 2, 3 ou 4 OU la valeur de stride est négative.");
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glVertexPointer : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_DEBUG_MESSAGE_CALLBACK>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_DEBUG_MESSAGE_CALLBACK>(GLint err)
 			{
 				switch(err)
 				{
@@ -351,12 +304,11 @@ namespace Croissant
 					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glDebugMessageCallback : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_DELETE_BUFFERS>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_DELETE_BUFFERS>(GLint err)
 			{
 				switch(err)
 				{
@@ -364,15 +316,13 @@ namespace Croissant
 					break;
 				case GL_INVALID_VALUE:
 					throw OpenGLRendererException("Erreur lors de l'appel à glDeleteBuffers : Valeur de n négative.");
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glDeleteBuffers : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_DELETE_PROGRAM>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_DELETE_PROGRAM>(GLint err)
 			{
 				switch(err)
 				{
@@ -380,15 +330,13 @@ namespace Croissant
 					break;
 				case GL_INVALID_VALUE:
 					throw OpenGLRendererException("Erreur lors de l'appel à glDeleteProgram : Valeur de program non générée par OpenGL.");
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glDeleteProgram : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_DELETE_SHADER>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_DELETE_SHADER>(GLint err)
 			{
 				switch(err)
 				{
@@ -396,15 +344,13 @@ namespace Croissant
 					break;
 				case GL_INVALID_VALUE:
 					throw OpenGLRendererException("Erreur lors de l'appel à glDeleteShader : Valeur de shader non générée par OpenGL.");
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glDeleteShader : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_CLEAR>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_CLEAR>(GLint err)
 			{
 				switch(err)
 				{
@@ -412,15 +358,13 @@ namespace Croissant
 					break;
 				case GL_INVALID_VALUE:
 					throw OpenGLRendererException("Erreur lors de l'appel à glClear : Valeur de mask contient des bits inconnus.");
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glClear : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_MATRIX_MODE>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_MATRIX_MODE>(GLint err)
 			{
 				switch(err)
 				{
@@ -428,18 +372,15 @@ namespace Croissant
 					break;
 				case GL_INVALID_ENUM:
 					throw OpenGLRendererException("Erreur lors de l'appel à glMatrixMode : Valeur de mode inconnue.");
-					break;
 				case GL_INVALID_OPERATION:
 					throw OpenGLRendererException("Erreur lors de l'appel à glMatrixMode : Appel de la méthode entre glBegin et glEnd.");
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glMatrixMode : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_PUSH_MATRIX>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_PUSH_MATRIX>(GLint err)
 			{
 				switch(err)
 				{
@@ -447,18 +388,15 @@ namespace Croissant
 					break;
 				case GL_STACK_OVERFLOW:
 					throw OpenGLRendererException("Erreur lors de l'appel à glPushMatrix : La pile de matrices est pleine.");
-					break;
 				case GL_INVALID_OPERATION:
 					throw OpenGLRendererException("Erreur lors de l'appel à glPushMatrix : Appel de la méthode entre glBegin et glEnd.");
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glPushMatrix : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_POP_MATRIX>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_POP_MATRIX>(GLint err)
 			{
 				switch(err)
 				{
@@ -466,18 +404,15 @@ namespace Croissant
 					break;
 				case GL_STACK_UNDERFLOW:
 					throw OpenGLRendererException("Erreur lors de l'appel à glPopMatrix : La pile de matrices est vide.");
-					break;
 				case GL_INVALID_OPERATION:
 					throw OpenGLRendererException("Erreur lors de l'appel à glPopMatrix : Appel de la méthode entre glBegin et glEnd.");
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glPopMatrix : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_MAP_BUFFER>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_MAP_BUFFER>(GLint err)
 			{
 				switch(err)
 				{
@@ -485,21 +420,17 @@ namespace Croissant
 					break;
 				case GL_INVALID_ENUM:
 					throw OpenGLRendererException("Erreur lors de l'appel à glMapBuffer : La valeur de target ou de access n'est pas valide.");
-					break;
 				case GL_OUT_OF_MEMORY:
 					throw OpenGLRendererException("Erreur lors de l'appel à glMapBuffer : Impossible d'allouer la tailler mémoire nécessaire.");
-					break;
 				case GL_INVALID_OPERATION:
 					throw OpenGLRendererException("Erreur lors de l'appel à glMapBuffer : Le buffer a une taille de 0 ou est déjà mappé.");
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glMapBuffer : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_UNMAP_BUFFER>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_UNMAP_BUFFER>(GLint err)
 			{
 				switch(err)
 				{
@@ -507,18 +438,15 @@ namespace Croissant
 					break;
 				case GL_INVALID_ENUM:
 					throw OpenGLRendererException("Erreur lors de l'appel à glUnmapBuffer : La valeur de target ou de access n'est pas valide.");
-					break;
 				case GL_INVALID_OPERATION:
 					throw OpenGLRendererException("Erreur lors de l'appel à glUnmapBuffer : Le buffer n'est pas mappé.");
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glUnmapBuffer : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_GET_INTEGERV>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_GET_INTEGERV>(GLint err)
 			{
 				switch(err)
 				{
@@ -526,15 +454,13 @@ namespace Croissant
 					break;
 				case GL_INVALID_ENUM:
 					throw OpenGLRendererException("Erreur lors de l'appel à glGetIntegerv : La valeur de pname n'est pas valide.");
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glGetIntegerv : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_SHADER_SOURCE>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_SHADER_SOURCE>(GLint err)
 			{
 				switch (err)
 				{
@@ -542,18 +468,15 @@ namespace Croissant
 					break;
 				case GL_INVALID_VALUE:
 					throw OpenGLRendererException("Erreur lors de l'appel à glShaderSource : identifiant de shader n'existe pas, ou count est inférieur à 0.");
-					break;
 				case GL_INVALID_OPERATION:
 					throw OpenGLRendererException("Erreur lors de l'appel à glShaderSource : l'identifiant n'est pas un shader.");
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glShaderSource : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_ATTACH_SHADER>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_ATTACH_SHADER>(GLint err)
 			{
 				switch (err)
 				{
@@ -561,18 +484,15 @@ namespace Croissant
 					break;
 				case GL_INVALID_VALUE:
 					throw OpenGLRendererException("Erreur lors de l'appel à glAttachShader : l'identifiant de programme ou de shader n'existe pas.");
-					break;
 				case GL_INVALID_OPERATION:
 					throw OpenGLRendererException("Erreur lors de l'appel à glAttachShader : program n'est pas un program ou shader n'est pas un shader ou shader est déjà attaché à program.");
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glAttachShader : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_COMPILE_SHADER>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_COMPILE_SHADER>(GLint err)
 			{
 				switch (err)
 				{
@@ -580,18 +500,15 @@ namespace Croissant
 					break;
 				case GL_INVALID_VALUE:
 					throw OpenGLRendererException("Erreur lors de l'appel à glCompileShader : l'identifiant de shader n'existe pas.");
-					break;
 				case GL_INVALID_OPERATION:
 					throw OpenGLRendererException("Erreur lors de l'appel à glCompileShader : L'identifiant n'est pas celui d'un shader.");
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glCompileShader : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_GET_SHADER_IV>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_GET_SHADER_IV>(GLint err)
 			{
 				switch (err)
 				{
@@ -599,21 +516,17 @@ namespace Croissant
 					break;
 				case GL_INVALID_VALUE:
 					throw OpenGLRendererException("Erreur lors de l'appel à glGetShaderiv : l'identifiant de shader n'existe pas.");
-					break;
 				case GL_INVALID_OPERATION:
 					throw OpenGLRendererException("Erreur lors de l'appel à glGetShaderiv : L'identifiant n'est pas celui d'un shader.");
-					break;
 				case GL_INVALID_ENUM:
 					throw OpenGLRendererException("Erreur lors de l'appel à glGetShaderiv : La valeur du paramète pname n'existe pas.");
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glGetShaderiv : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_BIND_ATTRIB_LOCATION>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_BIND_ATTRIB_LOCATION>(GLint err)
 			{
 				switch (err)
 				{
@@ -621,18 +534,15 @@ namespace Croissant
 					break;
 				case GL_INVALID_VALUE:
 					throw OpenGLRendererException("Erreur lors de l'appel à glBindAttribLocation : l'identifiant de programme n'existe pas ou l'index est plus grand que la valeur de GL_MAX_VERTEX_ATTRIBS.");
-					break;
 				case GL_INVALID_OPERATION:
 					throw OpenGLRendererException("Erreur lors de l'appel à glBindAttribLocation : Le nom commence part 'gl_' ce qui est interdit ou l'identifiant de programme n'est pas celui d'un programme.");
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glBindAttribLocation : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_LINK_PROGRAM>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_LINK_PROGRAM>(GLint err)
 			{
 				switch (err)
 				{
@@ -640,18 +550,15 @@ namespace Croissant
 					break;
 				case GL_INVALID_VALUE:
 					throw OpenGLRendererException("Erreur lors de l'appel à glLinkProgram : l'identifiant de programme n'existe pas.");
-					break;
 				case GL_INVALID_OPERATION:
 					throw OpenGLRendererException("Erreur lors de l'appel à glLinkProgram : l'identifiant de programme n'est pas celui d'un programme ou le programme est actuellement le programme actif et le mode de retour sur transformation est activé.");
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glLinkProgram : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_GET_PROGRAM_IV>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_GET_PROGRAM_IV>(GLint err)
 			{
 				switch (err)
 				{
@@ -659,21 +566,17 @@ namespace Croissant
 					break;
 				case GL_INVALID_VALUE:
 					throw OpenGLRendererException("Erreur lors de l'appel à glGetProgramiv : l'identifiant de programme n'existe pas.");
-					break;
 				case GL_INVALID_OPERATION:
 					throw OpenGLRendererException("Erreur lors de l'appel à glGetProgramiv : l'identifiant de programme n'est pas celui d'un programme ou le programme ne contient pas de geomtry shader pour les names GL_GEOMETRY_VERTICES_OUT, GL_GEOMETRY_INPUT_TYPE, or GL_GEOMETRY_OUTPUT_TYPE.");
-					break;
 				case GL_INVALID_ENUM:
 					throw OpenGLRendererException("Erreur lors de l'appel à glGetProgramiv : La valeur du paramète name n'existe pas.");
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glGetProgramiv : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_USE_PROGRAM>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_USE_PROGRAM>(GLint err)
 			{
 				switch (err)
 				{
@@ -681,18 +584,15 @@ namespace Croissant
 					break;
 				case GL_INVALID_VALUE:
 					throw OpenGLRendererException("Erreur lors de l'appel à glUseProgram : l'identifiant de programme n'existe pas et ne vaut pas 0.");
-					break;
 				case GL_INVALID_OPERATION:
 					throw OpenGLRendererException("Erreur lors de l'appel à glUseProgram : l'identifiant de programme n'est pas celui d'un programme OU le programme ne peut pas être mis dans l'état courant OU le retour de transformation est activé.");
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glUseProgram : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_ENABLE_VERTEX_ATTRIB_ARRAY>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_ENABLE_VERTEX_ATTRIB_ARRAY>(GLint err)
 			{
 				switch (err)
 				{
@@ -700,15 +600,13 @@ namespace Croissant
 					break;
 				case GL_INVALID_VALUE:
 					throw OpenGLRendererException("Erreur lors de l'appel à glEnableVertexAttribArray : l'index est plus grand ou égal à la valeur de GL_MAX_VERTEX_ATTRIBS.");
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glEnableVertexAttribArray : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_DISABLE_VERTEX_ATTRIB_ARRAY>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_DISABLE_VERTEX_ATTRIB_ARRAY>(GLint err)
 			{
 				switch (err)
 				{
@@ -716,15 +614,13 @@ namespace Croissant
 					break;
 				case GL_INVALID_VALUE:
 					throw OpenGLRendererException("Erreur lors de l'appel à glDisableVertexAttribArray : l'index est plus grand ou égal à la valeur de GL_MAX_VERTEX_ATTRIBS.");
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glDisableVertexAttribArray : Erreur non identifiée.");
-					break;
 				}
 			}
 
 			template<>
-			inline void glThrowOnError<GLFUNCINDEX_VERTEX_ATTRIB_POINTER>(GLint err)
+			void glThrowOnError<GLFUNCINDEX_VERTEX_ATTRIB_POINTER>(GLint err)
 			{
 				switch (err)
 				{
@@ -732,20 +628,48 @@ namespace Croissant
 					break;
 				case GL_INVALID_VALUE:
 					throw OpenGLRendererException("Erreur lors de l'appel à glVertexAttribPointer : l'index est plus grand ou égal à la valeur de GL_MAX_VERTEX_ATTRIBS OU la valeur de size n'est pas compris entre 1 et 4 OU la valeur de stride est négative.");
-					break;
 				case GL_INVALID_ENUM:
 					throw OpenGLRendererException("Erreur lors de l'appel à glVertexAttribPointer : la valeur de type n'est pas reconnue.");
-					break;
 				case GL_INVALID_OPERATION:
 					throw OpenGLRendererException("Erreur lors de l'appel à glVertexAttribPointer : Pas de vertex array lié au context.");
-					break;
 				default:
 					throw OpenGLRendererException("Erreur lors de l'appel à glVertexAttribPointer : Erreur non identifiée.");
-					break;
 				}
 			}
 
-			using LogManager = Croissant::Core::LogManager;
+			template<>
+			void glThrowOnError<GLFUNCINDEX_GET_UNIFORM_LOCATION>(GLint err)
+			{
+				switch (err)
+				{
+				case GL_NO_ERROR:
+					break;
+				case GL_INVALID_VALUE:
+					throw OpenGLRendererException("Erreur lors de l'appel à glGetUniformLocation : La valeur de programId n'a pas été généré par OpenGL.");
+				case GL_INVALID_OPERATION:
+					throw OpenGLRendererException("Erreur lors de l'appel à glGetUniformLocation : La valeur de programId n'est pas un programme OU le prgramme n'a pas été link.");
+				default:
+					throw OpenGLRendererException("Erreur lors de l'appel à glGetUniformLocation : Erreur non identifiée.");
+				}
+			}
+
+			template<>
+			void glThrowOnError<GLFUNCINDEX_UNIFORM_MATRIX_4FV>(GLint err)
+			{
+				switch (err)
+				{
+				case GL_NO_ERROR:
+					break;
+				case GL_INVALID_VALUE:
+					throw OpenGLRendererException("Erreur lors de l'appel à glUniformMatrix4fv : La valeur de count est inférieure à 0.");
+				case GL_INVALID_OPERATION:
+					throw OpenGLRendererException("Erreur lors de l'appel à glUniformMatrix4fv : Il n'y a pas de programme actif OU location n'est pas l'emplacement d'un uniform valide OU la variable n'est mas une matrice 4x4 de float. OU la valeur de count > 1 et la variable uniforme n'est pas un tableau.");
+				default:
+					throw OpenGLRendererException("Erreur lors de l'appel à glUniformMatrix4fv : Erreur non identifiée.");
+				}
+			}
+
+			using LogManager = Core::LogManager;
 			using string = std::string;
 
 			template <typename Func>
@@ -809,13 +733,13 @@ namespace Croissant
 				};
 
 				wc.lpfnWndProc   = WndProc;
-				wc.hInstance     = 0;
-				wc.hbrBackground = (HBRUSH)(COLOR_BACKGROUND);
+				wc.hInstance     = nullptr;
+				wc.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_BACKGROUND);
 				wc.lpszClassName = DUMMY_WINDOW_CLASS_NAME;
 				wc.style = CS_OWNDC;
 				if( !RegisterClass(&wc) )
 					return;
-				windowHandle = CreateWindow(wc.lpszClassName,"openglversioncheck",WS_OVERLAPPEDWINDOW,0,0,640,480,0,0,0,0);
+				windowHandle = CreateWindow(wc.lpszClassName,"openglversioncheck",WS_OVERLAPPEDWINDOW,0,0,640,480,nullptr,nullptr,nullptr,nullptr);
 
 				ourWindowHandleToDeviceContext = GetDC(windowHandle);
 
@@ -848,7 +772,7 @@ namespace Croissant
 					DispatchMessage( &msg );
 				}
 
-				wglMakeCurrent (NULL, NULL);
+				wglMakeCurrent (nullptr, nullptr);
 				wglDeleteContext(ourOpenGLRenderingContext);
 				DeleteDC(ourWindowHandleToDeviceContext);
 				UnregisterClass(DUMMY_WINDOW_CLASS_NAME, nullptr);
@@ -872,9 +796,9 @@ namespace Croissant
 		OpenGLWrapper::OpenGLWrapper(Core::LogManager& logManager)
 			: m_logManager(logManager)
 		{
-			HDC ourWindowHandleToDeviceContext = { 0 };
-			HGLRC ourOpenGLRenderingContext = { 0 };
-			HWND windowHandle = { 0 };
+			HDC ourWindowHandleToDeviceContext = { nullptr };
+			HGLRC ourOpenGLRenderingContext = { nullptr };
+			HWND windowHandle = { nullptr };
 
 			createDummyContext(ourWindowHandleToDeviceContext, ourOpenGLRenderingContext, windowHandle);
 
@@ -917,6 +841,8 @@ namespace Croissant
 			ext_glDisableVertexAttribArray = LoadGLSymbol<glDisableVertexAttribArray_t>("glDisableVertexAttribArray");
 			ext_glVertexAttribPointer = LoadGLSymbol<glVertexAttribPointer_t>("glVertexAttribPointer");
 			ext_glGetProgramInfoLog = LoadGLSymbol<glGetProgramInfoLog_t>("glGetProgramInfoLog");
+			ext_glGetUniformLocation = LoadGLSymbol<glGetUniformLocation_t>("glGetUniformLocation");
+			ext_glUniformMatrix4fv = LoadGLSymbol<glUniformMatrix4fv_t>("glUniformMatrix4fv");
 
 			int NumberOfExtensions;
 			glGetIntegerv(GL_NUM_EXTENSIONS, &NumberOfExtensions);
@@ -1231,9 +1157,22 @@ namespace Croissant
 			GLsizei len;
 
 			result.resize(logLength);
-//			result.reserve(logLength);
 			ext_glGetProgramInfoLog(programId, logLength, &len, &result[0]);
 			return result;
+		}
+
+		int32_t OpenGLWrapper::GetUniformLocation(uint32_t programId, std::string const name) const
+		{
+			int32_t result = ext_glGetUniformLocation(programId, name.c_str());
+
+			glCheckForError<GLFUNCINDEX_GET_UNIFORM_LOCATION>(*this);
+			return result;
+		}
+
+		void OpenGLWrapper::SetUniformMatrix4f(int32_t location, int32_t count, bool transpose, Math::Matrix4f const& matrix) const
+		{
+			ext_glUniformMatrix4fv(location, count, (transpose ? GL_TRUE : GL_FALSE), matrix.Data().data());
+			glCheckForError<GLFUNCINDEX_UNIFORM_MATRIX_4FV>(*this);
 		}
 
 		GLenum OpenGLWrapper::s_valueNames[] {

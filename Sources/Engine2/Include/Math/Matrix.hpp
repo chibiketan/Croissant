@@ -1,5 +1,6 @@
 #ifndef CROISSANT_ENGINE_MATH_HPP_INC
 #  define CROISSANT_ENGINE_MATH_HPP_INC
+#  include <array>
 
 namespace Croissant
 {
@@ -10,16 +11,16 @@ namespace Croissant
 			template<typename Number, size_t size, size_t index>
 			struct MatrixHelper
 			{
-				inline static void InitializeToZero(Number data[size * size]);
-				inline static void InitializeToIdentity(Number data[size * size]);
+				inline static void InitializeToZero(std::array<Number, size * size> &data);
+				inline static void InitializeToIdentity(std::array<Number, size * size> &data);
 				constexpr static Number GetIndexValueForIdentity();
 			};
 
 			template<typename Number, size_t size>
 			struct MatrixHelper<Number, size, 0>
 			{
-				inline static void Init(Number data[size * size]);
-				inline static void InitializeToIdentity(Number data[size * size]);
+				inline static void Init(std::array<Number, size * size> &data);
+				inline static void InitializeToIdentity(std::array<Number, size * size> &data);
 				constexpr static Number GetIndexValueForIdentity();
 			};
 		}
@@ -29,27 +30,28 @@ namespace Croissant
 		{
 		public:
 			Matrix();
-			explicit Matrix(Number const source[size * size]);
+			explicit Matrix(std::array<Number, size * size> const& source);
 			Matrix(Matrix const&);
 			Matrix(Matrix &&);
 			Matrix& operator=(Matrix const&);
 			Matrix& operator=(Matrix &&);
+			std::array<Number, size * size> const&	Data() const;
 			static Matrix Identity();
 
 		private:
-			Number	m_data[size * size];
+			std::array<Number, size * size>	m_data;
 		};
 
 		// --------------------------------------------------------------------------- _Internal::MatrixHelper
 		template<typename Number, size_t size, size_t index>
-		void _Internal::MatrixHelper<Number, size, index>::InitializeToZero(Number data[size * size])
+		void _Internal::MatrixHelper<Number, size, index>::InitializeToZero(std::array<Number, size * size> &data)
 		{
 			MatrixHelper<Number, size, index - 1>::InitializeToZero(data);
 			data[index] = 0;
 		}
 
 		template <typename Number, size_t size>
-		void _Internal::MatrixHelper<Number, size, 0>::Init(Number data[size * size])
+		void _Internal::MatrixHelper<Number, size, 0>::Init(std::array<Number, size * size> &data)
 		{
 			data[0] = 0;
 		}
@@ -61,14 +63,14 @@ namespace Croissant
 		}
 
 		template <typename Number, size_t size, size_t index>
-		void _Internal::MatrixHelper<Number, size, index>::InitializeToIdentity(Number data[size * size])
+		void _Internal::MatrixHelper<Number, size, index>::InitializeToIdentity(std::array<Number, size * size> &data)
 		{
 			MatrixHelper<Number, size, index - 1>::InitializeToIdentity(data);
 			data[index] = GetIndexValueForIdentity();
 		}
 
 		template <typename Number, size_t size>
-		void _Internal::MatrixHelper<Number, size, 0>::InitializeToIdentity(Number data[size * size])
+		void _Internal::MatrixHelper<Number, size, 0>::InitializeToIdentity(std::array<Number, size * size> &data)
 		{
 			data[0] = GetIndexValueForIdentity();
 		}
@@ -87,43 +89,49 @@ namespace Croissant
 		}
 
 		template <typename Number, size_t size>
-		Matrix<Number, size>::Matrix(const Number source[size * size])
+		Matrix<Number, size>::Matrix(std::array<Number, size * size> const& source)
 		{
-			::memcpy(m_data, source, size * size * sizeof(Number));
+			m_data = source;
 		}
 
 		template <typename Number, size_t size>
-		Matrix<Number, size>::Matrix(Matrix const&)
+		Matrix<Number, size>::Matrix(Matrix const& ref)
 		{
-			::memcpy(m_data, source, size * size * sizeof(Number));
+			m_data = ref.m_data;
 		}
 
 		template <typename Number, size_t size>
 		Matrix<Number, size>::Matrix(Matrix&& ref)
 		{
-			::memcpy(m_data, ref.m_data, size * size * sizeof(Number));
+			m_data = std::move(ref.m_data);
 			_Internal::MatrixHelper<Number, size, size * size - 1>::InitializeToZero(ref.m_data);
 		}
 
 		template <typename Number, size_t size>
-		Matrix<Number, size>& Matrix<Number, size>::operator=(Matrix const&)
+		Matrix<Number, size>& Matrix<Number, size>::operator=(Matrix const& ref)
 		{
-			::memcpy(m_data, ref.m_data, size * size * sizeof(Number));
+			m_data = ref.m_data;
 			return *this;
 		}
 
 		template <typename Number, size_t size>
 		Matrix<Number, size>& Matrix<Number, size>::operator=(Matrix&& ref)
 		{
-			::memcpy(m_data, ref.m_data, size * size * sizeof(Number));
+			m_data = std::move(ref.m_data);
 			_Internal::MatrixHelper<Number, size, size * size - 1>::InitializeToZero(ref.m_data);
 			return *this;
 		}
 
 		template <typename Number, size_t size>
+		std::array<Number, size * size> const& Matrix<Number, size>::Data() const
+		{
+			return m_data;
+		}
+
+		template <typename Number, size_t size>
 		Matrix<Number, size> Matrix<Number, size>::Identity()
 		{
-			Number data[size * size];
+			std::array<Number, size * size> data;
 
 			_Internal::MatrixHelper<Number, size, size * size - 1>::InitializeToIdentity(data);
 			return Matrix(data);
