@@ -17,6 +17,8 @@
 #include <chrono>
 #include "Math/Matrix.hpp"
 
+#define PI 3.14159265f
+
 //#include <iostream>
 
 //class TraceEventListener : public Croissant::Event::IEventListener
@@ -88,6 +90,7 @@ int main(int, char**)
 		int fps = 0;
 		Time firstFrameTime { Clock::now() };
 		Time lastFrameTime { firstFrameTime };
+		Time prevFrameTime{ firstFrameTime };
 
 		// --------------------------------------------------------------------------- begin initialisation
 		auto vertexShaderContent = std::string(R"(
@@ -200,9 +203,6 @@ void main()
 		opengl.BindBuffer(GL_ARRAY_BUFFER, verticesBufferId);
 		opengl.BufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-		auto verticesSize = sizeof(vertices);
-		//std::cout << "sizeof(vertices) : " << sizeof(vertices) << std::endl;
-
 		// cube indexes
 
 		uint32_t indexes[] = {
@@ -229,15 +229,46 @@ void main()
 		auto indexesSize = sizeof(indexes);
 
 		// TODO : 
-		auto projection = Croissant::Math::Matrix4f::Identity();
 		auto uniformWorldViewProjMatrix = opengl.GetUniformLocation(programId, "WorldViewProjMatrix");
+		auto projection = Croissant::Math::Matrix4f::Identity();
+		//auto angleX = 30.0f * PI / 180.0f;
+		//auto angleY = 30.0f * PI / 180.0f;
+		//auto angleZ = 30.0f * PI / 180.0f;
+
+		// toutes les rotations sont dans le sens inverse des aiguilles d'une montre
+		//// rotation sur Z
+		//auto yaw = Croissant::Math::Matrix4f({
+		//	std::cosf(angleZ),	-std::sinf(angleZ),	0.0f,	0.0f,
+		//	std::sinf(angleZ),	std::cosf(angleZ),	0.0f,	0.0f,
+		//	0.0f,				0.0f,				1.0f,	0.0f,
+		//	0.0f,				0.0f,				0.0f,	1.0f
+		//});
+
+		//// rotation sur Y
+		//auto pitch = Croissant::Math::Matrix4f({
+		//	std::cosf(angleY),	0.0f,	std::sinf(angleY),	0.0f,
+		//	0.0f,				1.0f,	0.0f,				0.0f,
+		//	-std::sinf(angleY),	0.0f,	std::cosf(angleY),	0.0f,
+		//	0.0f,				0.0f,	0.0f,				1.0f
+		//});
+
+		//// rotation sur X
+		//auto roll = Croissant::Math::Matrix4f({
+		//	1.0f,	0.0f,				0.0f,				0.0f,
+		//	0.0f,	std::cosf(angleX),	-std::sinf(angleX),	0.0f,
+		//	0.0f,	std::sinf(angleX),	std::cosf(angleX),	0.0f,
+		//	0.0f,	0.0f,				0.0f,				1.0f
+		//});
 
 		// --------------------------------------------------------------------------- end   initialisation
-
+		auto baseAngle = 0.0f;
+		auto step = 1.0f;
 		while (1)
 		{
+
 			++fps;
 			Time currentFrameTime { Clock::now() };
+			durationSecond secondSincePrevFrame{ currentFrameTime - prevFrameTime };
 			durationSecond secondSinceFirstFrame { currentFrameTime - firstFrameTime };
 			if (secondSinceFirstFrame.count() >= 1.0f) {
 				durationNanoSecond nanoS = std::chrono::duration_cast<durationNanoSecond>(secondSinceFirstFrame);
@@ -249,6 +280,24 @@ void main()
 				lastFrameTime = firstFrameTime;
 			}
 
+			baseAngle += step * secondSinceFirstFrame.count();
+			auto angleX = 30.0f * PI / 180.0f;
+			auto angleY = baseAngle * PI / 180.0f;
+			auto angleZ = 30.0f * PI / 180.0f;
+
+			// rotation complète
+			auto sinX = std::sinf(angleX);
+			auto cosX = std::cosf(angleX);
+			auto sinY = std::sinf(angleY);
+			auto cosY = std::cosf(angleY);
+			auto sinZ = std::sinf(angleZ);
+			auto cosZ = std::cosf(angleZ);
+			auto rotation = Croissant::Math::Matrix4f({
+				cosZ * cosY,	cosZ * sinY * sinX - sinZ * cosX,	cosZ * sinY * cosX + sinZ * sinX,	0.0f,
+				sinZ * cosY,	sinZ * sinY * sinX + cosZ * cosX,	sinZ * sinY * cosX - cosZ * sinX,	0.0f,
+				-sinY,			cosY * sinX,						cosY * cosX,						0.0f,
+				0.0f,			0.0f,								0.0f,								1.0f
+			});
 
 
 			auto evt = win.PeekEvent();
@@ -269,7 +318,7 @@ void main()
 			opengl.EnableVertexAttribArray(0);
 			opengl.EnableVertexAttribArray(1);
 
-			opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, false, projection);
+			opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, true, rotation);
 
 			//opengl.VertexPointer(3, GL_FLOAT, sizeof(vertexProp), 0);
 			//opengl.ColorPointer(3, GL_UNSIGNED_BYTE, sizeof(vertexProp), BUFFER_OFFSET(sizeof(vertexProp::m_coord)));
@@ -288,6 +337,7 @@ void main()
 
 
 			renderer.Render();
+			prevFrameTime = currentFrameTime;
 		}
 	}
 	catch (std::exception& e)
