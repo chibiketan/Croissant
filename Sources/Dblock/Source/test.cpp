@@ -105,12 +105,6 @@ uniform mat4 WorldViewProjMatrix;
 
 /********************Fonctions********************/
 out vec3 vcolor;
-mat4 matrix = mat4(
-	1, 0, 0, 0,
-	0, 1, 0, 0,
-	0, 0, 1, 0,
-	0, 0, 0, 1
-);
 
 void main()
 {
@@ -262,7 +256,7 @@ void main()
 
 		// --------------------------------------------------------------------------- end   initialisation
 		auto baseAngle = 0.0f;
-		auto step = 1.0f;
+		auto step = 100.0f;
 		while (1)
 		{
 
@@ -280,10 +274,16 @@ void main()
 				lastFrameTime = firstFrameTime;
 			}
 
-			baseAngle += step * secondSinceFirstFrame.count();
+			baseAngle += (step * secondSincePrevFrame.count());
+
+			if (baseAngle > 360.0f)
+			{
+				baseAngle -= 360.0f;
+			}
+
 			auto angleX = 30.0f * PI / 180.0f;
-			auto angleY = baseAngle * PI / 180.0f;
-			auto angleZ = 30.0f * PI / 180.0f;
+			auto angleY = 30.0f * PI / 180.0f;
+			auto angleZ = baseAngle * PI / 180.0f;
 
 			// rotation complète
 			auto sinX = std::sinf(angleX);
@@ -298,7 +298,6 @@ void main()
 				-sinY,			cosY * sinX,						cosY * cosX,						0.0f,
 				0.0f,			0.0f,								0.0f,								1.0f
 			});
-
 
 			auto evt = win.PeekEvent();
 
