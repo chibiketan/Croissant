@@ -18,6 +18,9 @@ croissant_files(${PROJECT_NAME} ${ENGINE_SOURCE}
 	Graphic/WindowEvent.cpp
 	Graphic/WindowEventClose.cpp
 	Graphic/WindowEventNone.cpp
+    Math/Matrix4.cpp
+    Math/Vector4.cpp
+    Math/Point4.cpp
 	Module/ServiceProvider.cpp
 	Module/ServiceProviderInternal.cpp
 	Threading/AutoResetEvent.cpp
@@ -40,6 +43,9 @@ croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
 	Graphic/WindowEventClose.hpp
 	Graphic/WindowEventNone.hpp
 	Math/Matrix.hpp
+    Math/Matrix4.hpp
+    Math/Vector4.hpp
+    Math/Point4.hpp
 	Module/ServiceProvider.hpp
 	Module/ServiceProviderInternal.hpp
 	Threading/AutoResetEvent.hpp
@@ -57,7 +63,7 @@ else()
 	message("Building ${PROJECT_NAME} as static library")
 	add_library(${PROJECT_NAME} 
 		${${PROJECT_NAME}_Sources}
-	)
+    )
 endif()
 
 target_include_directories(${PROJECT_NAME}
