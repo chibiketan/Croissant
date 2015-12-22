@@ -11,6 +11,7 @@ croissant_files(${PROJECT_NAME} ${UTGTEST_SOURCE}
 	FileSystem/Directory.cpp
 	FileSystem/File.cpp
 	Math/Point.cpp
+	Math/Vector4.cpp
 )
 
 croissant_files(${PROJECT_NAME} ${UTGTEST_INCLUDE}
