@@ -10,6 +10,7 @@ croissant_files(${PROJECT_NAME} ${UTGTEST_SOURCE}
 	Event/EventManager.cpp
 	FileSystem/Directory.cpp
 	FileSystem/File.cpp
+	Math/Matrix4.cpp
 	Math/Point.cpp
 	Math/Vector4.cpp
 )
