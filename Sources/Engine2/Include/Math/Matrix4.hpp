@@ -21,7 +21,8 @@ namespace Croissant
 			float&									operator()(size_t row, size_t column);
 			void									LoadIdentity();
 			void									LoadZero();
-			Matrix4									operator*(Matrix4 const& right);
+			Matrix4									operator*(Matrix4 const& right) const;
+			bool									operator==(Matrix4 const& right) const;
 
 		private:
 			std::array<float, ARRAY_SIZE>	m_data;

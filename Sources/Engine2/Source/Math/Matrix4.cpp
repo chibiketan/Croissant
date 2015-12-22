@@ -64,9 +64,10 @@ namespace Croissant
 			};
 		}
 
-		Matrix4 Matrix4::operator*(Matrix4 const& right)
+		Matrix4 Matrix4::operator*(Matrix4 const& right) const
 		{
 			auto& rthis = *this;
+			// TODO: ne pas utiliser l'opérateur () mais plutôt les indexes de m_data
 			auto result = Matrix4({
 				// first line
 				rthis(0, 0) * right(0, 0) + rthis(1, 0) * right(0, 1) + rthis(2, 0) * right(0, 2) + rthis(3, 0) * right(0, 3),
@@ -91,6 +92,11 @@ namespace Croissant
 			});
 
 			return result;
+		}
+
+		bool Matrix4::operator==(Matrix4 const& right) const
+		{
+			return m_data == right.m_data;
 		}
 	}
 }
