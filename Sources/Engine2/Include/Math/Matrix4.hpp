@@ -13,19 +13,21 @@ namespace Croissant
 		class ENGINE_API Matrix4 final
 		{
 		public:
+			using ValueType = float;
+			using ArrayType = std::array<ValueType, ARRAY_SIZE>;
 
 			Matrix4();
-			explicit Matrix4(std::array<float, ARRAY_SIZE> const& source);
-			std::array<float, ARRAY_SIZE> const&	Data() const;
-			float									operator()(size_t row, size_t column) const;
-			float&									operator()(size_t row, size_t column);
-			void									LoadIdentity();
-			void									LoadZero();
-			Matrix4									operator*(Matrix4 const& right) const;
-			bool									operator==(Matrix4 const& right) const;
+			explicit Matrix4(ArrayType const& source);
+			ArrayType const&	Data() const;
+			ValueType			operator()(size_t row, size_t column) const;
+			ValueType&			operator()(size_t row, size_t column);
+			void				LoadIdentity();
+			void				LoadZero();
+			Matrix4				operator*(Matrix4 const& right) const;
+			bool				operator==(Matrix4 const& right) const;
 
 		private:
-			std::array<float, ARRAY_SIZE>	m_data;
+			ArrayType	m_data;
 		};
 
 	}

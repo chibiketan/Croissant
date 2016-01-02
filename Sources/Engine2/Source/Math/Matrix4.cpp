@@ -20,24 +20,24 @@ namespace Croissant
 		{
 		}
 
-		Matrix4::Matrix4(std::array<float, 16> const& source)
+		Matrix4::Matrix4(Matrix4::ArrayType const& source)
 			: m_data(source)
 		{
 		}
 
-		std::array<float, 16> const& Matrix4::Data() const
+		Matrix4::ArrayType const& Matrix4::Data() const
 		{
 			return m_data;
 		}
 
-		float Matrix4::operator()(size_t row, size_t column) const
+		Matrix4::ValueType Matrix4::operator()(size_t row, size_t column) const
 		{
 			assert(row < DIMENSION);
 			assert(column < DIMENSION);
 			return m_data[row * DIMENSION + column];
 		}
 
-		float& Matrix4::operator()(size_t row, size_t column)
+		Matrix4::ValueType& Matrix4::operator()(size_t row, size_t column)
 		{
 			assert(row < DIMENSION);
 			assert(column < DIMENSION);
