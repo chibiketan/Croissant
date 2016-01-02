@@ -26,24 +26,24 @@ TEST_F(Matrix4Test, DefaultConstructorIsIdentity)
 
 	// line 1
 	ASSERT_FLOAT_EQ(1.0f, matrix(0, 0));
-	ASSERT_FLOAT_EQ(0.0f, matrix(0, 0));
-	ASSERT_FLOAT_EQ(0.0f, matrix(0, 0));
-	ASSERT_FLOAT_EQ(0.0f, matrix(0, 0));
+	ASSERT_FLOAT_EQ(0.0f, matrix(0, 1));
+	ASSERT_FLOAT_EQ(0.0f, matrix(0, 2));
+	ASSERT_FLOAT_EQ(0.0f, matrix(0, 3));
 	// line 2
-	ASSERT_FLOAT_EQ(0.0f, matrix(0, 0));
-	ASSERT_FLOAT_EQ(1.0f, matrix(0, 0));
-	ASSERT_FLOAT_EQ(0.0f, matrix(0, 0));
-	ASSERT_FLOAT_EQ(0.0f, matrix(0, 0));
+	ASSERT_FLOAT_EQ(0.0f, matrix(1, 0));
+	ASSERT_FLOAT_EQ(1.0f, matrix(1, 1));
+	ASSERT_FLOAT_EQ(0.0f, matrix(1, 2));
+	ASSERT_FLOAT_EQ(0.0f, matrix(1, 3));
 	// line 3
-	ASSERT_FLOAT_EQ(0.0f, matrix(0, 0));
-	ASSERT_FLOAT_EQ(0.0f, matrix(0, 0));
-	ASSERT_FLOAT_EQ(3.0f, matrix(0, 0));
-	ASSERT_FLOAT_EQ(0.0f, matrix(0, 0));
+	ASSERT_FLOAT_EQ(0.0f, matrix(2, 0));
+	ASSERT_FLOAT_EQ(0.0f, matrix(2, 1));
+	ASSERT_FLOAT_EQ(1.0f, matrix(2, 2));
+	ASSERT_FLOAT_EQ(0.0f, matrix(2, 3));
 	// line 4
-	ASSERT_FLOAT_EQ(0.0f, matrix(0, 0));
-	ASSERT_FLOAT_EQ(0.0f, matrix(0, 0));
-	ASSERT_FLOAT_EQ(0.0f, matrix(0, 0));
-	ASSERT_FLOAT_EQ(1.0f, matrix(0, 0));
+	ASSERT_FLOAT_EQ(0.0f, matrix(3, 0));
+	ASSERT_FLOAT_EQ(0.0f, matrix(3, 1));
+	ASSERT_FLOAT_EQ(0.0f, matrix(3, 2));
+	ASSERT_FLOAT_EQ(1.0f, matrix(3, 3));
 }
 
 TEST_F(Matrix4Test, MultiplicationOfIdentity)
