@@ -70,25 +70,25 @@ namespace Croissant
 			// TODO: ne pas utiliser l'opérateur () mais plutôt les indexes de m_data
 			auto result = Matrix4({
 				// first line
-				rthis(0, 0) * right(0, 0) + rthis(1, 0) * right(0, 1) + rthis(2, 0) * right(0, 2) + rthis(3, 0) * right(0, 3),
-				rthis(0, 1) * right(0, 0) + rthis(1, 1) * right(0, 1) + rthis(2, 1) * right(0, 2) + rthis(3, 1) * right(0, 3),
-				rthis(0, 2) * right(0, 0) + rthis(1, 2) * right(0, 1) + rthis(2, 2) * right(0, 2) + rthis(3, 2) * right(0, 3),
-				rthis(0, 3) * right(0, 0) + rthis(1, 3) * right(0, 1) + rthis(2, 3) * right(0, 2) + rthis(3, 3) * right(0, 3),
+				rthis(0, 0) * right(0, 0) + rthis(0, 1) * right(1, 0) + rthis(0, 2) * right(2, 0) + rthis(0, 3) * right(3, 0),
+				rthis(0, 0) * right(0, 1) + rthis(0, 1) * right(1, 1) + rthis(0, 2) * right(2, 1) + rthis(0, 3) * right(3, 1),
+				rthis(0, 0) * right(0, 2) + rthis(0, 1) * right(1, 2) + rthis(0, 2) * right(2, 2) + rthis(0, 3) * right(3, 2),
+				rthis(0, 0) * right(0, 3) + rthis(0, 1) * right(1, 3) + rthis(0, 2) * right(2, 3) + rthis(0, 3) * right(3, 3),
 				// second line
-				rthis(0, 0) * right(1, 0) + rthis(1, 0) * right(1, 1) + rthis(2, 0) * right(1, 2) + rthis(3, 0) * right(1, 3),
-				rthis(0, 1) * right(1, 0) + rthis(1, 1) * right(1, 1) + rthis(2, 1) * right(1, 2) + rthis(3, 1) * right(1, 3),
-				rthis(0, 2) * right(1, 0) + rthis(1, 2) * right(1, 1) + rthis(2, 2) * right(1, 2) + rthis(3, 2) * right(1, 3),
-				rthis(0, 3) * right(1, 0) + rthis(1, 3) * right(1, 1) + rthis(2, 3) * right(1, 2) + rthis(3, 3) * right(1, 3),
+				rthis(1, 0) * right(0, 0) + rthis(1, 1) * right(1, 0) + rthis(1, 2) * right(2, 0) + rthis(1, 3) * right(3, 0),
+				rthis(1, 0) * right(0, 1) + rthis(1, 1) * right(1, 1) + rthis(1, 2) * right(2, 1) + rthis(1, 3) * right(3, 1),
+				rthis(1, 0) * right(0, 2) + rthis(1, 1) * right(1, 2) + rthis(1, 2) * right(2, 2) + rthis(1, 3) * right(3, 2),
+				rthis(1, 0) * right(0, 3) + rthis(1, 1) * right(1, 3) + rthis(1, 2) * right(2, 3) + rthis(1, 3) * right(3, 3),
 				// third line
-				rthis(0, 0) * right(2, 0) + rthis(1, 0) * right(2, 1) + rthis(2, 0) * right(2, 2) + rthis(3, 0) * right(2, 3),
-				rthis(0, 1) * right(2, 0) + rthis(1, 1) * right(2, 1) + rthis(2, 1) * right(2, 2) + rthis(3, 1) * right(2, 3),
-				rthis(0, 2) * right(2, 0) + rthis(1, 2) * right(2, 1) + rthis(2, 2) * right(2, 2) + rthis(3, 2) * right(2, 3),
-				rthis(0, 3) * right(2, 0) + rthis(1, 3) * right(2, 1) + rthis(2, 3) * right(2, 2) + rthis(3, 3) * right(2, 3),
+				rthis(2, 0) * right(0, 0) + rthis(2, 1) * right(1, 0) + rthis(2, 2) * right(2, 0) + rthis(2, 3) * right(3, 0),
+				rthis(2, 0) * right(0, 1) + rthis(2, 1) * right(1, 1) + rthis(2, 2) * right(2, 1) + rthis(2, 3) * right(3, 1),
+				rthis(2, 0) * right(0, 2) + rthis(2, 1) * right(1, 2) + rthis(2, 2) * right(2, 2) + rthis(2, 3) * right(3, 2),
+				rthis(2, 0) * right(0, 3) + rthis(2, 1) * right(1, 3) + rthis(2, 2) * right(2, 3) + rthis(2, 3) * right(3, 3),
 				// fourth line
-				rthis(0, 0) * right(3, 0) + rthis(1, 0) * right(3, 1) + rthis(2, 0) * right(3, 2) + rthis(3, 0) * right(3, 3),
-				rthis(0, 1) * right(3, 0) + rthis(1, 1) * right(3, 1) + rthis(2, 1) * right(3, 2) + rthis(3, 1) * right(3, 3),
-				rthis(0, 2) * right(3, 0) + rthis(1, 2) * right(3, 1) + rthis(2, 2) * right(3, 2) + rthis(3, 2) * right(3, 3),
-				rthis(0, 3) * right(3, 0) + rthis(1, 3) * right(3, 1) + rthis(2, 3) * right(3, 2) + rthis(3, 3) * right(3, 3),
+				rthis(3, 0) * right(0, 0) + rthis(3, 1) * right(1, 0) + rthis(3, 2) * right(2, 0) + rthis(3, 3) * right(3, 0),
+				rthis(3, 0) * right(0, 1) + rthis(3, 1) * right(1, 1) + rthis(3, 2) * right(2, 1) + rthis(3, 3) * right(3, 1),
+				rthis(3, 0) * right(0, 2) + rthis(3, 1) * right(1, 2) + rthis(3, 2) * right(2, 2) + rthis(3, 3) * right(3, 2),
+				rthis(3, 0) * right(0, 3) + rthis(3, 1) * right(1, 3) + rthis(3, 2) * right(2, 3) + rthis(3, 3) * right(3, 3),
 			});
 
 			return result;
