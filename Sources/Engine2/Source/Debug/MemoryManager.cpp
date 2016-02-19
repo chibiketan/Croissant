@@ -86,32 +86,56 @@ namespace Croissant
 
 #elif defined(CROISSANT_WINDOWS)
 
+
+
 			template<typename C, size_t size, size_t size2>
 			void CopyString(C (&output)[size], const C (&source)[size2])
 			{
+#  if defined(COMPILER_MSVC)
 				::strcpy_s(output, source);
+#  else
+                ::strcpy(output, source);
+#  endif
 			}
 
 			void CopyString(char* output, size_t size, const char* source)
 			{
+#  if defined(COMPILER_MSVC)
 				::strcpy_s(output, size, source);
+#  else
+                (void)size;
+                ::strcpy(output, source);
+#  endif
 			}
 
 			template<typename C, size_t size>
 			void CatString(C(&output)[size], const C* source)
 			{
+#  if defined(COMPILER_MSVC)
 				::strcat_s(output, source);
+#  else
+                ::strcat(output, source);
+#  endif
 			}
 
 			void CatString(char* output, size_t size, const char* source)
 			{
+#  if defined(COMPILER_MSVC)
 				::strcat_s(output, size, source);
+#  else
+                (void)size;
+                ::strcat(output, source);
+#  endif
 			}
 
 			template<typename C, size_t size, size_t sizeDrive, size_t sizeDir>
 			void SplitPath(const C(&output)[size], C (&drivePath)[sizeDrive], C (&dir)[sizeDir])
 			{
+#  if defined(COMPILER_MSVC)
 				::_splitpath_s(output, drivePath, sizeDrive, dir, sizeDir, nullptr, 0, nullptr, 0);
+#  else
+                ::_splitpath(output, drivePath, dir, nullptr, nullptr);
+#  endif
 			}
 
 			char *GetFileRelativeToApp(const char* fileName)
@@ -150,7 +174,11 @@ namespace Croissant
 
 			void OpenFile(FILE* (&file), const char* path, const char* mode)
 			{
+#  if defined(COMPILER_MSVC)
 				fopen_s(&file, path, mode);
+#  else
+                file = ::fopen(path, mode);
+#  endif
 			}
 
 

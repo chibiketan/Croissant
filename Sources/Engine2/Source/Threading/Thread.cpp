@@ -1,7 +1,8 @@
-#ifdef CROISSANT_HAS_THREAD
-
 #include "Debug/MemoryManager.hpp"
 #include "Threading/Thread.hpp"
+
+#ifdef CROISSANT_HAS_THREAD
+
 
 #if defined(CROISSANT_THREAD_STD)
 #  include "../Source/Specific/Threading/Thread.std.cpp"

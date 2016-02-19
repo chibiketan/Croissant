@@ -1,6 +1,7 @@
 #include "Debug/MemoryManager.hpp"
 #include "Core/LogManager.hpp"
 #include "FileSystem/Directory.hpp"
+#include "Threading/Thread.hpp"
 
 #include <thread>
 

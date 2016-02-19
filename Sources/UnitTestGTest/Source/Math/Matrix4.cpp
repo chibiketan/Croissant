@@ -63,12 +63,12 @@ TEST_F(Matrix4Test, MultiplicationOfYawPitchRoll)
 	auto angleZ = 30.0f * PI / 180.0f;
 	Croissant::Math::Matrix4 matrix;
 
-	auto sinX = std::sinf(angleX);
-	auto cosX = std::cosf(angleX);
-	auto sinY = std::sinf(angleY);
-	auto cosY = std::cosf(angleY);
-	auto sinZ = std::sinf(angleZ);
-	auto cosZ = std::cosf(angleZ);
+	auto sinX = std::sin(angleX);
+	auto cosX = std::cos(angleX);
+	auto sinY = std::sin(angleY);
+	auto cosY = std::cos(angleY);
+	auto sinZ = std::sin(angleZ);
+	auto cosZ = std::cos(angleZ);
 	// source : http://planning.cs.uiuc.edu/node102.html
 	auto expected = Croissant::Math::Matrix4({
 		cosZ * cosY,	cosZ * sinY * sinX - sinZ * cosX,	cosZ * sinY * cosX + sinZ * sinX,	0.0f,

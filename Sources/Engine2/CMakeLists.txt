@@ -92,17 +92,17 @@ target_link_libraries(${PROJECT_NAME}
 	PUBLIC opengl32 glu32 gdi32
 )
 
-target_compile_features(${PROJECT_NAME}
-	PUBLIC
-		cxx_defaulted_functions
-		cxx_delegating_constructors
-		cxx_deleted_functions
-		cxx_final
-		cxx_lambdas
-		cxx_nullptr
-		cxx_override
-		cxx_rvalue_references
-)
+#target_compile_features(${PROJECT_NAME}
+#	PUBLIC
+#		cxx_defaulted_functions
+#		cxx_delegating_constructors
+#		cxx_deleted_functions
+#		cxx_final
+#		cxx_lambdas
+#		cxx_nullptr
+#		cxx_override
+#		cxx_rvalue_references
+#)
 
 
 

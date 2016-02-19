@@ -19,6 +19,7 @@ namespace Croissant
 			template<typename Number, size_t size>
 			struct MatrixHelper<Number, size, 0>
 			{
+				inline static void InitializeToZero(std::array<Number, size * size> &data);
 				inline static void Init(std::array<Number, size * size> &data);
 				inline static void InitializeToIdentity(std::array<Number, size * size> &data);
 				constexpr static Number GetIndexValueForIdentity();
@@ -26,7 +27,7 @@ namespace Croissant
 		}
 
 		template<typename Number, size_t size>
-		class Matrix sealed
+		class Matrix final
 		{
 		public:
 			Matrix();
@@ -48,6 +49,12 @@ namespace Croissant
 		{
 			MatrixHelper<Number, size, index - 1>::InitializeToZero(data);
 			data[index] = 0;
+		}
+
+		template<typename Number, size_t size>
+		void _Internal::MatrixHelper<Number, size, 0>::InitializeToZero(std::array<Number, size * size> &data)
+		{
+			data[0] = 0;
 		}
 
 		template <typename Number, size_t size>

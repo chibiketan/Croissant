@@ -16,6 +16,7 @@
 #include <iostream>
 #include <chrono>
 #include "Math/Matrix.hpp"
+#include <cmath>
 
 #define PI 3.14159265f
 
@@ -286,12 +287,12 @@ void main()
 			auto angleZ = baseAngle * PI / 180.0f;
 
 			// rotation complète
-			auto sinX = std::sinf(angleX);
-			auto cosX = std::cosf(angleX);
-			auto sinY = std::sinf(angleY);
-			auto cosY = std::cosf(angleY);
-			auto sinZ = std::sinf(angleZ);
-			auto cosZ = std::cosf(angleZ);
+			auto sinX = std::sin(angleX);
+			auto cosX = std::cos(angleX);
+			auto sinY = std::sin(angleY);
+			auto cosY = std::cos(angleY);
+			auto sinZ = std::sin(angleZ);
+			auto cosZ = std::cos(angleZ);
 			auto rotation = Croissant::Math::Matrix4f({
 				cosZ * cosY,	cosZ * sinY * sinX - sinZ * cosX,	cosZ * sinY * cosX + sinZ * sinX,	0.0f,
 				sinZ * cosY,	sinZ * sinY * sinX + cosZ * cosX,	sinZ * sinY * cosX - cosZ * sinX,	0.0f,
