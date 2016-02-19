@@ -1,6 +1,8 @@
 #ifndef ENGINE_HPP_INC
 #define ENGINE_HPP_INC
 
+#include "defines.hpp"
+
 #if defined(COMPILER_MSVC)
 #  define WIN32_LEAN_AND_MEAN
 #  include <Windows.h>

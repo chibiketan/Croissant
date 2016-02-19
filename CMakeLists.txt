@@ -7,6 +7,7 @@ get_filename_component(CROISSANT_ROOT_DIR "." ABSOLUTE)
 
 message("compilation root directory : ${CROISSANT_ROOT_DIR}")
 
+find_package(PythonInterp REQUIRED)
 #-------------------------------------------------------------------------------
 #   define top-level options for the whole project
 #-------------------------------------------------------------------------------
@@ -331,11 +332,12 @@ macro(croissant_setup)
 	if (CROISSANT_SHARED_LIB)
 		list(APPEND CROISSANT_PLATFORM_DEFINES -DCROISSANT_SHARED_LIB)
 	endif()
-	
-	foreach(def ${CROISSANT_PLATFORM_DEFINES})
-		message(STATUS "def : ${def}")
-		add_definitions(${def})
-	endforeach()
+
+# defines are now writen to defines.hpp
+#	foreach(def ${CROISSANT_PLATFORM_DEFINES})
+#		message(STATUS "def : ${def}")
+#		add_definitions(${def})
+#	endforeach()
 	# add_definitions(${CROISSANT_PLATFORM_DEFINES})
 endmacro()
 

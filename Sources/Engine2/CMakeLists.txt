@@ -3,6 +3,23 @@ get_filename_component(CROISSANT_ENGINE_ROOT_DIR "." ABSOLUTE)
 
 set(ENGINE_SOURCE "${CROISSANT_ENGINE_ROOT_DIR}/Source")
 set(ENGINE_INCLUDE "${CROISSANT_ENGINE_ROOT_DIR}/Include")
+set(ENGINE_DEFINE_FILE "defines.hpp")
+
+#file(WRITE ${ENGINE_INCLUDE}/${ENGINE_DEFINE_FILE} "")
+
+execute_process(
+        COMMAND ${PYTHON_EXECUTABLE} ${CROISSANT_ROOT_DIR}/python/create_header.py ${ENGINE_INCLUDE}/${ENGINE_DEFINE_FILE} ${CROISSANT_PLATFORM_DEFINES}
+)
+
+#add_custom_command(
+#        PRE_BUILD
+#        TARGET ${PROJECT_NAME}
+#        #        OUTPUT ${ENGINE_INCLUDE}/defines.h
+#        COMMAND ${PYTHON_EXECUTABLE} ${CROISSANT_ROOT_DIR}/python/create_header.py ${ENGINE_INCLUDE}/${ENGINE_DEFINE_FILE} ${CROISSANT_PLATFORM_DEFINES}
+#        #        DEPENDS wordlist.txt
+#)
+
+
 
 croissant_files(${PROJECT_NAME} ${ENGINE_SOURCE}
 	Core/Application.cpp
@@ -28,7 +45,8 @@ croissant_files(${PROJECT_NAME} ${ENGINE_SOURCE}
 )
 
 croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
-	Engine.hpp
+    ${ENGINE_DEFINE_FILE}
+    Engine.hpp
 	Core/Application.hpp
 	Core/LogManager.hpp
 	Debug/MemoryManager.hpp
@@ -89,6 +107,8 @@ target_compile_features(${PROJECT_NAME}
 
 
 set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CROISSANT_ROOT_DIR}/Bin)
+
+
 
 # cmake_minimum_required(VERSION 3.1)
 # project(ENGINE)

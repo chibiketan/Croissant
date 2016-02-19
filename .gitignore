@@ -28,3 +28,6 @@
 *.app
 .idea
 /Bin/*
+
+# generated files
+/Sources/Engine2/Include/defines.hpp
