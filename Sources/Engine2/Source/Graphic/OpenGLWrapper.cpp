@@ -69,7 +69,10 @@ namespace Croissant
 		{
 
 			template<unsigned int funcIndex>
-			void glThrowOnError(GLint err) = delete;
+			void glThrowOnError(GLint)
+			{
+				static_assert(funcIndex < 0, "La fonction \"glThrowOnError\" doit être spécialisée");
+			};
 
 			template<>
 			void glThrowOnError<GLFUNCINDEX_GEN_BUFFERS>(GLint err)
