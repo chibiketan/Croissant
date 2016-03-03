@@ -1,5 +1,5 @@
-#ifndef CROISSANT_ENGINE_MATH_HPP_INC
-#  define CROISSANT_ENGINE_MATH_HPP_INC
+#ifndef CROISSANT_ENGINE_MATH_MATRIX_HPP_INC
+#  define CROISSANT_ENGINE_MATH_MATRIX_HPP_INC
 #  include <array>
 
 namespace Croissant
@@ -149,4 +149,4 @@ namespace Croissant
 	}
 }
 
-#endif /* CROISSANT_ENGINE_MATH_HPP_INC */
+#endif /* CROISSANT_ENGINE_MATH_MATRIX_HPP_INC */
