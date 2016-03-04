@@ -55,6 +55,9 @@
 
 #include "Graphic/OpenGLRenderer.hpp"
 #include "Graphic/OpenGLWrapper.hpp"
+#include <Math/Vector4.hpp>
+#include <Math/Quaternion.hpp>
+#include <Math/Matrix4.hpp>
 
 using Clock = std::chrono::high_resolution_clock;
 using Time = Clock::time_point;
@@ -257,7 +260,7 @@ void main()
 
 		// --------------------------------------------------------------------------- end   initialisation
 		auto baseAngle = 0.0f;
-		auto step = 100.0f;
+		auto step = 90.0f;
 		while (1)
 		{
 
@@ -286,19 +289,23 @@ void main()
 			auto angleY = 30.0f * PI / 180.0f;
 			auto angleZ = baseAngle * PI / 180.0f;
 
+			Croissant::Math::Vector4 tmp(0.0, 0.0, 1.0);
+			Croissant::Math::Quaternion quat(tmp, angleZ);
+			auto rotation = quat.ToMatrix();
+
 			// rotation complète
-			auto sinX = std::sin(angleX);
-			auto cosX = std::cos(angleX);
-			auto sinY = std::sin(angleY);
-			auto cosY = std::cos(angleY);
-			auto sinZ = std::sin(angleZ);
-			auto cosZ = std::cos(angleZ);
-			auto rotation = Croissant::Math::Matrix4f({
-				cosZ * cosY,	cosZ * sinY * sinX - sinZ * cosX,	cosZ * sinY * cosX + sinZ * sinX,	0.0f,
-				sinZ * cosY,	sinZ * sinY * sinX + cosZ * cosX,	sinZ * sinY * cosX - cosZ * sinX,	0.0f,
-				-sinY,			cosY * sinX,						cosY * cosX,						0.0f,
-				0.0f,			0.0f,								0.0f,								1.0f
-			});
+			//auto sinX = std::sin(angleX);
+			//auto cosX = std::cos(angleX);
+			//auto sinY = std::sin(angleY);
+			//auto cosY = std::cos(angleY);
+			//auto sinZ = std::sin(angleZ);
+			//auto cosZ = std::cos(angleZ);
+			//auto rotation = Croissant::Math::Matrix4f({
+			//	cosZ * cosY,	cosZ * sinY * sinX - sinZ * cosX,	cosZ * sinY * cosX + sinZ * sinX,	0.0f,
+			//	sinZ * cosY,	sinZ * sinY * sinX + cosZ * cosX,	sinZ * sinY * cosX - cosZ * sinX,	0.0f,
+			//	-sinY,			cosY * sinX,						cosY * cosX,						0.0f,
+			//	0.0f,			0.0f,								0.0f,								1.0f
+			//});
 
 			auto evt = win.PeekEvent();
 

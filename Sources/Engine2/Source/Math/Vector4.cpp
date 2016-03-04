@@ -32,5 +32,12 @@ namespace Croissant
 			return m_components.at(3);
 		}
 
+		Vector4::type Vector4::Length() const
+		{
+			return std::sqrt(this->m_components[0] * this->m_components[0]
+				+ this->m_components[1] * this->m_components[1]
+				+ this->m_components[2] * this->m_components[2]
+				+ this->m_components[3] * this->m_components[3]);
+		}
 	}
 }

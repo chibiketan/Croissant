@@ -36,8 +36,9 @@ croissant_files(${PROJECT_NAME} ${ENGINE_SOURCE}
 	Graphic/WindowEventClose.cpp
 	Graphic/WindowEventNone.cpp
     Math/Matrix4.cpp
-    Math/Vector4.cpp
     Math/Point4.cpp
+	Math/Quaternion.cpp
+    Math/Vector4.cpp
 	Module/ServiceProvider.cpp
 	Module/ServiceProviderInternal.cpp
 	Threading/AutoResetEvent.cpp
@@ -60,10 +61,10 @@ croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
 	Graphic/WindowEvent.hpp
 	Graphic/WindowEventClose.hpp
 	Graphic/WindowEventNone.hpp
-	Math/Matrix.hpp
     Math/Matrix4.hpp
-    Math/Vector4.hpp
     Math/Point4.hpp
+    Math/Vector4.hpp
+	Math/Quaternion.hpp
 	Module/ServiceProvider.hpp
 	Module/ServiceProviderInternal.hpp
 	Threading/AutoResetEvent.hpp
