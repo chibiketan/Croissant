@@ -7,7 +7,8 @@ namespace Croissant
 	namespace Math
 	{
 		Quaternion::Quaternion(Vector4 const& vector, float angle)
-			: m_elements { vector.GetX(), vector.GetY(), vector.GetZ(), angle }
+			: m_elements { vector.GetX() * std::sin(angle / 2.0f), vector.GetY() * std::sin(angle / 2.0f),
+			vector.GetZ() * std::sin(angle / 2.0f), std::cos(angle / 2.0f) }
 		{
 		}
 
