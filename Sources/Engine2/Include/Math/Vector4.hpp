@@ -20,6 +20,7 @@ namespace Croissant
 			const_reference	GetZ() const;
 			const_reference	GetW() const;
 			type			Length() const;
+			void			MakeUnit();
 
 		private:
 			std::array<type, 4>	m_components;

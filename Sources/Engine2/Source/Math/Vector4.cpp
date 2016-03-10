@@ -39,5 +39,19 @@ namespace Croissant
 				+ this->m_components[2] * this->m_components[2]
 				+ this->m_components[3] * this->m_components[3]);
 		}
+
+		void Vector4::MakeUnit()
+		{
+			auto len = this->Length();
+
+			if (len != 1.0f)
+			{
+				auto invLen = 1.0f / len;
+				m_components[0] *= invLen;
+				m_components[1] *= invLen;
+				m_components[2] *= invLen;
+				m_components[3] *= invLen;
+			}
+		}
 	}
 }

@@ -184,15 +184,33 @@ void main()
 		// TODO supprimer les shaders ?
 
 		// TODO : configurer les sommets pour l'affichage
+		//vertexProp vertices[] = {
+		//	vertexProp{ { -0.5, 0.5, 0.5 },{ 255, 0, 0 } },
+		//	vertexProp{ { 0.5, 0.5, 0.5 },{ 255, 255, 255 } },
+		//	vertexProp{ { -0.5, 0.5, -0.5 },{ 0, 255, 0 } },
+		//	vertexProp{ { 0.5, 0.5, -0.5 },{ 255, 255, 255 } },
+		//	vertexProp{ { -0.5, -0.5, 0.5 },{ 0, 0, 255 } },
+		//	vertexProp{ { 0.5, -0.5, 0.5 },{ 255, 255, 255 } },
+		//	vertexProp{ { -0.5, -0.5, -0.5 },{ 255, 0, 255 } },
+		//	vertexProp{ { 0.5, -0.5, -0.5 },{ 255, 255, 255 } }
+		//};
 		vertexProp vertices[] = {
-			vertexProp{ { -0.5, 0.5, 0.5 },{ 255, 0, 0 } },
-			vertexProp{ { 0.5, 0.5, 0.5 },{ 255, 255, 255 } },
-			vertexProp{ { -0.5, 0.5, -0.5 },{ 0, 255, 0 } },
-			vertexProp{ { 0.5, 0.5, -0.5 },{ 255, 255, 255 } },
-			vertexProp{ { -0.5, -0.5, 0.5 },{ 0, 0, 255 } },
-			vertexProp{ { 0.5, -0.5, 0.5 },{ 255, 255, 255 } },
-			vertexProp{ { -0.5, -0.5, -0.5 },{ 255, 0, 255 } },
-			vertexProp{ { 0.5, -0.5, -0.5 },{ 255, 255, 255 } }
+			vertexProp{ { 0.0, 0.0, 0.0 },{ 0xFF, 0x00, 0x00 } }, // face avant Z, bas gauche
+			vertexProp{ { 0.5, 0.0, 0.0 },{ 0xFF, 0x00, 0x00 } }, // face avant Z, bas droit
+			vertexProp{ { 0.5, 0.5, 0.0 },{ 0xFF, 0x00, 0x00 } }, // face avant Z, haut droit
+			vertexProp{ { 0.0, 0.5, 0.0 },{ 0xFF, 0x00, 0x00 } }, // face avant Z, haut gauche
+			vertexProp{ { 0.0, 0.0, 0.5 },{ 0x00, 0xFF, 0x00 } }, // face arrière Z, bas gauche
+			vertexProp{ { 0.5, 0.0, 0.5 },{ 0x00, 0xFF, 0x00 } }, // face arrière Z, bas droit
+			vertexProp{ { 0.5, 0.5, 0.5 },{ 0x00, 0xFF, 0x00 } }, // face arrière Z, haut droit
+			vertexProp{ { 0.0, 0.5, 0.5 },{ 0x00, 0xFF, 0x00 } }, // face arrière Z, haut gauche
+			vertexProp{ { 0.0, 0.0, 0.5 },{ 0x00, 0x00, 0xFF } }, // face avant X, bas gauche
+			vertexProp{ { 0.0, 0.0, 0.0 },{ 0x00, 0x00, 0xFF } }, // face avant X, bas droit
+			vertexProp{ { 0.0, 0.5, 0.0 },{ 0x00, 0x00, 0xFF } }, // face avant X, haut droit
+			vertexProp{ { 0.0, 0.5, 0.5 },{ 0x00, 0x00, 0xFF } }, // face avant X, haut gauche
+			vertexProp{ { 0.5, 0.0, 0.5 },{ 0x66, 0x66, 0x66 } }, // face arrière X, bas gauche
+			vertexProp{ { 0.5, 0.0, 0.0 },{ 0x66, 0x66, 0x66 } }, // face arrière X, bas droit
+			vertexProp{ { 0.5, 0.5, 0.0 },{ 0x66, 0x66, 0x66 } }, // face arrière X, haut droit
+			vertexProp{ { 0.5, 0.5, 0.5 },{ 0x66, 0x66, 0x66 } }, // face arrière X, haut gauche
 		};
 		uint32_t verticesBufferId;
 		uint32_t indexesBufferId;
@@ -203,19 +221,29 @@ void main()
 
 		// cube indexes
 
+		//uint32_t indexes[] = {
+		//	0, 2, 4, // demi face gauche (-x)
+		//	4, 2, 6, // demi face gauche (-x)
+		//	3, 1, 7, // demi face droit (x)
+		//	7, 1, 5, // demi face droit (x)
+		//	0, 1, 2, // demi face dessus (y)
+		//	2, 1, 3, // demi face dessus (y)
+		//	4, 1, 0, // demi face fond (z)
+		//	5, 1, 4, // demi face fond (z)
+		//	6, 2, 3, // demi face devant (-z)
+		//	6, 3, 7, // demi face devant (-z)
+		//	6, 5, 4, // demi face dessous (-y)
+		//	7, 5, 6 // demi face dessous (-y)
+		//};
 		uint32_t indexes[] = {
-			0, 2, 4, // demi face gauche (-x)
-			4, 2, 6, // demi face gauche (-x)
-			3, 1, 7, // demi face droit (x)
-			7, 1, 5, // demi face droit (x)
-			0, 1, 2, // demi face dessus (y)
-			2, 1, 3, // demi face dessus (y)
-			4, 1, 0, // demi face fond (z)
-			5, 1, 4, // demi face fond (z)
-			6, 2, 3, // demi face devant (-z)
-			6, 3, 7, // demi face devant (-z)
-			6, 5, 4, // demi face dessous (-y)
-			7, 5, 6 // demi face dessous (-y)
+			0, 1, 2, // demi face avant Z, bas droite
+			0, 2, 3, // demi face avant Z, haut gauche
+			7, 5, 4, // demi face arrière Z, bas droite
+			7, 6, 5, // demi face arrière Z, haut gauche
+			8, 9, 10, // demi face avant X, bas droite
+			8, 10, 11, // demi face avant X, haut gauche
+			15, 13, 12, // demi face arrière X, bas droite
+			15, 14, 13, // demi face arrière X, haut gauche
 		};
 
 		opengl.GenBuffers(1, &indexesBufferId);
@@ -228,7 +256,7 @@ void main()
 
 		// TODO : 
 		auto uniformWorldViewProjMatrix = opengl.GetUniformLocation(programId, "WorldViewProjMatrix");
-		auto projection = Croissant::Math::Matrix4f::Identity();
+		//auto projection = Croissant::Math::Matrix4f::Identity();
 		//auto angleX = 30.0f * PI / 180.0f;
 		//auto angleY = 30.0f * PI / 180.0f;
 		//auto angleZ = 30.0f * PI / 180.0f;
@@ -260,7 +288,7 @@ void main()
 
 		// --------------------------------------------------------------------------- end   initialisation
 		auto baseAngle = 0.0f;
-		auto step = 90.0f;
+		auto step = 45.0f;
 		while (1)
 		{
 
@@ -289,7 +317,9 @@ void main()
 			auto angleY = 30.0f * PI / 180.0f;
 			auto angleZ = baseAngle * PI / 180.0f;
 
-			Croissant::Math::Vector4 tmp(0.0, 0.0, 1.0);
+			//Croissant::Math::Vector4 tmp(0.0, 0.0, 1.0);
+			Croissant::Math::Vector4 tmp(1.0, 0.0, 0.0);
+			//tmp.MakeUnit();
 			Croissant::Math::Quaternion quat(tmp, angleZ);
 			auto rotation = quat.ToMatrix();
 
