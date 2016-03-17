@@ -72,9 +72,74 @@ struct vertexProp
 
 #define BUFFER_OFFSET(val) reinterpret_cast<void*>(val)
 
+class ApplicationBase
+{
+protected:
+	void OnInitializeBase() { std::cout << "Dans ApplicationBase::OnInitializeBase" << std::endl; }
+};
+
+namespace Imp
+{
+	template<typename T>
+	struct HasMethodInitialize
+	{
+		template<typename U, void (U::*)()> struct SFINAE { };
+		template<typename U> static int8_t Test(SFINAE<U, &U::OnInitialize>*);
+		template<typename U> static int16_t Test(...);
+		static const bool Has = sizeof(Test<T>(nullptr)) == sizeof(int8_t);
+	};
+
+	template<typename App, bool val = HasMethodInitialize<App>::Has>
+	struct AppInitialization
+	{
+		static void InitializeInternal(App &);
+	};
+
+	template<typename App>
+	struct AppInitialization<App, false>
+	{
+		static void InitializeInternal(App &)
+		{
+			std::cout << "specialisation false" << std::endl;
+		}
+	};
+
+	template<typename App>
+	struct AppInitialization<App, true>
+	{
+		static void InitializeInternal(App &ref)
+		{
+			std::cout << "specialisation true" << std::endl;
+			ref.OnInitialize();
+		}
+	};
+}
+
+template<typename App>
+class Application : public App, public ApplicationBase
+{
+	//void Initialize() { InitializeInternal<App>(*this); }
+public:
+	void Initialize() { Imp::AppInitialization<App>::InitializeInternal(*this); }
+};
+
+class DBlockApplication
+{
+public:
+	void OnInitialize() { std::cout << "Dans DBlockApplication::OnInitialize" << std::endl; }
+
+};
+
 
 int main(int, char**)
 {
+	Application<DBlockApplication> appTest;
+
+	appTest.Initialize();
+
+	return 0;
+
+
 	Croissant::Core::Application app;
 	std::string const baseTitle("Ma fenetre - fps : ");
 
