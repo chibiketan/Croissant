@@ -58,6 +58,7 @@
 #include <Math/Vector4.hpp>
 #include <Math/Quaternion.hpp>
 #include <Math/Matrix4.hpp>
+#include "Math/Point4.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
 using Time = Clock::time_point;
@@ -133,12 +134,14 @@ public:
 
 int main(int, char**)
 {
-	Application<DBlockApplication> appTest;
+	//Application<DBlockApplication> appTest;
 
-	appTest.Initialize();
+	//appTest.Initialize();
 
-	return 0;
+	//return 0;
+	Croissant::Math::Point4 p(1.0f, 0.0f, 0.0f);
 
+	std::cout << "P = " << p << std::endl;
 
 	Croissant::Core::Application app;
 	std::string const baseTitle("Ma fenetre - fps : ");
