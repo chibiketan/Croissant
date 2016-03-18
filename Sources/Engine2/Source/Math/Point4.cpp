@@ -5,6 +5,10 @@
 #include "Math/Point4.hpp"
 #include "Math/Matrix4.hpp"
 #include <assert.h>
+#include <algorithm>
+#include <cmath>
+
+#undef max
 
 namespace Croissant
 {
@@ -32,6 +36,11 @@ namespace Croissant
 				if (intDiff <= maxUlps)
 					return true;
 				return false;
+			}
+
+			bool EqualWithEpsilon(float a, float b)
+			{
+				return std::fabs(a - b) < 0.005;
 			}
 		}
 
@@ -108,13 +117,18 @@ namespace Croissant
 
 		bool Point4::operator==(Point4 const& right) const
 		{
-			for (auto i = 0; i < m_elements.size(); ++i)
-			{
-				if (!AlmostEqual2sComplement(m_elements[i], m_elements[i], 1))
-				{
-					return false;
-				}
-			}
+			//auto t = std::mismatch(m_elements.begin(), m_elements.end(), right.m_elements.begin(), right.m_elements.end(), [](float const& l, float const& r) { return AlmostEqual2sComplement(l, r, 100000); });
+			auto t = std::mismatch(m_elements.begin(), m_elements.end(), right.m_elements.begin(), right.m_elements.end(), EqualWithEpsilon);
+
+			return t.first == m_elements.end();
+			//for (auto i = 0; i < m_elements.size(); ++i)
+			//{
+			//	if (!AlmostEqual2sComplement(m_elements[i], right.m_elements[i], 1))
+			//	//if (!EqualWithEpsilon(m_elements[i], right.m_elements[i]))
+			//	{
+			//		return false;
+			//	}
+			//}
 
 			return true;
 			//return m_elements == right.m_elements;

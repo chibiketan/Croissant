@@ -86,7 +86,7 @@ TEST_F(QuaternionTest, RotationDe0SurAxeY)
 
 TEST_F(QuaternionTest, RotationDe90SurAxeY)
 {
-	Croissant::Math::Point4 expected{ 0.0f, 0.0f, -1.0f };
+	Croissant::Math::Point4 expected{ 0.0f, 0.0f, 1.0f };
 	Croissant::Math::Quaternion q{ Croissant::Math::Vector4{ 0.0f, 1.0f, 0.0f }, 90.0f * PI / 180.0f };
 	Croissant::Math::Point4 p{ 1.0f, 0.0f, 0.0f };
 	auto pPrime = p * q.ToMatrix();
@@ -106,7 +106,7 @@ TEST_F(QuaternionTest, RotationDe180SurAxeY)
 
 TEST_F(QuaternionTest, RotationDe270SurAxeY)
 {
-	Croissant::Math::Point4 expected{ 0.0f, 0.0f, 1.0f };
+	Croissant::Math::Point4 expected{ 0.0f, 0.0f, -1.0f };
 	Croissant::Math::Quaternion q{ Croissant::Math::Vector4{ 0.0f, 1.0f, 0.0f }, 270.0f * PI / 180.0f };
 	Croissant::Math::Point4 p{ 1.0f, 0.0f, 0.0f };
 	auto pPrime = p * q.ToMatrix();
