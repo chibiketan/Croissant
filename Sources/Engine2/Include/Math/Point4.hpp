@@ -32,6 +32,7 @@ namespace Croissant
 			type		Z() const;
 			type_ref	W();
 			type		W() const;
+			///<summary>Multiplication d'un point par une matrice qui donne un point</summary>
 			Point4		operator*(Matrix4 const& right) const;
 			friend std::ostream& operator<<(std::ostream& out, Point4 const& point);
 
