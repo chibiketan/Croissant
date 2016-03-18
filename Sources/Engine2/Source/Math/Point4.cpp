@@ -4,11 +4,37 @@
 
 #include "Math/Point4.hpp"
 #include "Math/Matrix4.hpp"
+#include <assert.h>
 
 namespace Croissant
 {
 	namespace Math
 	{
+		namespace
+		{
+			// TODO : extraire ce morceau de code dans un header utilitaire
+			// from http://www.cygnus-software.com/papers/comparingfloats/Comparing%20floating%20point%20numbers.htm
+			// Usable AlmostEqual function
+			bool AlmostEqual2sComplement(float A, float B, int maxUlps)
+			{
+				// Make sure maxUlps is non-negative and small enough that the
+				// default NAN won't compare as equal to anything.
+				assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
+				int aInt = *reinterpret_cast<int*>(&A);
+				// Make aInt lexicographically ordered as a twos-complement int
+				if (aInt < 0)
+					aInt = 0x80000000 - aInt;
+				// Make bInt lexicographically ordered as a twos-complement int
+				int bInt = *reinterpret_cast<int*>(&B);
+				if (bInt < 0)
+					bInt = 0x80000000 - bInt;
+				int intDiff = abs(aInt - bInt);
+				if (intDiff <= maxUlps)
+					return true;
+				return false;
+			}
+		}
+
 		Point4::Point4()
 			: m_elements { type(0.0f), type(0.0f), type(0.0f), type(0.0f) }
 		{
@@ -80,12 +106,26 @@ namespace Croissant
 			};
 		}
 
+		bool Point4::operator==(Point4 const& right) const
+		{
+			for (auto i = 0; i < m_elements.size(); ++i)
+			{
+				if (!AlmostEqual2sComplement(m_elements[i], m_elements[i], 1))
+				{
+					return false;
+				}
+			}
+
+			return true;
+			//return m_elements == right.m_elements;
+		}
+
 		std::ostream& operator<<(std::ostream& out, Point4 const& point)
 		{
 			auto precision = out.precision();
 			auto oldSetf = out.setf(std::ios_base::fixed, std::ios_base::floatfield);
 
-			out.precision(2);
+			out.precision(6);
 			out << "(" << point.X() << ", " << point.Y() << ", " << point.Z() << ", " << point.W() << ")";
 			out.setf(oldSetf);
 			out.precision(precision);
