@@ -14,7 +14,7 @@ namespace Croissant
 {
 	namespace Math
 	{
-		class ENGINE_API Point4
+		class ENGINE_API Point4 final
 		{
 		public:
 			using type = float;
@@ -30,7 +30,7 @@ namespace Croissant
 			type		Z() const;
 			type_ref	W();
 			type		W() const;
-			friend std::ostream& operator<<(std::ostream& out, Point4& const point);
+			friend std::ostream& operator<<(std::ostream& out, Point4 const& point);
 
 		private:
 			std::array<type, 4>	m_elements;

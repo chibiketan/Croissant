@@ -58,9 +58,15 @@ namespace Croissant
 			return m_elements[3];
 		}
 
-		std::ostream& operator<<(std::ostream& out, Point4& point)
+		std::ostream& operator<<(std::ostream& out, Point4 const& point)
 		{
+			auto precision = out.precision();
+			auto oldSetf = out.setf(std::ios_base::fixed, std::ios_base::floatfield);
+
+			out.precision(2);
 			out << "(" << point.X() << ", " << point.Y() << ", " << point.Z() << ", " << point.W() << ")";
+			out.setf(oldSetf);
+			out.precision(precision);
 			return out;
 		}
 	}
