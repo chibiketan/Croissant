@@ -105,3 +105,4 @@ TEST_F(Matrix4Test, MultiplicationOfYawPitchRoll)
 	EXPECT_EQ(expected, rotationTotal);
 
 }
+

@@ -100,5 +100,21 @@ namespace Croissant
 			return m_data == right.m_data;
 		}
 
+		std::ostream& operator<<(std::ostream& out, Matrix4 const& obj)
+		{
+			auto precision = out.precision();
+			auto oldSetf = out.setf(std::ios_base::fixed, std::ios_base::floatfield);
+
+			out.precision(2);
+			out << "[\n"
+				<< "[" << obj(0, 0) << ", " << obj(0, 1) << ", " << obj(0, 2) << ", " << obj(0, 3) << "]\n"
+				<< "[" << obj(1, 0) << ", " << obj(1, 1) << ", " << obj(1, 2) << ", " << obj(1, 3) << "]\n"
+				<< "[" << obj(2, 0) << ", " << obj(2, 1) << ", " << obj(2, 2) << ", " << obj(2, 3) << "]\n"
+				<< "[" << obj(3, 0) << ", " << obj(3, 1) << ", " << obj(3, 2) << ", " << obj(3, 3) << "]\n"
+				<< "]";
+			out.setf(oldSetf);
+			out.precision(precision);
+			return out;
+		}
 	}
 }

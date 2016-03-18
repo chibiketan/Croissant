@@ -20,13 +20,14 @@ namespace Croissant
 
 			Matrix4();
 			explicit Matrix4(ArrayType const& source);
-			ArrayType const&	Data() const;
-			ValueType			operator()(size_t row, size_t column) const;
-			ValueType&			operator()(size_t row, size_t column);
-			void				LoadIdentity();
-			void				LoadZero();
-			Matrix4				operator*(Matrix4 const& right) const;
-			bool				operator==(Matrix4 const& right) const;
+			ArrayType const&		Data() const;
+			ValueType				operator()(size_t row, size_t column) const;
+			ValueType&				operator()(size_t row, size_t column);
+			void					LoadIdentity();
+			void					LoadZero();
+			Matrix4					operator*(Matrix4 const& right) const;
+			bool					operator==(Matrix4 const& right) const;
+			friend std::ostream&	operator<<(std::ostream& out, Matrix4 const& obj);
 
 		private:
 			ArrayType	m_data;
