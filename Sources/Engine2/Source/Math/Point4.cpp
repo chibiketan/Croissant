@@ -61,6 +61,7 @@ namespace Croissant
 
 		Point4 Point4::operator*(Matrix4 const& right) const
 		{
+			// Le nombre de colonne de la matrice de gauche est égal au nombre de ligne de celle de droite
 			//	                    |--------------|
 			//  |--------------|    |xx, xy, xz, xw|    
 			// P|xp, yp, zp, wp| X M|yx, yy, yz, yw|
@@ -71,10 +72,12 @@ namespace Croissant
 			//   |--------------------------|
 			// P'|xp*xx, yp*xy, zp*xz, wp*xw|
 			//   |--------------------------|
-			return Point4(X()*right(0, 0)
-				, Y()*right(0, 1)
-				, Z()*right(0, 2)
-				);
+			return Point4{
+				X()*right(0, 0) + Y()*right(1, 0) + Z()*right(2, 0) + W()*right(3, 0),
+				X()*right(0, 1) + Y()*right(1, 1) + Z()*right(2, 1) + W()*right(3, 1),
+				X()*right(0, 2) + Y()*right(1, 2) + Z()*right(2, 2) + W()*right(3, 2),
+				X()*right(0, 3) + Y()*right(1, 3) + Z()*right(2, 3) + W()*right(3, 3)
+			};
 		}
 
 		std::ostream& operator<<(std::ostream& out, Point4 const& point)
