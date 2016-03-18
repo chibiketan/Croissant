@@ -12,6 +12,7 @@ croissant_files(${PROJECT_NAME} ${UTGTEST_SOURCE}
 	FileSystem/File.cpp
 	Math/Matrix4.cpp
 	Math/Point.cpp
+	Math/Quaternion.cpp
 	Math/Vector4.cpp
 )
 
