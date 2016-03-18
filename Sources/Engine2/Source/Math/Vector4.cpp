@@ -12,22 +12,22 @@ namespace Croissant
 			this->m_components[3] = w;
 		}
 
-		Vector4::const_reference Vector4::GetX() const
+		Vector4::const_reference Vector4::X() const
 		{
 			return m_components.at(0);
 		}
 
-		Vector4::const_reference Vector4::GetY() const
+		Vector4::const_reference Vector4::Y() const
 		{
 			return m_components.at(1);
 		}
 
-		Vector4::const_reference Vector4::GetZ() const
+		Vector4::const_reference Vector4::Z() const
 		{
 			return m_components.at(2);
 		}
 
-		Vector4::const_reference Vector4::GetW() const
+		Vector4::const_reference Vector4::W() const
 		{
 			return m_components.at(3);
 		}

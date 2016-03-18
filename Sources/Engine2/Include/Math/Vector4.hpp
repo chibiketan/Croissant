@@ -15,10 +15,10 @@ namespace Croissant
 			using reference = type&;
 			using const_reference = type const&;
 			Vector4(type x, type y, type z, type w = 0.0f);// composant W d'un vecteur vaut 0
-			const_reference	GetX() const;
-			const_reference	GetY() const;
-			const_reference	GetZ() const;
-			const_reference	GetW() const;
+			const_reference	X() const;
+			const_reference	Y() const;
+			const_reference	Z() const;
+			const_reference	W() const;
 			type			Length() const;
 			void			MakeUnit();
 
