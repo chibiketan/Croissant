@@ -3,6 +3,7 @@
 //
 
 #include "Math/Point4.hpp"
+#include "Math/Matrix4.hpp"
 
 namespace Croissant
 {
@@ -56,6 +57,24 @@ namespace Croissant
 		Point4::type Point4::W() const
 		{
 			return m_elements[3];
+		}
+
+		Point4 Point4::operator*(Matrix4 const& right) const
+		{
+			//	                    |--------------|
+			//  |--------------|    |xx, xy, xz, xw|    
+			// P|xp, yp, zp, wp| X M|yx, yy, yz, yw|
+			//  |--------------|    |zx, zy, zz, zw|    
+			//                      |wx, wy, wz, ww| 
+			//                      |--------------|
+			// multiplication
+			//   |--------------------------|
+			// P'|xp*xx, yp*xy, zp*xz, wp*xw|
+			//   |--------------------------|
+			return Point4(X()*right(0, 0)
+				, Y()*right(0, 1)
+				, Z()*right(0, 2)
+				);
 		}
 
 		std::ostream& operator<<(std::ostream& out, Point4 const& point)

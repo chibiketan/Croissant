@@ -1,4 +1,5 @@
 #include "Math/Matrix4.hpp"
+#include "Math/Point4.hpp"
 #include <assert.h>
 
 #define DIMENSION 4
@@ -98,5 +99,6 @@ namespace Croissant
 		{
 			return m_data == right.m_data;
 		}
+
 	}
 }

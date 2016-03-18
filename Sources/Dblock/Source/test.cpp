@@ -140,8 +140,11 @@ int main(int, char**)
 
 	//return 0;
 	Croissant::Math::Point4 p(1.0f, 0.0f, 0.0f);
+	Croissant::Math::Quaternion Q { Croissant::Math::Vector4 { 0.0f, 0.0f, 1.0f }, 90.0f * PI / 2.0f };
+	auto P2 = p * Q.ToMatrix();
 
 	std::cout << "P = " << p << std::endl;
+	std::cout << "P' = " << P2 << std::endl;
 
 	Croissant::Core::Application app;
 	std::string const baseTitle("Ma fenetre - fps : ");

@@ -10,6 +10,8 @@ namespace Croissant
 {
 	namespace Math
 	{
+		class Point4;
+
 		class ENGINE_API Matrix4 final
 		{
 		public:

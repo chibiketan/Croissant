@@ -14,6 +14,8 @@ namespace Croissant
 {
 	namespace Math
 	{
+		class Matrix4;
+
 		class ENGINE_API Point4 final
 		{
 		public:
@@ -30,6 +32,7 @@ namespace Croissant
 			type		Z() const;
 			type_ref	W();
 			type		W() const;
+			Point4		operator*(Matrix4 const& right) const;
 			friend std::ostream& operator<<(std::ostream& out, Point4 const& point);
 
 		private:
