@@ -22,6 +22,38 @@ protected:
 
 };
 
+// ---------------------------------------------------------------- Rotation axe perso
+TEST_F(QuaternionTest, RotationDe0SurAxePerso)
+{
+	Croissant::Math::Point4 expected{ 1.0f, 0.0f, 0.0f };
+	Croissant::Math::Quaternion q{ Croissant::Math::Vector4{ 1.0f, 1.0f, 0.0f }, 0.0f * PI / 180.0f };
+	Croissant::Math::Point4 p{ 1.0f, 0.0f, 0.0f };
+	auto pPrime = p * q.ToMatrix();
+
+	ASSERT_EQ(expected, pPrime);
+}
+
+TEST_F(QuaternionTest, RotationDe90SurAxePerso)
+{
+	Croissant::Math::Point4 expected{ 0.333f, 0.666f, 0.666f };
+	Croissant::Math::Quaternion q{ Croissant::Math::Vector4{ 1.0f, 1.0f, 0.0f }, 90.0f * PI / 180.0f };
+	Croissant::Math::Point4 p{ 1.0f, 0.0f, 0.0f };
+	auto pPrime = p * q.ToMatrix();
+
+	ASSERT_EQ(expected, pPrime);
+}
+
+TEST_F(QuaternionTest, RotationDe180SurAxePerso)
+{
+	Croissant::Math::Point4 expected{ 0.0f, 1.0f, 0.0f };
+	Croissant::Math::Quaternion q{ Croissant::Math::Vector4{ 1.0f, 1.0f, 0.0f }, 180.0f * PI / 180.0f };
+	Croissant::Math::Point4 p{ 1.0f, 0.0f, 0.0f };
+	auto pPrime = p * q.ToMatrix();
+
+	ASSERT_EQ(expected, pPrime);
+}
+
+
 // ---------------------------------------------------------------- Rotation axe X
 TEST_F(QuaternionTest, RotationDe0SurAxeX)
 {
