@@ -379,6 +379,12 @@ void main()
 
 		// TODO : 
 		auto uniformWorldViewProjMatrix = opengl.GetUniformLocation(programId, "WorldViewProjMatrix");
+		Croissant::Math::Matrix4 translation{ Croissant::Math::Matrix4::ArrayType{
+			1.0f, 0.0f, 0.0f, 0.5f,
+			0.0f, 1.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f
+		} };
 
 		// --------------------------------------------------------------------------- end   initialisation
 		auto baseAngle = 0.0f;
@@ -413,24 +419,10 @@ void main()
 			auto angleZ = baseAngle * PI / 180.0f;
 
 			//Croissant::Math::Vector4 tmp(0.0, 0.0, 1.0);
-			Croissant::Math::Vector4 tmp(1.0, 0.0, 0.0);
+			Croissant::Math::Vector4 tmp(0.0, 1.0, 0.0);
 			//tmp.MakeUnit();
 			Croissant::Math::Quaternion quat(tmp, angleZ);
 			auto rotation = quat.ToMatrix();
-
-			// rotation complète
-			//auto sinX = std::sin(angleX);
-			//auto cosX = std::cos(angleX);
-			//auto sinY = std::sin(angleY);
-			//auto cosY = std::cos(angleY);
-			//auto sinZ = std::sin(angleZ);
-			//auto cosZ = std::cos(angleZ);
-			//auto rotation = Croissant::Math::Matrix4f({
-			//	cosZ * cosY,	cosZ * sinY * sinX - sinZ * cosX,	cosZ * sinY * cosX + sinZ * sinX,	0.0f,
-			//	sinZ * cosY,	sinZ * sinY * sinX + cosZ * cosX,	sinZ * sinY * cosX - cosZ * sinX,	0.0f,
-			//	-sinY,			cosY * sinX,						cosY * cosX,						0.0f,
-			//	0.0f,			0.0f,								0.0f,								1.0f
-			//});
 
 			auto evt = win.PeekEvent();
 
@@ -472,7 +464,8 @@ void main()
 			opengl.EnableVertexAttribArray(0);
 			opengl.EnableVertexAttribArray(1);
 
-			opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, true, rotation);
+			//opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, true, rotation);
+			opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, true, translation * rotation);
 
 			//opengl.VertexPointer(3, GL_FLOAT, sizeof(vertexProp), 0);
 			//opengl.ColorPointer(3, GL_UNSIGNED_BYTE, sizeof(vertexProp), BUFFER_OFFSET(sizeof(vertexProp::m_coord)));
