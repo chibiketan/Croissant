@@ -305,10 +305,17 @@ void main()
 			vertexProp{ { 0.5, 0.5, 0.0 },{ 0x66, 0x66, 0x66 } }, // face arrière X, haut droit
 			vertexProp{ { 0.5, 0.5, 0.5 },{ 0x66, 0x66, 0x66 } }, // face arrière X, haut gauche
 		};
+
+		vertexProp pointVertices[] = {
+			vertexProp{ { 0.75f, 0.0f, 0.0f },{ 0xFF, 0xFF, 0xFF } }
+		};
+
 		uint32_t verticesBufferId;
 		uint32_t indexesBufferId;
 		uint32_t planVerticesBufferId;
 		uint32_t planIndexesBufferId;
+		uint32_t pointVerticesBufferId;
+		uint32_t pointIndexesBufferId;
 
 		opengl.GenBuffers(1, &verticesBufferId);
 		opengl.BindBuffer(GL_ARRAY_BUFFER, verticesBufferId);
@@ -317,6 +324,10 @@ void main()
 		opengl.GenBuffers(1, &planVerticesBufferId);
 		opengl.BindBuffer(GL_ARRAY_BUFFER, planVerticesBufferId);
 		opengl.BufferData(GL_ARRAY_BUFFER, sizeof(planVertices), planVertices, GL_STATIC_DRAW);
+
+		opengl.GenBuffers(1, &pointVerticesBufferId);
+		opengl.BindBuffer(GL_ARRAY_BUFFER, pointVerticesBufferId);
+		opengl.BufferData(GL_ARRAY_BUFFER, sizeof(pointVertices), pointVertices, GL_STATIC_DRAW);
 
 		// cube indexes
 		uint32_t indexes[] = {
@@ -336,6 +347,10 @@ void main()
 			4, 5
 		};
 
+		uint32_t pointIndexes[] = {
+			0
+		};
+
 		opengl.GenBuffers(1, &indexesBufferId);
 		opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexesBufferId);
 		opengl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexes), indexes, GL_STATIC_DRAW);
@@ -349,7 +364,17 @@ void main()
 		opengl.GenBuffers(1, &planIndexesBufferId);
 		opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, planIndexesBufferId);
 		opengl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(planIndexes), planIndexes, GL_STATIC_DRAW);
+		opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		opengl.BindBuffer(GL_ARRAY_BUFFER, 0);
 		auto planIndexesSize = sizeof(planIndexes);
+
+		// point index buffer
+		opengl.GenBuffers(1, &pointIndexesBufferId);
+		opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, pointIndexesBufferId);
+		opengl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(pointIndexes), pointIndexes, GL_STATIC_DRAW);
+		opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		opengl.BindBuffer(GL_ARRAY_BUFFER, 0);
+		auto pointIndexesSize = sizeof(pointIndexes);
 
 
 		// TODO : 
@@ -461,6 +486,28 @@ void main()
 			opengl.DisableVertexAttribArray(0);
 			opengl.DisableVertexAttribArray(1);
 
+			opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			opengl.BindBuffer(GL_ARRAY_BUFFER, 0);
+
+			//render point
+			Croissant::Math::Quaternion quatPoint(Croissant::Math::Vector4{ 0.0f, 0.0f, 1.0f }, angleZ);
+			rotation = quatPoint.ToMatrix();
+
+			opengl.BindBuffer(GL_ARRAY_BUFFER, pointVerticesBufferId);
+			opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, pointIndexesBufferId);
+			opengl.EnableVertexAttribArray(0);
+			opengl.EnableVertexAttribArray(1);
+			// définition des constantes
+			opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, true, rotation);
+			// définition des attributs des vertex
+			opengl.VertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vertexProp), nullptr);
+			opengl.VertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, true, sizeof(vertexProp), BUFFER_OFFSET(sizeof(pointVertices[0].m_coord)));
+			// dessin effectif
+			opengl.DrawElements(GL_POINTS, static_cast<GLsizei>(pointIndexesSize), GL_UNSIGNED_INT, nullptr);
+			// desactivation des attributs de vertex
+			opengl.DisableVertexAttribArray(0);
+			opengl.DisableVertexAttribArray(1);
+			// suppression du binding sur les buffers
 			opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			opengl.BindBuffer(GL_ARRAY_BUFFER, 0);
 
