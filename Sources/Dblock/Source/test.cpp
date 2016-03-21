@@ -1,3 +1,15 @@
+// TODO
+// 1) Afficher le repère du plan
+// 2) Tester le rendu d'un point qui se déplace à l'aide d'un quaternion
+// 3) Implémenter la translation via un vecteur
+// 4) Implémenter une caméra
+// 5) implémenter la matrice de transformation plan ==> vue
+// 6) Implémenter une classe Monde avec une caméra et un ensemble de node
+// 7) implémenter un node d'un monde qui contient 
+// 8) Implémenter une matrice de transformation model => plan
+// 9) Implémenter les fenêtres dans un module
+// 10) Implémenter le rendered dans un module
+
 //#include "Core/DebugMemoryManager.hpp"
 //#include "Core/Application.hpp"
 //#include "Event/IEventListener.hpp"
@@ -266,6 +278,15 @@ void main()
 		//	vertexProp{ { -0.5, -0.5, -0.5 },{ 255, 0, 255 } },
 		//	vertexProp{ { 0.5, -0.5, -0.5 },{ 255, 255, 255 } }
 		//};
+		vertexProp planVertices[] = {
+			vertexProp{ { 0.0f, 0.0f, 0.0f },{ 0xFF, 0x00, 0x00 } }, // X
+			vertexProp{ { 1.0f, 0.0f, 0.0f },{ 0xFF, 0x00, 0x00 } }, // X
+			vertexProp{ { 0.0f, 0.0f, 0.0f },{ 0x00, 0xFF, 0x00 } }, // Y
+			vertexProp{ { 0.0f, 1.0f, 0.0f },{ 0x00, 0xFF, 0x00 } }, // Y
+			vertexProp{ { 0.0f, 0.0f, 0.0f },{ 0x00, 0x00, 0xFF } }, // Z
+			vertexProp{ { 0.0f, 0.0f, 1.0f },{ 0x00, 0x00, 0xFF } }, // Z
+		};
+
 		vertexProp vertices[] = {
 			vertexProp{ { 0.0, 0.0, 0.0 },{ 0xFF, 0x00, 0x00 } }, // face avant Z, bas gauche
 			vertexProp{ { 0.5, 0.0, 0.0 },{ 0xFF, 0x00, 0x00 } }, // face avant Z, bas droit
@@ -286,27 +307,18 @@ void main()
 		};
 		uint32_t verticesBufferId;
 		uint32_t indexesBufferId;
+		uint32_t planVerticesBufferId;
+		uint32_t planIndexesBufferId;
 
 		opengl.GenBuffers(1, &verticesBufferId);
 		opengl.BindBuffer(GL_ARRAY_BUFFER, verticesBufferId);
 		opengl.BufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-		// cube indexes
+		opengl.GenBuffers(1, &planVerticesBufferId);
+		opengl.BindBuffer(GL_ARRAY_BUFFER, planVerticesBufferId);
+		opengl.BufferData(GL_ARRAY_BUFFER, sizeof(planVertices), planVertices, GL_STATIC_DRAW);
 
-		//uint32_t indexes[] = {
-		//	0, 2, 4, // demi face gauche (-x)
-		//	4, 2, 6, // demi face gauche (-x)
-		//	3, 1, 7, // demi face droit (x)
-		//	7, 1, 5, // demi face droit (x)
-		//	0, 1, 2, // demi face dessus (y)
-		//	2, 1, 3, // demi face dessus (y)
-		//	4, 1, 0, // demi face fond (z)
-		//	5, 1, 4, // demi face fond (z)
-		//	6, 2, 3, // demi face devant (-z)
-		//	6, 3, 7, // demi face devant (-z)
-		//	6, 5, 4, // demi face dessous (-y)
-		//	7, 5, 6 // demi face dessous (-y)
-		//};
+		// cube indexes
 		uint32_t indexes[] = {
 			0, 1, 2, // demi face avant Z, bas droite
 			0, 2, 3, // demi face avant Z, haut gauche
@@ -318,6 +330,12 @@ void main()
 			15, 14, 13, // demi face arrière X, haut gauche
 		};
 
+		uint32_t planIndexes[] = {
+			0, 1,
+			2, 3,
+			4, 5
+		};
+
 		opengl.GenBuffers(1, &indexesBufferId);
 		opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexesBufferId);
 		opengl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexes), indexes, GL_STATIC_DRAW);
@@ -326,41 +344,21 @@ void main()
 		opengl.BindBuffer(GL_ARRAY_BUFFER, 0);
 		auto indexesSize = sizeof(indexes);
 
+
+		// plan index buffer
+		opengl.GenBuffers(1, &planIndexesBufferId);
+		opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, planIndexesBufferId);
+		opengl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(planIndexes), planIndexes, GL_STATIC_DRAW);
+		auto planIndexesSize = sizeof(planIndexes);
+
+
 		// TODO : 
 		auto uniformWorldViewProjMatrix = opengl.GetUniformLocation(programId, "WorldViewProjMatrix");
-		//auto projection = Croissant::Math::Matrix4f::Identity();
-		//auto angleX = 30.0f * PI / 180.0f;
-		//auto angleY = 30.0f * PI / 180.0f;
-		//auto angleZ = 30.0f * PI / 180.0f;
-
-		// toutes les rotations sont dans le sens inverse des aiguilles d'une montre
-		//// rotation sur Z
-		//auto yaw = Croissant::Math::Matrix4f({
-		//	std::cosf(angleZ),	-std::sinf(angleZ),	0.0f,	0.0f,
-		//	std::sinf(angleZ),	std::cosf(angleZ),	0.0f,	0.0f,
-		//	0.0f,				0.0f,				1.0f,	0.0f,
-		//	0.0f,				0.0f,				0.0f,	1.0f
-		//});
-
-		//// rotation sur Y
-		//auto pitch = Croissant::Math::Matrix4f({
-		//	std::cosf(angleY),	0.0f,	std::sinf(angleY),	0.0f,
-		//	0.0f,				1.0f,	0.0f,				0.0f,
-		//	-std::sinf(angleY),	0.0f,	std::cosf(angleY),	0.0f,
-		//	0.0f,				0.0f,	0.0f,				1.0f
-		//});
-
-		//// rotation sur X
-		//auto roll = Croissant::Math::Matrix4f({
-		//	1.0f,	0.0f,				0.0f,				0.0f,
-		//	0.0f,	std::cosf(angleX),	-std::sinf(angleX),	0.0f,
-		//	0.0f,	std::sinf(angleX),	std::cosf(angleX),	0.0f,
-		//	0.0f,	0.0f,				0.0f,				1.0f
-		//});
 
 		// --------------------------------------------------------------------------- end   initialisation
 		auto baseAngle = 0.0f;
 		auto step = 45.0f;
+		Croissant::Math::Matrix4 identity;
 		while (1)
 		{
 
@@ -421,6 +419,28 @@ void main()
 			opengl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			opengl.UseProgram(programId);
 			// render
+
+			// render plan
+			opengl.BindBuffer(GL_ARRAY_BUFFER, planVerticesBufferId);
+			opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, planIndexesBufferId);
+			opengl.EnableVertexAttribArray(0);
+			opengl.EnableVertexAttribArray(1);
+			// définition des constantes
+			opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, true, identity);
+			// définition des attributs des vertex
+			opengl.VertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vertexProp), nullptr);
+			opengl.VertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, true, sizeof(vertexProp), BUFFER_OFFSET(sizeof(planVertices[0].m_coord)));
+			// dessin effectif
+			opengl.DrawElements(GL_LINES, static_cast<GLsizei>(planIndexesSize), GL_UNSIGNED_INT, nullptr);
+			// desactivation des attributs de vertex
+			opengl.DisableVertexAttribArray(0);
+			opengl.DisableVertexAttribArray(1);
+			// suppression du binding sur les buffers
+			opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			opengl.BindBuffer(GL_ARRAY_BUFFER, 0);
+
+
+			// render cube
 			opengl.BindBuffer(GL_ARRAY_BUFFER, verticesBufferId);
 			opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexesBufferId);
 
