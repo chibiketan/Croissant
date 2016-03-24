@@ -28,6 +28,7 @@ croissant_files(${PROJECT_NAME} ${ENGINE_SOURCE}
 	Exception/CroissantException.cpp
 	FileSystem/Directory.cpp
 	FileSystem/File.cpp
+	Graphic/Camera.cpp
 	Graphic/OpenGLRenderer.cpp
 	Graphic/OpenGLSystemInfo.cpp
 	Graphic/OpenGLWrapper.cpp
@@ -54,6 +55,7 @@ croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
 	Exception/CroissantException.hpp
 	FileSystem/Directory.hpp
 	FileSystem/File.hpp
+	Graphic/Camera.hpp
 	Graphic/OpenGLRenderer.hpp
 	Graphic/OpenGLSystemInfo.hpp
 	Graphic/OpenGLWrapper.hpp
