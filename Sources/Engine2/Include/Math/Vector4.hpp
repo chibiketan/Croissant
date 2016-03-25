@@ -21,6 +21,9 @@ namespace Croissant
 			const_reference	W() const;
 			type			Length() const;
 			void			MakeUnit();
+			static Vector4 const	UnitX;
+			static Vector4 const	UnitY;
+			static Vector4 const	UnitZ;
 
 		private:
 			std::array<type, 4>	m_components;
