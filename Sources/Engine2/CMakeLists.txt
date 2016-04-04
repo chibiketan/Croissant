@@ -35,6 +35,7 @@ croissant_files(${PROJECT_NAME} ${ENGINE_SOURCE}
 	Graphic/Window.cpp
 	Graphic/WindowEvent.cpp
 	Graphic/WindowEventClose.cpp
+	Graphic/WindowEventKey.cpp
 	Graphic/WindowEventNone.cpp
     Math/Matrix4.cpp
     Math/Point4.cpp
@@ -62,6 +63,7 @@ croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
 	Graphic/Window.hpp
 	Graphic/WindowEvent.hpp
 	Graphic/WindowEventClose.hpp
+	Graphic/WindowEventKey.hpp
 	Graphic/WindowEventNone.hpp
     Math/Matrix4.hpp
     Math/Point4.hpp

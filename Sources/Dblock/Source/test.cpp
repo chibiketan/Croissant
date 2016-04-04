@@ -71,6 +71,7 @@
 #include <Math/Quaternion.hpp>
 #include <Math/Matrix4.hpp>
 #include "Math/Point4.hpp"
+#include <Graphic/Camera.hpp>
 
 using Clock = std::chrono::high_resolution_clock;
 using Time = Clock::time_point;
@@ -387,9 +388,20 @@ void main()
 		} };
 
 		// --------------------------------------------------------------------------- end   initialisation
+		Croissant::Graphic::Camera cam{};
 		auto baseAngle = 0.0f;
 		auto step = 45.0f;
 		Croissant::Math::Matrix4 identity;
+
+		cam.SetPosition(Croissant::Math::Point4{ 0.0f, 10.0f, -5.0f });
+		Croissant::Math::Vector4 look{ 0.0f, 0.0f, 1.0f };
+		Croissant::Math::Vector4 up = Croissant::Math::Vector4::UnitY;
+		Croissant::Math::Vector4 right = Croissant::Math::Vector4::UnitX;
+		//Croissant::Math::Quaternion camRot{ Croissant::Math::Vector4::UnitX, 20 };
+		//auto camRotMat = camRot.ToMatrix();
+		////cam.SetAxes(Croissant::Math::Vector4{ 0.0f, 0.0f, 1.0f }, Croissant::Math::Vector4::UnitY, Croissant::Math::Vector4::UnitX);
+		//cam.SetAxes(look * camRotMat, up * camRotMat, right * camRotMat);
+		cam.SetFrustum(90.0f, static_cast<float>(win.Width()) / static_cast<float>(win.Height()), 1.0f, 1000.0f);
 		while (1)
 		{
 
@@ -418,6 +430,12 @@ void main()
 			auto angleY = 30.0f * PI / 180.0f;
 			auto angleZ = baseAngle * PI / 180.0f;
 
+			Croissant::Math::Quaternion camRot{ Croissant::Math::Vector4::UnitX, angleZ };
+			auto camRotMat = camRot.ToMatrix();
+			//cam.SetAxes(Croissant::Math::Vector4{ 0.0f, 0.0f, 1.0f }, Croissant::Math::Vector4::UnitY, Croissant::Math::Vector4::UnitX);
+			cam.SetAxes(look * camRotMat, up * camRotMat, right * camRotMat);
+
+
 			//Croissant::Math::Vector4 tmp(0.0, 0.0, 1.0);
 			Croissant::Math::Vector4 tmp(0.0, 1.0, 0.0);
 			//tmp.MakeUnit();
@@ -432,6 +450,16 @@ void main()
 				break;
 			}
 
+			if (evt->GetType() == Croissant::Graphic::WindowEventType::KEYDOWN)
+			{
+				std::cout << "Une touche a été pressée" << std::endl;
+			}
+
+			if (evt->GetType() == Croissant::Graphic::WindowEventType::KEYUP)
+			{
+				std::cout << "Une touche a été relachée" << std::endl;
+			}
+
 			// clear
 			opengl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			opengl.UseProgram(programId);
@@ -443,7 +471,7 @@ void main()
 			opengl.EnableVertexAttribArray(0);
 			opengl.EnableVertexAttribArray(1);
 			// définition des constantes
-			opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, true, identity);
+			opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, true, identity * cam.GetProjectionViewMatrix());
 			// définition des attributs des vertex
 			opengl.VertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vertexProp), nullptr);
 			opengl.VertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, true, sizeof(vertexProp), BUFFER_OFFSET(sizeof(planVertices[0].m_coord)));
@@ -457,52 +485,52 @@ void main()
 			opengl.BindBuffer(GL_ARRAY_BUFFER, 0);
 
 
-			// render cube
-			opengl.BindBuffer(GL_ARRAY_BUFFER, verticesBufferId);
-			opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexesBufferId);
+//			// render cube
+//			opengl.BindBuffer(GL_ARRAY_BUFFER, verticesBufferId);
+//			opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexesBufferId);
+//
+//			opengl.EnableVertexAttribArray(0);
+//			opengl.EnableVertexAttribArray(1);
+//
+//			//opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, true, rotation);
+//			opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, true, translation * rotation);
+//
+//			//opengl.VertexPointer(3, GL_FLOAT, sizeof(vertexProp), 0);
+//			//opengl.ColorPointer(3, GL_UNSIGNED_BYTE, sizeof(vertexProp), BUFFER_OFFSET(sizeof(vertexProp::m_coord)));
+//			opengl.VertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vertexProp), 0);
+//			opengl.VertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, true, sizeof(vertexProp), BUFFER_OFFSET(sizeof(vertices[0].m_coord)));
+//
+////			opengl.PolygonMode(GL_FRONT, GL_LINE);
+//			opengl.DrawElements(GL_TRIANGLES, static_cast<GLsizei>(indexesSize), GL_UNSIGNED_INT, nullptr);
+////			opengl.PolygonMode(GL_FRONT, GL_FILL);
+//
+//			opengl.DisableVertexAttribArray(0);
+//			opengl.DisableVertexAttribArray(1);
+//
+//			opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+//			opengl.BindBuffer(GL_ARRAY_BUFFER, 0);
 
-			opengl.EnableVertexAttribArray(0);
-			opengl.EnableVertexAttribArray(1);
+			////render point
+			//Croissant::Math::Quaternion quatPoint(Croissant::Math::Vector4{ 0.0f, 0.0f, 1.0f }, angleZ);
+			//rotation = quatPoint.ToMatrix();
 
+			//opengl.BindBuffer(GL_ARRAY_BUFFER, pointVerticesBufferId);
+			//opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, pointIndexesBufferId);
+			//opengl.EnableVertexAttribArray(0);
+			//opengl.EnableVertexAttribArray(1);
+			//// définition des constantes
 			//opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, true, rotation);
-			opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, true, translation * rotation);
-
-			//opengl.VertexPointer(3, GL_FLOAT, sizeof(vertexProp), 0);
-			//opengl.ColorPointer(3, GL_UNSIGNED_BYTE, sizeof(vertexProp), BUFFER_OFFSET(sizeof(vertexProp::m_coord)));
-			opengl.VertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vertexProp), 0);
-			opengl.VertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, true, sizeof(vertexProp), BUFFER_OFFSET(sizeof(vertices[0].m_coord)));
-
-//			opengl.PolygonMode(GL_FRONT, GL_LINE);
-			opengl.DrawElements(GL_TRIANGLES, static_cast<GLsizei>(indexesSize), GL_UNSIGNED_INT, nullptr);
-//			opengl.PolygonMode(GL_FRONT, GL_FILL);
-
-			opengl.DisableVertexAttribArray(0);
-			opengl.DisableVertexAttribArray(1);
-
-			opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-			opengl.BindBuffer(GL_ARRAY_BUFFER, 0);
-
-			//render point
-			Croissant::Math::Quaternion quatPoint(Croissant::Math::Vector4{ 0.0f, 0.0f, 1.0f }, angleZ);
-			rotation = quatPoint.ToMatrix();
-
-			opengl.BindBuffer(GL_ARRAY_BUFFER, pointVerticesBufferId);
-			opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, pointIndexesBufferId);
-			opengl.EnableVertexAttribArray(0);
-			opengl.EnableVertexAttribArray(1);
-			// définition des constantes
-			opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, true, rotation);
-			// définition des attributs des vertex
-			opengl.VertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vertexProp), nullptr);
-			opengl.VertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, true, sizeof(vertexProp), BUFFER_OFFSET(sizeof(pointVertices[0].m_coord)));
-			// dessin effectif
-			opengl.DrawElements(GL_POINTS, static_cast<GLsizei>(pointIndexesSize), GL_UNSIGNED_INT, nullptr);
-			// desactivation des attributs de vertex
-			opengl.DisableVertexAttribArray(0);
-			opengl.DisableVertexAttribArray(1);
-			// suppression du binding sur les buffers
-			opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-			opengl.BindBuffer(GL_ARRAY_BUFFER, 0);
+			//// définition des attributs des vertex
+			//opengl.VertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vertexProp), nullptr);
+			//opengl.VertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, true, sizeof(vertexProp), BUFFER_OFFSET(sizeof(pointVertices[0].m_coord)));
+			//// dessin effectif
+			//opengl.DrawElements(GL_POINTS, static_cast<GLsizei>(pointIndexesSize), GL_UNSIGNED_INT, nullptr);
+			//// desactivation des attributs de vertex
+			//opengl.DisableVertexAttribArray(0);
+			//opengl.DisableVertexAttribArray(1);
+			//// suppression du binding sur les buffers
+			//opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			//opengl.BindBuffer(GL_ARRAY_BUFFER, 0);
 
 
 			renderer.Render();

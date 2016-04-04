@@ -14,6 +14,7 @@ namespace Croissant
 {
 	namespace Math
 	{
+		class Vector4;
 		class Matrix4;
 
 		class ENGINE_API Point4 final
@@ -32,6 +33,7 @@ namespace Croissant
 			type		Z() const;
 			type_ref	W();
 			type		W() const;
+			type		DotProduct(Vector4 const& v) const;
 			///<summary>Multiplication d'un point par une matrice qui donne un point</summary>
 			Point4		operator*(Matrix4 const& right) const;
 			bool		operator==(Point4 const& right) const;

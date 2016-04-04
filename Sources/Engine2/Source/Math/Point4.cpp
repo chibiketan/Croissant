@@ -4,6 +4,7 @@
 
 #include "Math/Point4.hpp"
 #include "Math/Matrix4.hpp"
+#include "Math/Vector4.hpp"
 #include <assert.h>
 #include <algorithm>
 #include <cmath>
@@ -92,6 +93,14 @@ namespace Croissant
 		Point4::type Point4::W() const
 		{
 			return m_elements[3];
+		}
+
+		Point4::type Point4::DotProduct(Vector4 const& v) const
+		{
+			return (m_elements[0] * v.X())
+				+ (m_elements[1] * v.Y())
+				+ (m_elements[2] * v.Z())
+				+ (m_elements[3] * v.W());
 		}
 
 		Point4 Point4::operator*(Matrix4 const& right) const

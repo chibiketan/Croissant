@@ -19,9 +19,13 @@ namespace Croissant
 		public:
 			Camera();
 			void SetFrustum(float fieldOfViewDegree, float ratio, float nearView, float distantView);
-
+			void SetAxes(Math::Vector4 const& lookVector, Math::Vector4 const& upVector, Math::Vector4 const& rightVector);
+			void SetPosition(Math::Point4 const& position);
+			Math::Matrix4 const& GetProjectionViewMatrix() const;
 		private:
 			void OnFrustumChange();
+			void OnFrameChange();
+			void UpdateProjectionViewMatrix();
 
 			Math::Point4	m_position;
 			Math::Vector4	m_lookDirection;
@@ -30,6 +34,7 @@ namespace Croissant
 			std::array<float, 6>	m_frustum;
 			Math::Matrix4	m_projectionMatrix;
 			Math::Matrix4	m_viewMatrix;
+			Math::Matrix4	m_projectionViewMatrix;
 
 			enum class FrustumIndex
 			{

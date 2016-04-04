@@ -11,6 +11,7 @@
 #include "Graphic/WindowEventNone.hpp"
 #include "Graphic/WindowEventClose.hpp"
 #include "Exception/CroissantException.hpp"
+#include <Graphic/WindowEventKey.hpp>
 
 using WindowException = Croissant::Exception::CroissantException;
 using string = std::string;
@@ -41,7 +42,6 @@ namespace Croissant
 //					case WM_DESTROY:
 //						PostQuitMessage( 0 );
 //						break;
-
 				default:
 					return DefWindowProc( hWnd, message, wParam, lParam );
 				}
@@ -129,11 +129,22 @@ namespace Croissant
 			SetWindowText(m_windowHandle, title.c_str());
 		}
 
+		uint32_t Window::Width() const
+		{
+			return m_width;
+		}
+
+		uint32_t Window::Height() const
+		{
+			return m_height;
+		}
+
 		std::unique_ptr<WindowEvent const> Window::PeekEvent()
 		{
 			auto hnd = GetSystemHandle();
 
 			MSG msgTest;
+			LPARAM oldState = 0;
 			while (PeekMessage(&msgTest, hnd, 0, 0, PM_REMOVE))
 			{
 			    switch (msgTest.message)
@@ -148,7 +159,42 @@ namespace Croissant
 //			            break;
 //			        }
 //			        break;
-			    case WM_CLOSE:
+				case WM_KEYDOWN:
+					// https://msdn.microsoft.com/en-us/library/windows/desktop/ms646280%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396
+					// wparam : keycode
+					// lparam : options
+					// TODO: use mask
+
+					oldState = msgTest.lParam & 0b01000000'00000000'00000000'00000000;
+
+					if (oldState == 0)
+					{
+						// passage de l'état keyUp à keyDown
+						switch (msgTest.wParam)
+						{
+						case VK_UP:
+							return std::unique_ptr<WindowEvent const>(CROISSANT_NEW WindowEventKey(WindowEventKeyType::Press, WindowKey::Up));
+							break;
+						default:
+							break;
+						}
+					}
+					break;
+				case WM_KEYUP:
+					// https://msdn.microsoft.com/en-us/library/windows/desktop/ms646280%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396
+					// wparam : keycode
+					// lparam : options
+					// passage de l'état keyUp à keyDown
+					switch (msgTest.wParam)
+					{
+					case VK_UP:
+						return std::unique_ptr<WindowEvent const>(CROISSANT_NEW WindowEventKey(WindowEventKeyType::Release, WindowKey::Up));
+						break;
+					default:
+						break;
+					}
+					break;
+				case WM_CLOSE:
 			    case WM_DESTROY:
 			    case WM_QUIT:
 					return std::unique_ptr<WindowEvent const>(CROISSANT_NEW WindowEventClose());

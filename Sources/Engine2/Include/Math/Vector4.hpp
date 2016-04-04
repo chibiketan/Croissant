@@ -8,6 +8,9 @@ namespace Croissant
 {
 	namespace Math
 	{
+		class Matrix4;
+		class Point4;
+
 		class ENGINE_API Vector4
 		{
 		public:
@@ -21,6 +24,9 @@ namespace Croissant
 			const_reference	W() const;
 			type			Length() const;
 			void			MakeUnit();
+			type			DotProduct(Vector4 const& v) const;
+			type			DotProduct(Point4 const& p) const;
+			Vector4		operator*(Matrix4 const& right) const;
 			static Vector4 const	UnitX;
 			static Vector4 const	UnitY;
 			static Vector4 const	UnitZ;

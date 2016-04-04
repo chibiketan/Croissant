@@ -45,6 +45,8 @@ namespace Croissant
 			void Close();
 			void Open();
 			void SetTitle(std::string const& title);
+			uint32_t	Width() const;
+			uint32_t	Height() const;
 
 		private:
 
