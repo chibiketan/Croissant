@@ -42,9 +42,35 @@ namespace Croissant
 			OnFrameChange();
 		}
 
+		Math::Vector4 const& Camera::LookVector() const
+		{
+			return m_lookDirection;
+		}
+
+		Math::Vector4 const& Camera::RightVector() const
+		{
+			return m_rightDirection;
+		}
+
+		Math::Vector4 const& Camera::UpVector() const
+		{
+			return m_upDirection;
+		}
+
+		void Camera::Move(Math::Vector4 const& translation)
+		{
+			m_position += translation;
+			OnFrameChange();
+		}
+
 		Math::Matrix4 const& Camera::GetProjectionViewMatrix() const
 		{
 			return m_projectionViewMatrix;
+		}
+
+		Math::Point4 const& Camera::Position() const
+		{
+			return m_position;
 		}
 
 		void Camera::OnFrustumChange()

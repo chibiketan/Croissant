@@ -49,6 +49,43 @@ namespace Croissant
 				return 0;
 			}
 
+			std::unique_ptr<WindowEvent const> GenerateKeyEvent(MSG const& message, bool isRelease)
+			{
+				// https://msdn.microsoft.com/en-us/library/windows/desktop/ms646280%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396
+				auto type = (isRelease ? WindowEventKeyType::Release : WindowEventKeyType::Press);
+
+				if (!isRelease)
+				{
+					// dans le cas KeyPress, ne prendre en compte que le changement de touche
+					auto oldState = message.lParam & 0b01000000'00000000'00000000'00000000;
+
+					if (oldState != 0)
+					{
+						return nullptr;
+					}
+				}
+
+				switch (message.wParam)
+				{
+				case VK_UP:
+					return std::unique_ptr<WindowEvent const>(CROISSANT_NEW WindowEventKey(type, WindowKey::Up));
+				case VK_DOWN:
+					return std::unique_ptr<WindowEvent const>(CROISSANT_NEW WindowEventKey(type, WindowKey::Down));
+				case VK_LEFT:
+					return std::unique_ptr<WindowEvent const>(CROISSANT_NEW WindowEventKey(type, WindowKey::Left));
+				case VK_RIGHT:
+					return std::unique_ptr<WindowEvent const>(CROISSANT_NEW WindowEventKey(type, WindowKey::Right));
+				case VK_PRIOR:
+					return std::unique_ptr<WindowEvent const>(CROISSANT_NEW WindowEventKey(type, WindowKey::PageUp));
+				case VK_NEXT:
+					return std::unique_ptr<WindowEvent const>(CROISSANT_NEW WindowEventKey(type, WindowKey::PageDown));
+				default:
+					break;
+				}
+
+				return nullptr;
+			}
+
 		}
 
 		// --------------------------------------------- Window imp
@@ -144,55 +181,29 @@ namespace Croissant
 			auto hnd = GetSystemHandle();
 
 			MSG msgTest;
-			LPARAM oldState = 0;
+			std::unique_ptr<WindowEvent const> event { nullptr };
+
 			while (PeekMessage(&msgTest, hnd, 0, 0, PM_REMOVE))
 			{
 			    switch (msgTest.message)
 			    {
-//			    case WM_KEYDOWN:
-//			        // key codes : http://msdn.microsoft.com/en-us/library/windows/desktop/dd375731(v=vs.85).aspx
-//			        switch (msgTest.wParam)
-//			        {
-//			        case 0x51:
-//						// TODO send end app request
-//						m_eventManager->AddEventAtUserInputLevel(std::unique_ptr<Croissant::Event::UserEvent>(CROISSANT_NEW Croissant::Event::UserEvent(Croissant::Event::UserEvent::UserQuit)));
-//			            break;
-//			        }
-//			        break;
 				case WM_KEYDOWN:
-					// https://msdn.microsoft.com/en-us/library/windows/desktop/ms646280%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396
-					// wparam : keycode
-					// lparam : options
-					// TODO: use mask
-
-					oldState = msgTest.lParam & 0b01000000'00000000'00000000'00000000;
-
-					if (oldState == 0)
+					event = GenerateKeyEvent(msgTest, false);
+					if (nullptr != event)
 					{
-						// passage de l'état keyUp à keyDown
-						switch (msgTest.wParam)
-						{
-						case VK_UP:
-							return std::unique_ptr<WindowEvent const>(CROISSANT_NEW WindowEventKey(WindowEventKeyType::Press, WindowKey::Up));
-							break;
-						default:
-							break;
-						}
+						return event;
 					}
+
+					TranslateMessage(&msgTest);
+					DispatchMessage(&msgTest);
 					break;
 				case WM_KEYUP:
-					// https://msdn.microsoft.com/en-us/library/windows/desktop/ms646280%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396
-					// wparam : keycode
-					// lparam : options
-					// passage de l'état keyUp à keyDown
-					switch (msgTest.wParam)
+					event = GenerateKeyEvent(msgTest, true);
+					if (nullptr != event)
 					{
-					case VK_UP:
-						return std::unique_ptr<WindowEvent const>(CROISSANT_NEW WindowEventKey(WindowEventKeyType::Release, WindowKey::Up));
-						break;
-					default:
-						break;
+						return event;
 					}
+
 					break;
 				case WM_CLOSE:
 			    case WM_DESTROY:

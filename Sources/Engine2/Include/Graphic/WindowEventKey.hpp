@@ -14,7 +14,9 @@ namespace Croissant
 			Up,
 			Down,
 			Left,
-			Right
+			Right,
+			PageUp,
+			PageDown
 		};
 
 		enum class WindowEventKeyType

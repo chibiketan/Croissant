@@ -21,7 +21,12 @@ namespace Croissant
 			void SetFrustum(float fieldOfViewDegree, float ratio, float nearView, float distantView);
 			void SetAxes(Math::Vector4 const& lookVector, Math::Vector4 const& upVector, Math::Vector4 const& rightVector);
 			void SetPosition(Math::Point4 const& position);
-			Math::Matrix4 const& GetProjectionViewMatrix() const;
+			Math::Vector4 const&	LookVector() const;
+			Math::Vector4 const&	RightVector() const;
+			Math::Vector4 const&	UpVector() const;
+			void					Move(Math::Vector4 const& translation);
+			Math::Matrix4 const&	GetProjectionViewMatrix() const;
+			Math::Point4 const&		Position() const;
 		private:
 			void OnFrustumChange();
 			void OnFrameChange();

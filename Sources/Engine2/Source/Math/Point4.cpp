@@ -143,6 +143,15 @@ namespace Croissant
 			//return m_elements == right.m_elements;
 		}
 
+		Point4& Point4::operator+=(Vector4 const& right)
+		{
+			m_elements[0] += right.X();
+			m_elements[1] += right.Y();
+			m_elements[2] += right.Z();
+			m_elements[3] += right.W();
+			return *this;
+		}
+
 		std::ostream& operator<<(std::ostream& out, Point4 const& point)
 		{
 			auto precision = out.precision();

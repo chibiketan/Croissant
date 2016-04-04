@@ -27,6 +27,8 @@ namespace Croissant
 			type			DotProduct(Vector4 const& v) const;
 			type			DotProduct(Point4 const& p) const;
 			Vector4		operator*(Matrix4 const& right) const;
+			Vector4		operator-() const;
+			Vector4		operator*(type val) const;
 			static Vector4 const	UnitX;
 			static Vector4 const	UnitY;
 			static Vector4 const	UnitZ;

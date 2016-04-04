@@ -29,6 +29,7 @@
 #include <chrono>
 #include "Math/Matrix.hpp"
 #include <cmath>
+#include "Graphic/WindowEventKey.hpp"
 
 #define PI 3.14159265f
 
@@ -144,9 +145,20 @@ public:
 
 };
 
+struct PressedKeys
+{
+	bool Up = false;
+	bool Down = false;
+	bool Left = false;
+	bool Right = false;
+	bool PageUp = false;
+	bool PageDown = false;
+};
+
 
 int main(int, char**)
 {
+	PressedKeys keys;
 	//Application<DBlockApplication> appTest;
 
 	//appTest.Initialize();
@@ -393,18 +405,17 @@ void main()
 		auto step = 45.0f;
 		Croissant::Math::Matrix4 identity;
 
-		cam.SetPosition(Croissant::Math::Point4{ 0.0f, 10.0f, -5.0f });
+		cam.SetPosition(Croissant::Math::Point4{ 0.0f, 0.0f, -5.0f });
 		Croissant::Math::Vector4 look{ 0.0f, 0.0f, 1.0f };
 		Croissant::Math::Vector4 up = Croissant::Math::Vector4::UnitY;
 		Croissant::Math::Vector4 right = Croissant::Math::Vector4::UnitX;
 		//Croissant::Math::Quaternion camRot{ Croissant::Math::Vector4::UnitX, 20 };
 		//auto camRotMat = camRot.ToMatrix();
-		////cam.SetAxes(Croissant::Math::Vector4{ 0.0f, 0.0f, 1.0f }, Croissant::Math::Vector4::UnitY, Croissant::Math::Vector4::UnitX);
+		cam.SetAxes(Croissant::Math::Vector4{ 0.0f, 0.0f, 1.0f }, Croissant::Math::Vector4::UnitY, Croissant::Math::Vector4::UnitX);
 		//cam.SetAxes(look * camRotMat, up * camRotMat, right * camRotMat);
 		cam.SetFrustum(90.0f, static_cast<float>(win.Width()) / static_cast<float>(win.Height()), 1.0f, 1000.0f);
 		while (1)
 		{
-
 			++fps;
 			Time currentFrameTime { Clock::now() };
 			durationSecond secondSincePrevFrame{ currentFrameTime - prevFrameTime };
@@ -426,14 +437,14 @@ void main()
 				baseAngle -= 360.0f;
 			}
 
-			auto angleX = 30.0f * PI / 180.0f;
-			auto angleY = 30.0f * PI / 180.0f;
+			//auto angleX = 30.0f * PI / 180.0f;
+			//auto angleY = 30.0f * PI / 180.0f;
 			auto angleZ = baseAngle * PI / 180.0f;
 
-			Croissant::Math::Quaternion camRot{ Croissant::Math::Vector4::UnitX, angleZ };
-			auto camRotMat = camRot.ToMatrix();
+			//Croissant::Math::Quaternion camRot{ Croissant::Math::Vector4::UnitX, angleZ };
+			//auto camRotMat = camRot.ToMatrix();
 			//cam.SetAxes(Croissant::Math::Vector4{ 0.0f, 0.0f, 1.0f }, Croissant::Math::Vector4::UnitY, Croissant::Math::Vector4::UnitX);
-			cam.SetAxes(look * camRotMat, up * camRotMat, right * camRotMat);
+			//cam.SetAxes(look * camRotMat, up * camRotMat, right * camRotMat);
 
 
 			//Croissant::Math::Vector4 tmp(0.0, 0.0, 1.0);
@@ -450,14 +461,65 @@ void main()
 				break;
 			}
 
-			if (evt->GetType() == Croissant::Graphic::WindowEventType::KEYDOWN)
+			if (evt->GetType() == Croissant::Graphic::WindowEventType::KEYDOWN
+				|| evt->GetType() == Croissant::Graphic::WindowEventType::KEYUP)
 			{
-				std::cout << "Une touche a été pressée" << std::endl;
+				auto& keyEvt = static_cast<Croissant::Graphic::WindowEventKey const&>(*evt);
+				auto keyState = keyEvt.Type() == Croissant::Graphic::WindowEventKeyType::Press;
+
+				switch (keyEvt.Key())
+				{
+				case Croissant::Graphic::WindowKey::Up:
+					keys.Up = keyState;
+					break;
+				case Croissant::Graphic::WindowKey::Down: 
+					keys.Down = keyState;
+					break;
+				case Croissant::Graphic::WindowKey::Left: 
+					keys.Left = keyState;
+					break;
+				case Croissant::Graphic::WindowKey::Right: 
+					keys.Right = keyState;
+					break;
+				case Croissant::Graphic::WindowKey::PageUp: 
+					keys.PageUp = keyState;
+					break;
+				case Croissant::Graphic::WindowKey::PageDown: 
+					keys.PageDown = keyState;
+					break;
+				default: break;
+				}
 			}
 
-			if (evt->GetType() == Croissant::Graphic::WindowEventType::KEYUP)
+			// move camera
+			if (keys.Up)
 			{
-				std::cout << "Une touche a été relachée" << std::endl;
+				// up first if up and down simultaneously set
+				cam.Move(cam.LookVector() *  secondSincePrevFrame.count());
+			}
+			else if (keys.Down)
+			{
+				cam.Move(-cam.LookVector() *  secondSincePrevFrame.count());
+			}
+
+			if (keys.Right)
+			{
+				// up first if up and down simultaneously set
+				cam.Move(cam.RightVector() *  secondSincePrevFrame.count());
+			}
+			else if (keys.Left)
+			{
+				cam.Move(-cam.RightVector() *  secondSincePrevFrame.count());
+			}
+
+			if (keys.PageUp)
+			{
+				// up first if up and down simultaneously set
+				cam.Move(cam.UpVector() *  secondSincePrevFrame.count());
+			}
+			else if (keys.PageDown)
+			{
+				cam.Move(-cam.UpVector() *  secondSincePrevFrame.count());
 			}
 
 			// clear

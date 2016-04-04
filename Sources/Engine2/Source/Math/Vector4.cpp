@@ -85,5 +85,25 @@ namespace Croissant
 				X()*right(0, 3) + Y()*right(1, 3) + Z()*right(2, 3) + W()*right(3, 3)
 			};
 		}
+
+		Vector4 Vector4::operator-() const
+		{
+			return Vector4{
+				-m_components[0],
+				-m_components[1],
+				-m_components[2],
+				-m_components[3]
+			};
+		}
+
+		Vector4 Vector4::operator*(type val) const
+		{
+			return Vector4{
+				m_components[0] * val,
+				m_components[1] * val,
+				m_components[2] * val,
+				m_components[3] * val
+			};
+		}
 	}
 }
