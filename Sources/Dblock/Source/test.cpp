@@ -156,17 +156,10 @@ struct PressedKeys
 };
 
 
-#include "Math/Tuple.hpp"
+#include "Math/Point2.hpp"
 
 int main(int, char**)
 {
-	Croissant::Math::Tuple<float, 2> t{ 1, 2, 3 };
-
-	//t.Z(1);
-	//auto v = t.Z();
-
-	return 0;
-
 	PressedKeys keys;
 	//Application<DBlockApplication> appTest;
 
@@ -192,10 +185,14 @@ int main(int, char**)
 
 	try
 	{
-		Croissant::Graphic::Window win(640, 480, "test titre");
+		// TODO use encapsulation !
+		auto vpWidth = 1920;
+		auto vpHeight = 1080;
+		Croissant::Graphic::Window win(1024, 768, "test titre");
 		Croissant::Graphic::OpenGLRenderer renderer(win, app.GetLogManager());
 		auto opengl = renderer.GetOpenGLWrapper();
 
+		win.SetPosition(Croissant::Math::Point2{ (vpWidth - win.Width()) / 2.0f, (vpHeight - win.Height()) / 2.0f });
 		win.Open();
 		int fps = 0;
 		Time firstFrameTime { Clock::now() };

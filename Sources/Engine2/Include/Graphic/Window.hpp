@@ -11,6 +11,7 @@
 #include <string>
 #include "Engine.hpp"
 #include "Graphic/WindowEventType.hpp"
+#include "Math/Point2.hpp"
 #include <memory>
 
 #if defined(CROISSANT_LINUX)
@@ -40,24 +41,27 @@ namespace Croissant
 			Window(uint32_t width, uint32_t height, const std::string& title);
 			~Window();
 
-			std::unique_ptr<WindowEvent const> PeekEvent();
-			const SystemHandle& GetSystemHandle() const;
-			void Close();
-			void Open();
-			void SetTitle(std::string const& title);
-			uint32_t	Width() const;
-			uint32_t	Height() const;
+			std::unique_ptr<WindowEvent const>	PeekEvent();
+			const SystemHandle&					GetSystemHandle() const;
+			void								Close();
+			void								Open();
+			void								SetTitle(std::string const& title);
+			void								SetPosition(Math::Point2 const& position);
+			Math::Point2 const&					GetPosition() const;
+			uint32_t							Width() const;
+			uint32_t							Height() const;
 
 		private:
 
-			SystemHandle m_windowHandle;
-			std::string const& m_title;
-			uint32_t m_width;
-			uint32_t m_height;
+			SystemHandle		m_windowHandle;
+			std::string const&	m_title;
+			Math::Point2		m_position;
+			uint32_t			m_width;
+			uint32_t			m_height;
 #if defined(CROISSANT_WINDOWS)
-			char const* m_className;
+			char const*			m_className;
 #elif defined(CROISSANT_LINUX)
-			Display* m_display;
+			Display*			m_display;
 
 #endif
 		};

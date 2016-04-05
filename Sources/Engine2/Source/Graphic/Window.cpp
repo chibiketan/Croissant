@@ -86,11 +86,17 @@ namespace Croissant
 				return nullptr;
 			}
 
+			void UpdateWindowsPlacement(HWND handle, Math::Point2 const& position, uint32_t width, uint32_t height)
+			{
+				UINT flags = 0;
+				SetWindowPos(handle, HWND_NOTOPMOST, position.X(), position.Y(), width, height, flags);
+			}
+
 		}
 
 		// --------------------------------------------- Window imp
 		Window::Window(uint32_t width, uint32_t height, const std::string& title)
-			: m_windowHandle { nullptr }, m_title { title }, m_width { width }, m_height{ height }
+			: m_windowHandle{ nullptr }, m_title{ title }, m_position{ 0, 0 }, m_width{ width }, m_height{ height }
 #if defined(CROISSANT_WINDOWS)
 				, m_className { nullptr }
 #endif
@@ -137,6 +143,7 @@ namespace Croissant
 			{
 				throw WindowException("Erreur lors de la création de la fenêtre");
 			}
+			UpdateWindowsPlacement(m_windowHandle, m_position, m_width, m_height);
 		}
 
 		Window::~Window()
@@ -164,6 +171,17 @@ namespace Croissant
 
 		void Window::SetTitle(string const& title) {
 			SetWindowText(m_windowHandle, title.c_str());
+		}
+
+		void Window::SetPosition(Math::Point2 const& position)
+		{
+			m_position = position;
+			UpdateWindowsPlacement(m_windowHandle, m_position, m_width, m_height);
+		}
+
+		Math::Point2 const& Window::GetPosition() const
+		{
+			return m_position;
 		}
 
 		uint32_t Window::Width() const
