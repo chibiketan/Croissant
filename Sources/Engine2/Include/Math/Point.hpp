@@ -1,83 +1,63 @@
-/*
- * Point.hpp
- *
- *  Created on: 10 sept. 2014
- *      Author: Gregory_Compte
- */
+#ifndef CROISSANT_ENGINE_MATH_POINT_HPP_INC
+#  define CROISSANT_ENGINE_MATH_POINT_HPP_INC
+#  pragma once
 
-#ifndef POINT_HPP_INC
-#define POINT_HPP_INC
-
-#include "Engine.hpp"
+#  include "Engine.hpp"
+#  include <type_traits>
 
 namespace Croissant
 {
 	namespace Math
 	{
-		template <typename T>
+		template <typename T, int size>
 		class ENGINE_API Point
 		{
 		public:
-			Point(T x, T y, T z);
-			T X() const;
-			T Y() const;
-			T Z() const;
-			void X(T x);
-			void Y(T y);
-			void Z(T z);
+			static_assert(size <2 || size > 4, "La valeur de size doit être comprise entre 2 et 4");
+			using type = typename std::decay<T>::type; // supprime les references 
+			using type_ref = T&;
+			using type_cref = type const&;
+
+			Point(type x, type y);
+			Point(type x, type y, type z);
+			Point(type x, type y, type z, type w);
+			type X() const;
+			type Y() const;
+			type Z() const;
+			type W() const;
+			void X(type x);
+			void Y(type y);
+			void Z(type z);
+			void W(type z);
 
 		private:
-			T m_pos[3];
+			type m_element[size];
 		};
 
 		// ---------------------------------------------- implémentation
-		template <typename T>
-		Point<T>::Point(T x, T y, T z)
-			: m_pos {x, y, z}
+		template <typename T, int size>
+		Point<T, size>::Point(type x, type y)
+			: m_element { x, y }
 		{
 		}
 
-		template <typename T>
-		T Point<T>::X() const
+		template <typename T, int size>
+		Point<T, size>::Point(type x, type y, type z)
+			: m_element{ x, y, z }
 		{
-			return m_pos[0];
 		}
 
-		template <typename T>
-		T Point<T>::Y() const
+		template <typename T, int size>
+		Point<T, size>::Point(type x, type y, type z, type w)
+			: m_element{ x, y, z, w }
 		{
-			return m_pos[1];
-		}
-
-		template <typename T>
-		T Point<T>::Z() const
-		{
-			return m_pos[2];
-		}
-
-		template <typename T>
-		void Point<T>::X(T x)
-		{
-			m_pos[0] = x;
-		}
-
-		template <typename T>
-		void Point<T>::Y(T y)
-		{
-			m_pos[1] = y;
-		}
-
-		template <typename T>
-		void Point<T>::Z(T z)
-		{
-			m_pos[2] = z;
 		}
 
 		// ---------------------------------------------- alias
-		using Pointf = Point<float>;
-		using Pointd = Point<double>;
-		using Pointi = Point<int>;
+		using Point2 = Point<float, 2>;
+		using Point3 = Point<float, 2>;
+		//using Point4 = Point<float, 2>;
 	}
 }
 
-#endif /* POINT_HPP_INC */
+#endif // !CROISSANT_ENGINE_MATH_POINT_HPP_INC
