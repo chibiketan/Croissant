@@ -156,8 +156,17 @@ struct PressedKeys
 };
 
 
+#include "Math/Tuple.hpp"
+
 int main(int, char**)
 {
+	Croissant::Math::Tuple<float, 2> t{ 1, 2, 3 };
+
+	//t.Z(1);
+	//auto v = t.Z();
+
+	return 0;
+
 	PressedKeys keys;
 	//Application<DBlockApplication> appTest;
 

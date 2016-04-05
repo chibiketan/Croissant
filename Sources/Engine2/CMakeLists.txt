@@ -65,10 +65,11 @@ croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
 	Graphic/WindowEventClose.hpp
 	Graphic/WindowEventKey.hpp
 	Graphic/WindowEventNone.hpp
-    Math/Matrix4.hpp
-    Math/Point4.hpp
-    Math/Vector4.hpp
+	Math/Matrix4.hpp
+	Math/Point4.hpp
+	Math/Vector4.hpp
 	Math/Quaternion.hpp
+	Math/Tuple.hpp
 	Module/ServiceProvider.hpp
 	Module/ServiceProviderInternal.hpp
 	Threading/AutoResetEvent.hpp
