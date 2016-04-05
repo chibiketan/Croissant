@@ -12,6 +12,8 @@
 #include "Graphic/WindowEventClose.hpp"
 #include "Exception/CroissantException.hpp"
 #include <Graphic/WindowEventKey.hpp>
+#include <Graphic/WindowMouseMoveEvent.hpp>
+#include <windowsx.h>
 
 using WindowException = Croissant::Exception::CroissantException;
 using string = std::string;
@@ -90,6 +92,23 @@ namespace Croissant
 			{
 				UINT flags = 0;
 				SetWindowPos(handle, HWND_NOTOPMOST, position.X(), position.Y(), width, height, flags);
+			}
+
+			///<summary>
+			///Crée un évènement WindowMouseMoveEvent et modifie la position fourni en paramètre
+			///</summary>
+			std::unique_ptr<const WindowEvent> GenerateMouseMoveEvent(MSG& message, Math::Point2& position)
+			{
+				int32_t xPos = GET_X_LPARAM(message.lParam); 
+				int32_t yPos = GET_Y_LPARAM(message.lParam);
+
+				auto deltaX = position.X() - xPos;
+				auto deltaY = position.Y() - yPos;
+
+				position.X(xPos);
+				position.Y(yPos);
+
+				return std::unique_ptr<WindowEvent const>(CROISSANT_NEW WindowMouseMoveEvent(deltaX, deltaY));
 			}
 
 		}
@@ -217,6 +236,14 @@ namespace Croissant
 					break;
 				case WM_KEYUP:
 					event = GenerateKeyEvent(msgTest, true);
+					if (nullptr != event)
+					{
+						return event;
+					}
+
+					break;
+				case WM_MOUSEMOVE:
+					event = GenerateMouseMoveEvent(msgTest, m_position);
 					if (nullptr != event)
 					{
 						return event;
