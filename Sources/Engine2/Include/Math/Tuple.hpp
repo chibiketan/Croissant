@@ -109,7 +109,7 @@ namespace Croissant
 		}
 
 		// ---------------------------------------------- alias
-		using Point2 = Tuple<float, 2>;
+		//using Point2 = Tuple<float, 2>;
 		using Point3 = Tuple<float, 2>;
 		//using Point4 = Point<float, 2>;
 	}

@@ -38,6 +38,7 @@ croissant_files(${PROJECT_NAME} ${ENGINE_SOURCE}
 	Graphic/WindowEventKey.cpp
 	Graphic/WindowEventNone.cpp
     Math/Matrix4.cpp
+    Math/Point2.cpp
     Math/Point4.cpp
 	Math/Quaternion.cpp
     Math/Vector4.cpp
@@ -66,6 +67,7 @@ croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
 	Graphic/WindowEventKey.hpp
 	Graphic/WindowEventNone.hpp
 	Math/Matrix4.hpp
+	Math/Point2.hpp
 	Math/Point4.hpp
 	Math/Vector4.hpp
 	Math/Quaternion.hpp
