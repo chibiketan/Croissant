@@ -9,6 +9,7 @@ namespace Croissant
 		Vector4 const Vector4::UnitX{ 1.0f, 0.0f, 0.0f };
 		Vector4 const Vector4::UnitY{ 0.0f, 1.0f, 0.0f };
 		Vector4 const Vector4::UnitZ{ 0.0f, 0.0f, 1.0f };
+		Vector4 const Vector4::Zero{ 0.0f, 0.0f, 0.0f };
 
 		Vector4::Vector4(type x, type y, type z, type w)
 		{

@@ -73,6 +73,16 @@ namespace Croissant
 			return m_position;
 		}
 
+		void Camera::Rotate(Math::Quaternion const& quaternion)
+		{
+			auto mat = quaternion.ToMatrix();
+
+			m_lookDirection = m_lookDirection * mat;
+			m_rightDirection = m_rightDirection * mat;
+			m_upDirection = m_upDirection * mat;
+			OnFrameChange();
+		}
+
 		void Camera::OnFrustumChange()
 		{
 			// map (x,y,z) into [-1,1]x[-1,1]x[-1,1].

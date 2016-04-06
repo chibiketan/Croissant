@@ -3,6 +3,7 @@
 
 #include "Engine.hpp"
 #include <array>
+#include "Quaternion.hpp"
 
 namespace Croissant
 {
@@ -32,6 +33,7 @@ namespace Croissant
 			static Vector4 const	UnitX;
 			static Vector4 const	UnitY;
 			static Vector4 const	UnitZ;
+			static Vector4 const	Zero;
 
 		private:
 			std::array<type, 4>	m_components;

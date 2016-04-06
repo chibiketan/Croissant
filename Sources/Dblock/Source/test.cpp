@@ -30,6 +30,7 @@
 #include "Math/Matrix.hpp"
 #include <cmath>
 #include "Graphic/WindowEventKey.hpp"
+#include "Graphic/WindowMouseMoveEvent.hpp"
 
 #define PI 3.14159265f
 
@@ -193,7 +194,15 @@ int main(int, char**)
 		auto opengl = renderer.GetOpenGLWrapper();
 
 		win.SetPosition(Croissant::Math::Point2{ (vpWidth - win.Width()) / 2.0f, (vpHeight - win.Height()) / 2.0f });
+		win.CenterCursor();
 		win.Open();
+
+		// traite tous les évènements en attente
+		while (win.PeekEvent()->GetType() != Croissant::Graphic::WindowEventType::NONE)
+		{
+			
+		}
+
 		int fps = 0;
 		Time firstFrameTime { Clock::now() };
 		Time lastFrameTime { firstFrameTime };
@@ -495,6 +504,30 @@ void main()
 					break;
 				default: break;
 				}
+			}
+
+			if (evt->GetType() == Croissant::Graphic::WindowEventType::MOUSEMOVE)
+			{
+				auto& mouseMoveEvt = static_cast<Croissant::Graphic::WindowMouseMoveEvent const&>(*evt);
+
+				Croissant::Math::Quaternion tmpQuat{ Croissant::Math::Vector4::Zero, 1.0f };
+
+				if (mouseMoveEvt.DeltaX() != 0)
+				{
+					tmpQuat *= Croissant::Math::Quaternion{ cam.UpVector(), (mouseMoveEvt.DeltaX() / 100.0f) * (PI / 180.0f) };
+				}
+
+				if (mouseMoveEvt.DeltaY() != 0)
+				{
+					tmpQuat *= Croissant::Math::Quaternion{ cam.RightVector(), (mouseMoveEvt.DeltaY() / 100.0f) * (PI / 180.0f) };
+				}
+
+				cam.Rotate(tmpQuat);
+				std::cout << "delta [" << mouseMoveEvt.DeltaX() << ", " << mouseMoveEvt.DeltaY() << "], Q" << tmpQuat << std::endl;
+				win.CenterCursor();
+				//std::cout << "MouseMove : deltaX = " << mouseMoveEvt.DeltaX() << std::endl;
+				//std::cout << "MouseMove : deltaY = " << mouseMoveEvt.DeltaY() << std::endl;
+				//Croissant::Math::Vector4 rotAxe{ 0.0f, 0.0f, 0.0f };
 			}
 
 			// move camera

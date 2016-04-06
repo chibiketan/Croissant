@@ -17,6 +17,9 @@ namespace Croissant
 			Quaternion(Vector4 const& vector, float angle);
 			Matrix4	ToMatrix() const;
 			float	Length() const;
+			Quaternion&	operator*=(Quaternion const& right);
+			Quaternion	operator*(Quaternion const& right) const;
+			friend std::ostream&	operator<<(std::ostream& out, Quaternion const& quat);
 			
 		private:
 			std::array<float, 4>	m_elements;

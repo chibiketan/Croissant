@@ -27,6 +27,7 @@ namespace Croissant
 			void					Move(Math::Vector4 const& translation);
 			Math::Matrix4 const&	GetProjectionViewMatrix() const;
 			Math::Point4 const&		Position() const;
+			void Rotate(Math::Quaternion const& quaternion);
 		private:
 			void OnFrustumChange();
 			void OnFrameChange();

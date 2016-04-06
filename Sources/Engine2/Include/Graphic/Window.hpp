@@ -50,6 +50,7 @@ namespace Croissant
 			Math::Point2 const&					GetPosition() const;
 			uint32_t							Width() const;
 			uint32_t							Height() const;
+			void								CenterCursor();
 
 		private:
 
@@ -58,6 +59,7 @@ namespace Croissant
 			Math::Point2		m_position;
 			uint32_t			m_width;
 			uint32_t			m_height;
+			Math::Point2		m_mouseLastPosition;
 #if defined(CROISSANT_WINDOWS)
 			char const*			m_className;
 #elif defined(CROISSANT_LINUX)

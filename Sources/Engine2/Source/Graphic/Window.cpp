@@ -102,8 +102,19 @@ namespace Croissant
 				int32_t xPos = GET_X_LPARAM(message.lParam); 
 				int32_t yPos = GET_Y_LPARAM(message.lParam);
 
-				auto deltaX = position.X() - xPos;
-				auto deltaY = position.Y() - yPos;
+				POINT t;
+				t.x = xPos;
+				t.y = yPos;
+				ClientToScreen(message.hwnd, &t);
+
+				auto deltaX = position.X() - t.x;
+				auto deltaY = position.Y() - t.y;
+
+				if (0 == deltaX && 0 == deltaY)
+				{
+					// si pas de mouvement, on ne génère pas dévènement
+					return nullptr;
+				}
 
 				position.X(xPos);
 				position.Y(yPos);
@@ -115,7 +126,7 @@ namespace Croissant
 
 		// --------------------------------------------- Window imp
 		Window::Window(uint32_t width, uint32_t height, const std::string& title)
-			: m_windowHandle{ nullptr }, m_title{ title }, m_position{ 0, 0 }, m_width{ width }, m_height{ height }
+			: m_windowHandle{ nullptr }, m_title{ title }, m_position{ 0, 0 }, m_width{ width }, m_height{ height }, m_mouseLastPosition{ 0, 0 }
 #if defined(CROISSANT_WINDOWS)
 				, m_className { nullptr }
 #endif
@@ -213,6 +224,18 @@ namespace Croissant
 			return m_height;
 		}
 
+		void Window::CenterCursor()
+		{
+			POINT pt;
+			pt.x = m_position.X() + (m_width / 2.0f);
+			pt.y = m_position.Y() + (m_height / 2.0f);
+//			ClientToScreen(m_windowHandle, &pt);
+			//SetCursorPos(m_position.X() + 50, m_position.Y() + 50);
+			m_mouseLastPosition.X(pt.x);
+			m_mouseLastPosition.Y(pt.y);
+			SetCursorPos(pt.x, pt.y);
+		}
+
 		std::unique_ptr<WindowEvent const> Window::PeekEvent()
 		{
 			auto hnd = GetSystemHandle();
@@ -243,7 +266,7 @@ namespace Croissant
 
 					break;
 				case WM_MOUSEMOVE:
-					event = GenerateMouseMoveEvent(msgTest, m_position);
+					event = GenerateMouseMoveEvent(msgTest, m_mouseLastPosition);
 					if (nullptr != event)
 					{
 						return event;
