@@ -7,8 +7,11 @@
 #include "Math/Vector4.hpp"
 #include "Math/Matrix4.hpp"
 
-// consist of PI / 180.0
-#define DEG_TO_RAD 0.0174532925199433
+namespace Croissant{
+	namespace Math{
+		class EulerAngle;
+	}
+}
 
 namespace Croissant
 {
@@ -28,6 +31,7 @@ namespace Croissant
 			Math::Matrix4 const&	GetProjectionViewMatrix() const;
 			Math::Point4 const&		Position() const;
 			void Rotate(Math::Quaternion const& quaternion);
+			void Rotate(Math::EulerAngle const& angle);
 		private:
 			void OnFrustumChange();
 			void OnFrameChange();

@@ -158,6 +158,7 @@ struct PressedKeys
 
 
 #include "Math/Point2.hpp"
+#include "Math/EulerAngle.hpp"
 
 int main(int, char**)
 {
@@ -510,20 +511,29 @@ void main()
 			{
 				auto& mouseMoveEvt = static_cast<Croissant::Graphic::WindowMouseMoveEvent const&>(*evt);
 
-				Croissant::Math::Quaternion tmpQuat{ Croissant::Math::Vector4::Zero, 1.0f };
+				// TODO : Utiliser des angles d'Euler plutôt qu'essayer de créer un quaternion
+				Croissant::Math::EulerAngle rotAngle{
+					mouseMoveEvt.DeltaX() / 100.0f,
+					mouseMoveEvt.DeltaY() / 100.0f,
+					0.0f
+				};
 
-				if (mouseMoveEvt.DeltaX() != 0)
-				{
-					tmpQuat *= Croissant::Math::Quaternion{ cam.UpVector(), (mouseMoveEvt.DeltaX() / 100.0f) * (PI / 180.0f) };
-				}
+				cam.Rotate(rotAngle);
 
-				if (mouseMoveEvt.DeltaY() != 0)
-				{
-					tmpQuat *= Croissant::Math::Quaternion{ cam.RightVector(), (mouseMoveEvt.DeltaY() / 100.0f) * (PI / 180.0f) };
-				}
+				//Croissant::Math::Quaternion tmpQuat{ Croissant::Math::Vector4::Zero, 1.0f };
 
-				cam.Rotate(tmpQuat);
-				std::cout << "delta [" << mouseMoveEvt.DeltaX() << ", " << mouseMoveEvt.DeltaY() << "], Q" << tmpQuat << std::endl;
+				//if (mouseMoveEvt.DeltaX() != 0)
+				//{
+				//	tmpQuat *= Croissant::Math::Quaternion{Croissant::Math::Vector4::UnitY, (mouseMoveEvt.DeltaX() / 100.0f) * (PI / 180.0f) };
+				//}
+
+				//if (mouseMoveEvt.DeltaY() != 0)
+				//{
+				//	tmpQuat *= Croissant::Math::Quaternion{Croissant::Math::Vector4::UnitX, (mouseMoveEvt.DeltaY() / 100.0f) * (PI / 180.0f) };
+				//}
+
+				//cam.Rotate(tmpQuat);
+				std::cout << "delta [" << mouseMoveEvt.DeltaX() << ", " << mouseMoveEvt.DeltaY() << "], " << rotAngle << std::endl;
 				win.CenterCursor();
 				//std::cout << "MouseMove : deltaX = " << mouseMoveEvt.DeltaX() << std::endl;
 				//std::cout << "MouseMove : deltaY = " << mouseMoveEvt.DeltaY() << std::endl;

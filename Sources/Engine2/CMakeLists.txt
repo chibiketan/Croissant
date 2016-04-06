@@ -38,6 +38,7 @@ croissant_files(${PROJECT_NAME} ${ENGINE_SOURCE}
 	Graphic/WindowEventKey.cpp
 	Graphic/WindowEventNone.cpp
 	Graphic/WindowMouseMoveEvent.cpp
+    Math/EulerAngle.cpp
     Math/Matrix4.cpp
     Math/Point2.cpp
     Math/Point4.cpp
@@ -68,6 +69,9 @@ croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
 	Graphic/WindowEventKey.hpp
 	Graphic/WindowEventNone.hpp
 	Graphic/WindowMouseMoveEvent.hpp
+	Math/EulerAngle.hpp
+	Math/Math.hpp
+	Math/Math.inl
 	Math/Matrix4.hpp
 	Math/Point2.hpp
 	Math/Point4.hpp

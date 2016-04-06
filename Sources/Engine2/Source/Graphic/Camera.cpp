@@ -1,4 +1,5 @@
 #include "Graphic/Camera.hpp"
+#include "Math/Math.hpp"
 
 namespace Croissant
 {
@@ -18,7 +19,7 @@ namespace Croissant
 
 		void Camera::SetFrustum(float fieldOfViewDegree, float aspectRatio, float nearView, float distantView)
 		{
-			auto halfAngleRadians = 0.5f * fieldOfViewDegree * static_cast<float>(DEG_TO_RAD);
+			auto halfAngleRadians = 0.5f * Math::ToRadian(fieldOfViewDegree);
 			m_frustum[static_cast<uint32_t>(FrustumIndex::UpMax)] = nearView*tan(halfAngleRadians);
 			m_frustum[static_cast<uint32_t>(FrustumIndex::RightMax)] = aspectRatio*m_frustum[static_cast<uint32_t>(FrustumIndex::UpMax)];
 			m_frustum[static_cast<uint32_t>(FrustumIndex::UpMin)] = -m_frustum[static_cast<uint32_t>(FrustumIndex::UpMax)];
@@ -81,6 +82,11 @@ namespace Croissant
 			m_rightDirection = m_rightDirection * mat;
 			m_upDirection = m_upDirection * mat;
 			OnFrameChange();
+		}
+
+		void Camera::Rotate(Math::EulerAngle const& angle)
+		{
+			Rotate(Math::ToQuaternion(angle));
 		}
 
 		void Camera::OnFrustumChange()
