@@ -1,23 +1,39 @@
-//#include "Core/DebugMemoryManager.hpp"
+#include "Debug/MemoryManager.hpp"
+#include "Math/Point4.hpp"
+#include "Math/EulerAngle.hpp"
+#include "Math/Math.hpp"
+#include "Math/Matrix4.hpp"
 //#include "Math/Point.hpp"
 //#include "Math/Vector.hpp"
 //
-//#include "gtest/gtest.h"
-//
-//class PointTest : public ::testing::Test
-//{
-//public:
-//	virtual void SetUp()
-//	{
-//	}
-//
-//	virtual void TearDown()
-//	{
-//	}
-//
-//protected:
-//
-//};
+#include "gtest/gtest.h"
+
+class PointTest : public ::testing::Test
+{
+public:
+	virtual void SetUp()
+	{
+	}
+
+	virtual void TearDown()
+	{
+	}
+
+protected:
+
+};
+
+TEST_F(PointTest, RotateWithEulerAngle)
+{
+	Croissant::Math::EulerAngle angle{ 0.0f, 0.0f, 45.0f };
+	Croissant::Math::Point4 point{ 0.0, 1.0, 0.0 };
+	Croissant::Math::Point4 expected{ 0.0, -1.0, 0.0 };
+
+	auto result = point * Croissant::Math::ToQuaternion(angle).ToMatrix();
+
+	ASSERT_EQ(expected, result);
+}
+
 //
 //TEST_F(PointTest, CanCreateSimplePointAndGetProperties)
 //{

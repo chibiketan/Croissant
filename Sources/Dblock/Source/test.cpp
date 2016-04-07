@@ -513,9 +513,9 @@ void main()
 
 				// TODO : Utiliser des angles d'Euler plutôt qu'essayer de créer un quaternion
 				Croissant::Math::EulerAngle rotAngle{
-					mouseMoveEvt.DeltaX() / 100.0f,
-					mouseMoveEvt.DeltaY() / 100.0f,
-					0.0f
+					mouseMoveEvt.DeltaX() * 0.3f,
+					mouseMoveEvt.DeltaY() * 0.3f,
+					0
 				};
 
 				cam.Rotate(rotAngle);
