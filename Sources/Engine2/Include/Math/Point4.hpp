@@ -37,7 +37,7 @@ namespace Croissant
 			///<summary>Multiplication d'un point par une matrice qui donne un point</summary>
 			Point4		operator*(Matrix4 const& right) const;
 			bool		operator==(Point4 const& right) const;
-			friend std::ostream& operator<<(std::ostream& out, Point4 const& point);
+			ENGINE_API friend std::ostream&	operator<<(std::ostream& out, Point4 const& point);
 			Point4&		operator+=(Vector4 const& right);
 		private:
 			std::array<type, 4>	m_elements;

@@ -25,7 +25,7 @@ namespace Croissant
 			inline float Pitch() const;
 			inline float Yaw() const;
 
-			friend std::ostream& operator<<(std::ostream& out, EulerAngle const& angle);
+			ENGINE_API friend std::ostream&	operator<<(std::ostream& out, EulerAngle const& angle);
 		private:
 			type	m_yaw;
 			type	m_pitch;

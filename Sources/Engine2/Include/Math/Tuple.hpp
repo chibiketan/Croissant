@@ -10,7 +10,7 @@ namespace Croissant
 	namespace Math
 	{
 		template <typename T, int size>
-		class ENGINE_API Tuple
+		class Tuple
 		{
 		public:
 			static_assert(size >= 2 || size <= 4, "La valeur de size doit être comprise entre 2 et 4");

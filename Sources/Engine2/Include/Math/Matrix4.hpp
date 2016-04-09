@@ -27,7 +27,7 @@ namespace Croissant
 			void					LoadZero();
 			Matrix4					operator*(Matrix4 const& right) const;
 			bool					operator==(Matrix4 const& right) const;
-			friend std::ostream&	operator<<(std::ostream& out, Matrix4 const& obj);
+			ENGINE_API friend std::ostream&	operator<<(std::ostream& out, Matrix4 const& obj);
 
 		private:
 			ArrayType	m_data;
