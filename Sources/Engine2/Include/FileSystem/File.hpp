@@ -17,7 +17,7 @@ namespace Croissant
 			File(const std::string& path);
 			File(const std::string& path, const Directory& parent);
 			File(const File& ) = delete;
-			File(File&&) = default;
+			File(File&&) noexcept = default;
 			~File();
 			bool Exist() const;
 			const std::string& Name() const;

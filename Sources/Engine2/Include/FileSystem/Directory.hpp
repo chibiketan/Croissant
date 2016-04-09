@@ -26,8 +26,8 @@ namespace Croissant
 
 			Directory(DEFAULT_DIRECTORY mode = DEFAULT_DIRECTORY::CURRENT_DIRECTORY);
 			Directory(const std::string& path);
-			Directory(Directory&& source);
-			~Directory();
+			Directory(Directory& source) = default;
+			Directory(Directory&& source) noexcept = default;
 			const std::string& FullPath() const;
 			const std::string& Name() const;
 			bool Exist() const;
@@ -38,20 +38,18 @@ namespace Croissant
 			bool Create(bool createParents = false);
 			void Refresh();
 
-			Directory& operator=(Directory&& source);
 			bool operator==(const Directory& source) const;
 
 			static std::string NormalizePath(const std::string& path);
 			static std::string GetName(const std::string& path);
 		private:
 
-			class Impl;
-			friend Impl;
 			friend File;
 
 			Directory(const std::string& path, bool needParent);
-
-			std::unique_ptr<Impl> m_impl;
+			std::string m_fullPath;
+			std::string m_name;
+			bool m_exist;
 		};
 	}
 }

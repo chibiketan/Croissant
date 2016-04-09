@@ -18,39 +18,6 @@ namespace Croissant
 			};
 
 		}
-
-		class Directory::Impl final
-		{
-		public:
-			Impl(Impl&&) = delete;
-			Impl& operator=(Impl&& source) = delete;
-			Impl(Impl const&) = delete;
-			Impl& operator=(Impl const& source) = delete;
-
-			Impl(DEFAULT_DIRECTORY mode = DEFAULT_DIRECTORY::CURRENT_DIRECTORY);
-			Impl(const std::string& path, bool doGoUp);
-			~Impl();
-			const std::string& FullPath() const;
-			const std::string& Name() const;
-			bool Exist() const;
-			Directory Parent() const;
-			Directory Child(const std::string& name) const;
-			Filelist Files() const;
-			Filelist Search(const std::string& pattern) const;
-			bool Create(bool createParents = false);
-			void Refresh();
-
-			bool operator==(const Impl& source) const;
-
-			static std::string NormalizePath(const std::string& path);
-			static std::string GetName(const std::string& path);
-		private:
-
-			std::string m_fullPath;
-			std::string m_name;
-			bool m_exist;
-		};
-
 	}
 }
 
@@ -153,9 +120,8 @@ namespace Croissant
 
 
 		}
-		// --------------------------------------------------- impl�mentation de Directory::Pimpl
-		Directory::Impl::Impl(DEFAULT_DIRECTORY mode)
-			: m_fullPath { "" }, m_name { "" }, m_exist { false }
+		// --------------------------------------------------- implémentation de Directory
+		Directory::Directory(DEFAULT_DIRECTORY mode)
 		{
 			if (DEFAULT_DIRECTORY::CURRENT_DIRECTORY == mode)
 			{
@@ -179,7 +145,12 @@ namespace Croissant
 			Refresh();
 		}
 
-		Directory::Impl::Impl(const std::string& path, bool needParent)
+		Directory::Directory(std::string const& path)
+			: Directory(path, false)
+		{
+		}
+
+		Directory::Directory(std::string const& path, bool needParent)
 			: m_fullPath { "" }, m_name { "" }, m_exist { false }
 		{
 			if (needParent)
@@ -195,42 +166,37 @@ namespace Croissant
 			Refresh();
 		}
 
-		Directory::Impl::~Impl()
-		{
-
-		}
-
-		const std::string& Directory::Impl::FullPath() const
+		std::string const& Directory::FullPath() const
 		{
 			return m_fullPath;
 		}
 
-		const std::string& Directory::Impl::Name() const
+		std::string const& Directory::Name() const
 		{
 			return m_name;
 		}
 
-		bool Directory::Impl::Exist() const
+		bool Directory::Exist() const
 		{
 			return m_exist;
 		}
 
-		void Directory::Impl::Refresh()
+		void Directory::Refresh()
 		{
 			m_exist = CheckDirectoryExistence(m_fullPath);
 		}
 
-		Directory Directory::Impl::Parent() const
+		Directory Directory::Parent() const
 		{
 			return Directory(m_fullPath, true);
 		}
 
-		bool Directory::Impl::operator==(const Directory::Impl& source) const
+		bool Directory::operator==(Directory const& source) const
 		{
 			return m_fullPath == source.m_fullPath;
 		}
 
-		Directory::Filelist Directory::Impl::Search(const std::string& pattern) const
+		Directory::Filelist Directory::Search(std::string const& pattern) const
 		{
 			Filelist result;
 			std::string fileName;
@@ -245,12 +211,12 @@ namespace Croissant
 			return result;
 		}
 
-		Directory Directory::Impl::Child( const std::string& name ) const
+		Directory Directory::Child( std::string const& name ) const
 		{
 			return Directory(m_fullPath + PATH_SEPARATOR + name);
 		}
 
-		bool Directory::Impl::Create( bool createParent )
+		bool Directory::Create( bool createParent )
 		{
 			TRACE("Début création de dossier pour ");
 			TRACE(FullPath().c_str());
@@ -276,7 +242,7 @@ namespace Croissant
 			return CreateDirectoryInternal(FullPath());
 		}
 
-		std::string Directory::Impl::NormalizePath(const std::string& path)
+		std::string Directory::NormalizePath(std::string const& path)
 		{
 			// TODO: faire disparaitre les appels au parent dans les chemins (../, ./)
 			std::string result;
@@ -375,7 +341,7 @@ namespace Croissant
 			return result;
 		}
 
-		std::string Directory::Impl::GetName(const std::string& path)
+		std::string Directory::GetName(std::string const& path)
 		{
 			auto begin = path.rbegin();
 			auto end = path.rend();
@@ -404,91 +370,9 @@ namespace Croissant
 			return std::string(begin.base(), searchEnd);
 		}
 
-		Directory::Filelist Directory::Impl::Files() const
-		{
-			return Search("*");
-		}
-
-
-
-		// --------------------------------------------------- impl�mentation de Directory
-		Directory::Directory(DEFAULT_DIRECTORY mode)
-			: m_impl { CROISSANT_NEW Impl { mode } }
-		{
-		}
-
-		Directory::Directory(std::string const& path)
-			: m_impl { CROISSANT_NEW Impl { path, false } }
-		{
-		}
-
-		Directory::Directory(std::string const& path, bool needParent)
-			: m_impl { CROISSANT_NEW Impl { path, needParent } }
-		{
-		}
-
-		Directory::~Directory()
-		{
-		}
-
-		std::string const& Directory::FullPath() const
-		{
-			return m_impl->FullPath();
-		}
-
-		std::string const& Directory::Name() const
-		{
-			return m_impl->Name();
-		}
-
-		bool Directory::Exist() const
-		{
-			return m_impl->Exist();
-		}
-
-		void Directory::Refresh()
-		{
-			m_impl->Refresh();
-		}
-
-		Directory Directory::Parent() const
-		{
-			return m_impl->Parent();
-		}
-
-		bool Directory::operator==(Directory const& source) const
-		{
-			return *(m_impl.get()) == *(source.m_impl.get());
-		}
-
-		Directory::Filelist Directory::Search(std::string const& pattern) const
-		{
-			return m_impl->Search(pattern);
-		}
-
-		Directory Directory::Child( std::string const& name ) const
-		{
-			return m_impl->Child(name);
-		}
-
-		bool Directory::Create( bool createParent )
-		{
-			return m_impl->Create(createParent);
-		}
-
-		std::string Directory::NormalizePath(std::string const& path)
-		{
-			return Directory::Impl::NormalizePath(path);
-		}
-
-		std::string Directory::GetName(std::string const& path)
-		{
-			return Directory::Impl::GetName(path);
-		}
-
 		Directory::Filelist Directory::Files() const
 		{
-			return m_impl->Files();
+			return Search("*");
 		}
 	}
 }
