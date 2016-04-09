@@ -169,15 +169,17 @@ TEST_F(DirectoryTest, CheckParentFromRootIsSamePath)
 TEST_F(DirectoryTest, CheckIfCanGetAllFilesFromDirectory)
 {
 	Croissant::FileSystem::Directory dir(Croissant::FileSystem::DEFAULT_DIRECTORY::CURRENT_DIRECTORY);
-	Croissant::FileSystem::Directory::Filelist fileList = dir.Files();
-
-	ASSERT_NE(0UL, fileList.size());
-	auto begin = fileList.begin();
-	auto end = fileList.end();
-
-	for (; begin != end; ++begin)
 	{
-		ASSERT_TRUE((*begin).Exist());
+		auto fileList = dir.Files();
+
+		ASSERT_NE(0UL, fileList.size());
+		auto begin = fileList.begin();
+		auto end = fileList.end();
+
+		for (; begin != end; ++begin)
+		{
+			ASSERT_TRUE((*begin).Exist());
+		}
 	}
 }
 

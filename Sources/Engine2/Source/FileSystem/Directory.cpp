@@ -204,7 +204,7 @@ namespace Croissant
 
 			while (NextSearch(handle, fileName))
 			{
-				result.push_back(File(m_fullPath + PATH_SEPARATOR + fileName));
+				result.emplace_back(m_fullPath + PATH_SEPARATOR + fileName);
 			}
 
 			CloseSearch(handle);

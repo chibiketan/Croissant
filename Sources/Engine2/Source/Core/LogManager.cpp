@@ -38,7 +38,7 @@ namespace Croissant
 
 		LogManager::Log::Log(std::string fileName)
 			: m_fileName { fileName }, m_queue()
-			, m_file(Croissant::FileSystem::File(fileName + ".log", Croissant::FileSystem::Directory(Croissant::FileSystem::DEFAULT_DIRECTORY::PROGRAM_DIRECTORY).Child("Logs")))
+			, m_file{ fileName + ".log", Croissant::FileSystem::Directory(Croissant::FileSystem::DEFAULT_DIRECTORY::PROGRAM_DIRECTORY).Child("Logs") }
 			, m_output(), m_mutex { }
 		{
 			if (!m_file.Exist())

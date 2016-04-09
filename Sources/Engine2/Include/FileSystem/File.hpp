@@ -26,6 +26,9 @@ namespace Croissant
 			Directory Parent() const;
 			void Refresh();
 
+			File& operator=(File const&) = delete;
+			File& operator=(File &&) noexcept = default;
+
 		private:
 			std::string m_fullPath;
 			std::string m_name;
