@@ -25,7 +25,7 @@ find_package(PythonInterp REQUIRED)
 option(CROISSANT_USE_THREAD "Enable thread support into croissant" ON)
 option(CROISSANT_MEMORY_DEBUG "Enable memory debug implementation into croissant" ON)
 option(CROISSANT_OPENGL_ERROR_THROW "Enable OpenGL call to throw when glGetError return error code" ON)
-option(CROISSANT_SHARED_LIB "Enable compile croissant into shared lib" ON)
+option(CROISSANT_SHARED_LIB "Enable compile croissant into shared lib" OFF)
 
 
 
