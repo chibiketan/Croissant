@@ -10,40 +10,22 @@ namespace Croissant
 {
 	namespace Math
 	{
-		float Sin(float radian)
+		inline float Sin(float radian)
 		{
 			return std::sin(radian);
 		}
 
-		float Cos(float radian)
+		inline float Cos(float radian)
 		{
 			return std::cos(radian);
 		}
 
-		float ToRadian(float degree)
+		inline float ToRadian(float degree)
 		{
 			return degree * PI_FOR_RAD;
 		}
 
-
-		//template<typename T>
-		//Quaternion<T> EulerAngles<T>::ToQuaternion() const
-		//{
-		//	T cy = std::cos(ToRadians(yaw) / F(2.0));
-		//	T cr = std::cos(ToRadians(roll) / F(2.0));
-		//	T cp = std::cos(ToRadians(pitch) / F(2.0));
-
-		//	T sy = std::sin(ToRadians(yaw) / F(2.0));
-		//	T sr = std::sin(ToRadians(roll) / F(2.0));
-		//	T sp = std::sin(ToRadians(pitch) / F(2.0));
-
-		//	return Quaternion<T>(,
-		//		,
-		//		,
-		//		);
-		//}
-
-		Quaternion ToQuaternion(EulerAngle const& angle)
+		inline Quaternion ToQuaternion(EulerAngle const& angle)
 		{
 			// W = cos(R / 2) * cos(P / 2) * cos(Y / 2) + sin(R /2) * sin(P / 2) * sin(Y / 2)
 			// X = sin(R / 2) * cos(P / 2) * cos(Y / 2) - cos(R /2) * sin(P / 2) * sin(Y / 2)
@@ -73,6 +55,18 @@ namespace Croissant
 				cr * cp * cy + sr * sp * sy
 			};
 		}
+
+		inline Math::Matrix4 ToMatrix(Math::Vector4 const& vector)
+		{
+			Math::Matrix4 result;
+
+			result.LoadIdentity();
+			result(0, 3) = vector.X();
+			result(1, 3) = vector.Y();
+			result(2, 3) = vector.Z();
+			return result;
+		}
+
 
 	}
 }

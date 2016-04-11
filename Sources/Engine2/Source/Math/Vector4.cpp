@@ -106,5 +106,15 @@ namespace Croissant
 				m_components[3] * val
 			};
 		}
+
+		Vector4 Vector4::operator+(Vector4 const& right) const
+		{
+			return Vector4{
+				X() + right.X(),
+				Y() + right.Y(),
+				Z() + right.Z(),
+				W() + right.Z()
+			};
+		}
 	}
 }

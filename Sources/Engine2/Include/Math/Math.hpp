@@ -3,6 +3,7 @@
 #  pragma once
 
 #  include "Engine.hpp"
+#  include "Math/Matrix4.hpp"
 
 namespace Croissant
 {
@@ -11,10 +12,11 @@ namespace Croissant
 		class Quaternion;
 		class EulerAngle;
 
-		inline float		Sin(float radian);
-		inline float		Cos(float radian);
-		inline float		ToRadian(float degree);
-		inline Quaternion	ToQuaternion(EulerAngle const& angle);
+		inline float			Sin(float radian);
+		inline float			Cos(float radian);
+		inline float			ToRadian(float degree);
+		inline Quaternion		ToQuaternion(EulerAngle const& angle);
+		inline Math::Matrix4	ToMatrix(Math::Vector4 const& vector);
 
 	}
 }

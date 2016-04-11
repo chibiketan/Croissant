@@ -30,6 +30,7 @@ namespace Croissant
 			Vector4		operator*(Matrix4 const& right) const;
 			Vector4		operator-() const;
 			Vector4		operator*(type val) const;
+			Vector4		operator+(Vector4 const& right) const;
 			static Vector4 const	UnitX;
 			static Vector4 const	UnitY;
 			static Vector4 const	UnitZ;
