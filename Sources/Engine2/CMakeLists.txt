@@ -24,6 +24,7 @@ execute_process(
 croissant_files(${PROJECT_NAME} ${ENGINE_SOURCE}
 	Core/Application.cpp
 	Core/LogManager.cpp
+	Core/Node.cpp
 	Debug/MemoryManager.cpp
 	Exception/CroissantException.cpp
 	FileSystem/Directory.cpp
@@ -55,6 +56,7 @@ croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
     Engine.hpp
 	Core/Application.hpp
 	Core/LogManager.hpp
+	Core/Node.hpp
 	Debug/MemoryManager.hpp
 	Exception/CroissantException.hpp
 	FileSystem/Directory.hpp
