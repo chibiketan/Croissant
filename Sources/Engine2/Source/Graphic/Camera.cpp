@@ -12,7 +12,9 @@ namespace Croissant
 			m_rightDirection{ Math::Vector4::UnitX },
 			m_frustum{  },
 			m_projectionMatrix{},
-			m_viewMatrix{}
+			m_viewMatrix{},
+			m_node{ nullptr },
+			m_nodeUpdateCallback{ [this](Core::Node const&, Math::Matrix4 const&) { this->UpdateProjectionViewMatrix();  } }
 		{
 			SetFrustum(90.0f, 1.0f, 1.0f, 10000.0f);
 		}
@@ -89,6 +91,20 @@ namespace Croissant
 			Rotate(Math::ToQuaternion(angle));
 		}
 
+		void Camera::SetNode(node_ptr node)
+		{
+			if (nullptr != m_node)
+			{
+				m_node->RemoveOnUpdate(m_nodeUpdateCallback);
+			}
+
+			m_node = node;
+			if (nullptr != node)
+			{
+				node->AddOnUpdate(m_nodeUpdateCallback);
+			}
+		}
+
 		void Camera::OnFrustumChange()
 		{
 			// map (x,y,z) into [-1,1]x[-1,1]x[-1,1].
@@ -163,7 +179,18 @@ namespace Croissant
 
 		void Camera::UpdateProjectionViewMatrix()
 		{
-			m_projectionViewMatrix = m_projectionMatrix * m_viewMatrix;
+			Math::Matrix4 mToW;
+
+			if (nullptr != m_node)
+			{
+				mToW = m_node->GetModelToWorldMatrix();
+			}
+			else
+			{
+				mToW.LoadIdentity();
+			}
+			
+			m_projectionViewMatrix = m_projectionMatrix * m_viewMatrix * mToW;
 		}
 	}
 }

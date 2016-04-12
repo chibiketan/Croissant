@@ -6,6 +6,8 @@
 #include "Math/Point4.hpp"
 #include "Math/Vector4.hpp"
 #include "Math/Matrix4.hpp"
+#include <memory>
+#include <Core/Node.hpp>
 
 namespace Croissant{
 	namespace Math{
@@ -20,6 +22,8 @@ namespace Croissant
 		class ENGINE_API Camera final
 		{
 		public:
+			using node_ptr = std::shared_ptr<Core::Node>;
+
 			Camera();
 			void SetFrustum(float fieldOfViewDegree, float ratio, float nearView, float distantView);
 			void SetAxes(Math::Vector4 const& lookVector, Math::Vector4 const& upVector, Math::Vector4 const& rightVector);
@@ -32,19 +36,22 @@ namespace Croissant
 			Math::Point4 const&		Position() const;
 			void Rotate(Math::Quaternion const& quaternion);
 			void Rotate(Math::EulerAngle const& angle);
+			void SetNode(node_ptr node);
 		private:
 			void OnFrustumChange();
 			void OnFrameChange();
 			void UpdateProjectionViewMatrix();
 
-			Math::Point4	m_position;
-			Math::Vector4	m_lookDirection;
-			Math::Vector4	m_upDirection;
-			Math::Vector4	m_rightDirection;
-			std::array<float, 6>	m_frustum;
-			Math::Matrix4	m_projectionMatrix;
-			Math::Matrix4	m_viewMatrix;
-			Math::Matrix4	m_projectionViewMatrix;
+			Math::Point4					m_position;
+			Math::Vector4					m_lookDirection;
+			Math::Vector4					m_upDirection;
+			Math::Vector4					m_rightDirection;
+			std::array<float, 6>			m_frustum;
+			Math::Matrix4					m_projectionMatrix;
+			Math::Matrix4					m_viewMatrix;
+			Math::Matrix4					m_projectionViewMatrix;
+			node_ptr						m_node;
+			Core::Node::OnUpdateCallback	m_nodeUpdateCallback;
 
 			enum class FrustumIndex
 			{

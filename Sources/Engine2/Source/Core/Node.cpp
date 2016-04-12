@@ -9,7 +9,8 @@ namespace Croissant
 		Node::Node()
 			: m_name { Node::GenerateName() }, m_parent { nullptr }, m_children(5),
 			m_rotation{ Math::Vector4::Zero, 1}, m_translation { Math::Vector4::Zero },
-			m_onUpdateListeners{}
+			m_onUpdateListeners{},
+			m_needUpdate{ false }
 		{
 		}
 
