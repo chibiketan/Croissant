@@ -363,6 +363,12 @@ void main()
 		opengl.BindBuffer(GL_ARRAY_BUFFER, pointVerticesBufferId);
 		opengl.BufferData(GL_ARRAY_BUFFER, sizeof(pointVertices), pointVertices, GL_STATIC_DRAW);
 
+		// reinitialise les matrices de projection et de transformation Model => Vue
+		//glMatrixMode(GL_PROJECTION);
+		//glLoadIdentity();
+		//glMatrixMode(GL_MODELVIEW);
+		//glLoadIdentity();
+
 		// cube indexes
 		uint32_t indexes[] = {
 			0, 1, 2, // demi face avant Z, bas droite
