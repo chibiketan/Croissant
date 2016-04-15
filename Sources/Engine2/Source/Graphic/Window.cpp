@@ -289,7 +289,8 @@ namespace Croissant
 			    }
 			}
 
-			return std::unique_ptr<WindowEvent const>(CROISSANT_NEW WindowEventNone());
+			return std::make_unique<WindowEventNone const>();
+			//return std::unique_ptr<WindowEvent const>(CROISSANT_NEW WindowEventNone());
 		}
 	}
 }

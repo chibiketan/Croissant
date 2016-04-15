@@ -1,5 +1,6 @@
 #include "Core/Node.hpp"
 #include <string>
+#include <algorithm>
 #include <Math/Math.inl>
 
 namespace Croissant
@@ -26,7 +27,7 @@ namespace Croissant
 
 		void Node::Move(Math::Vector4 const& move)
 		{
-			// TODO : marquer la matrice comme modifiée et non la calculer tout de suite
+			// TODO : marquer la matrice comme modifiï¿½e et non la calculer tout de suite
 			m_translation = m_translation + move;
 			m_needUpdate = true;
 		}

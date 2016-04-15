@@ -1,6 +1,7 @@
 #include "Math/Matrix4.hpp"
 #include "Math/Point4.hpp"
 #include <assert.h>
+#include <iostream>
 
 #define DIMENSION 4
 
@@ -68,7 +69,7 @@ namespace Croissant
 		Matrix4 Matrix4::operator*(Matrix4 const& right) const
 		{
 			auto& rthis = *this;
-			// TODO: ne pas utiliser l'opérateur () mais plutôt les indexes de m_data
+			// TODO: ne pas utiliser l'opï¿½rateur () mais plutï¿½t les indexes de m_data
 			auto result = Matrix4({
 				// first line
 				rthis(0, 0) * right(0, 0) + rthis(0, 1) * right(1, 0) + rthis(0, 2) * right(2, 0) + rthis(0, 3) * right(3, 0),

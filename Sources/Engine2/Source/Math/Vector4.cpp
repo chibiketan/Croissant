@@ -1,6 +1,7 @@
 #include "Math/Vector4.hpp"
 #include "Math/Point4.hpp"
 #include "Math/Matrix4.hpp"
+#include <cmath>
 
 namespace Croissant
 {

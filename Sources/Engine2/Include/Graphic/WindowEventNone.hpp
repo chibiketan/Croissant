@@ -19,6 +19,7 @@ namespace Croissant
 		{
 		public:
 			WindowEventNone();
+			virtual ~WindowEventNone() {};
 		};
 	}
 }

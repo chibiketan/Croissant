@@ -1,14 +1,15 @@
 #include "Math/Quaternion.hpp"
 #include "Math/Vector4.hpp"
 #include "Math/Matrix4.hpp"
+#include "Math/Math.hpp"
 
 namespace Croissant
 {
 	namespace Math
 	{
 		Quaternion::Quaternion(Vector4 const& vector, float angle)
-			: m_elements { vector.X() * std::sin(angle / 2.0f), vector.Y() * std::sin(angle / 2.0f),
-			vector.Z() * std::sin(angle / 2.0f), std::cos(angle / 2.0f) }
+			: m_elements { vector.X() * Sin(angle / 2.0f), vector.Y() * Sin(angle / 2.0f),
+			vector.Z() * Sin(angle / 2.0f), Cos(angle / 2.0f) }
 		{
 		}
 

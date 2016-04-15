@@ -160,6 +160,10 @@ struct PressedKeys
 #include "Math/Point2.hpp"
 #include "Math/EulerAngle.hpp"
 #include "Core/Node.hpp"
+#include "Graphic/WindowEventNone.hpp"
+
+class A {};
+class B : public A {};
 
 int main(int, char**)
 {
@@ -593,7 +597,7 @@ void main()
 			opengl.EnableVertexAttribArray(0);
 			opengl.EnableVertexAttribArray(1);
 			// définition des constantes
-			opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, true, identity * cam.GetProjectionViewMatrix());
+			opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, true, cam.GetProjectionViewMatrix());
 			// définition des attributs des vertex
 			opengl.VertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vertexProp), nullptr);
 			opengl.VertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, true, sizeof(vertexProp), BUFFER_OFFSET(sizeof(planVertices[0].m_coord)));

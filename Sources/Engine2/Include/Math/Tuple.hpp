@@ -18,17 +18,17 @@ namespace Croissant
 			using type_ref = T&;
 			using type_cref = type const&;
 
-			template<typename = typename std::enable_if<size == 2>::type> Tuple(type x, type y);
-			template<typename = typename std::enable_if<size == 3>::type> Tuple(type x, type y, type z);
-			template<typename = typename std::enable_if<size == 4>::type> Tuple(type x, type y, type z, type w);
+			template<class U = T, typename = typename std::enable_if<size == 2, U>::type> Tuple(type x, type y);
+			template<class U = T, typename = typename std::enable_if<size == 3, U>::type> Tuple(type x, type y, type z);
+			template<class U = T, typename = typename std::enable_if<size == 4, U>::type> Tuple(type x, type y, type z, type w);
 			type X() const;
 			type Y() const;
-			template<typename = typename std::enable_if<size >= 3>::type> type Z() const;
-			template<typename = typename std::enable_if<size >= 4>::type> type W() const;
+			template<class U = T, typename = typename std::enable_if<size >= 3, U>::type> type Z() const;
+			template<class U = T, typename = typename std::enable_if<size >= 4, U>::type> type W() const;
 			void X(type x);
 			void Y(type y);
-			template<typename = typename std::enable_if<size >= 3>::type> void Z(type z);
-			template<typename = typename std::enable_if<size >= 4>::type> void W(type w);
+			template<class U = T, typename = typename std::enable_if<size >= 3, U>::type> void Z(type z);
+			template<class U = T, typename = typename std::enable_if<size >= 4, U>::type> void W(type w);
 
 		private:
 			type m_element[size];
@@ -36,21 +36,21 @@ namespace Croissant
 
 		// ---------------------------------------------- implémentation
 		template <typename T, int size>
-		template<typename>
+		template<class U, typename>
 		Tuple<T, size>::Tuple(type x, type y)
 			: m_element { x, y }
 		{
 		}
 
 		template <typename T, int size>
-		template<typename>
+		template<class U, typename>
 		Tuple<T, size>::Tuple(type x, type y, type z)
 			: m_element{ x, y, z }
 		{
 		}
 
 		template <typename T, int size>
-		template<typename>
+		template<class U, typename>
 		Tuple<T, size>::Tuple(type x, type y, type z, type w)
 			: m_element{ x, y, z, w }
 		{
@@ -69,14 +69,14 @@ namespace Croissant
 		}
 
 		template <typename T, int size>
-		template <typename>
+		template <class U, typename>
 		typename Tuple<T, size>::type Tuple<T, size>::Z() const
 		{
 			return m_element[2];
 		}
 
 		template <typename T, int size>
-		template <typename>
+		template <class U, typename>
 		typename Tuple<T, size>::type Tuple<T, size>::W() const
 		{
 			return m_element[3];
@@ -95,14 +95,14 @@ namespace Croissant
 		}
 
 		template <typename T, int size>
-		template <typename>
+		template <class U, typename>
 		void Tuple<T, size>::Z(type z)
 		{
 			m_element[2] = z;
 		}
 
 		template <typename T, int size>
-		template <typename>
+		template <class U, typename>
 		void Tuple<T, size>::W(type w)
 		{
 			m_element[3] = w;

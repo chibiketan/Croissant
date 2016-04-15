@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 
 #undef max
 
@@ -105,7 +106,7 @@ namespace Croissant
 
 		Point4 Point4::operator*(Matrix4 const& right) const
 		{
-			// Le nombre de colonne de la matrice de gauche est égal au nombre de ligne de celle de droite
+			// Le nombre de colonne de la matrice de gauche est ï¿½gal au nombre de ligne de celle de droite
 			//	                    |--------------|
 			//  |--------------|    |xx, xy, xz, xw|    
 			// P|xp, yp, zp, wp| X M|yx, yy, yz, yw|
