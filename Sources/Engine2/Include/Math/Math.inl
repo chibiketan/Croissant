@@ -64,6 +64,9 @@ namespace Croissant
 			result(0, 3) = vector.X();
 			result(1, 3) = vector.Y();
 			result(2, 3) = vector.Z();
+			//result(3, 0) = vector.X();
+			//result(3, 1) = vector.Y();
+			//result(3, 2) = vector.Z();
 			return result;
 		}
 

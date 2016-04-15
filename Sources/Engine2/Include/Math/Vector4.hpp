@@ -39,7 +39,11 @@ namespace Croissant
 		private:
 			std::array<type, 4>	m_components;
 		};
+
+
+		std::ostream&	operator<<(std::ostream& out, Vector4 const& vec);
 	}
 }
+
 
 #endif //CROISSANT_ENGINE_MATH_VECTOR4_HPP_INC

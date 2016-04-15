@@ -26,8 +26,8 @@ namespace Croissant
 			void RemoveOnUpdate(OnUpdateCallback& callback) const;
 			void Move(Math::Vector4 const& move);
 			void Rotate(Math::Quaternion const& rotation);
-			Math::Matrix4 const&	GetModelToWorldMatrix() const;
-
+			Math::Matrix4 const&		GetModelToWorldMatrix() const;
+			inline Math::Vector4 const&	GetTranslation() const;
 		private:
 			static std::string	GenerateName();
 			void				Update() const;
@@ -41,6 +41,17 @@ namespace Croissant
 			mutable std::list<OnUpdateCallback*>	m_onUpdateListeners;
 			mutable Math::Matrix4					m_modelToWorldMatrix;
 		};
+	}
+}
+
+namespace Croissant
+{
+	namespace Core
+	{
+		inline Math::Vector4 const&	Node::GetTranslation() const
+		{
+			return m_translation;
+		}
 	}
 }
 

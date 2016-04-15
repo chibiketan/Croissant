@@ -31,21 +31,29 @@ namespace Croissant
 			Math::Vector4 const&	LookVector() const;
 			Math::Vector4 const&	RightVector() const;
 			Math::Vector4 const&	UpVector() const;
+			inline Math::Vector4 const&	GetRealLookDirection() const;
+			inline Math::Vector4 const&	GetRealRightDirection() const;
+			inline Math::Vector4 const&	GetRealUpDirection() const;
 			void					Move(Math::Vector4 const& translation);
 			Math::Matrix4 const&	GetProjectionViewMatrix() const;
 			Math::Point4 const&		Position() const;
-			void Rotate(Math::Quaternion const& quaternion);
-			void Rotate(Math::EulerAngle const& angle);
-			void SetNode(node_ptr node);
+			void					Rotate(Math::Quaternion const& quaternion);
+			void					Rotate(Math::EulerAngle const& angle);
+			void					SetNode(node_ptr node);
 		private:
 			void OnFrustumChange();
 			void OnFrameChange();
+			void OnNodeUpdate();
+			void UpdateRealDirections();
 			void UpdateProjectionViewMatrix();
 
 			Math::Point4					m_position;
 			Math::Vector4					m_lookDirection;
 			Math::Vector4					m_upDirection;
 			Math::Vector4					m_rightDirection;
+			Math::Vector4					m_realLookDirection;
+			Math::Vector4					m_realUpDirection;
+			Math::Vector4					m_realRightDirection;
 			std::array<float, 6>			m_frustum;
 			Math::Matrix4					m_projectionMatrix;
 			Math::Matrix4					m_viewMatrix;
@@ -63,6 +71,27 @@ namespace Croissant
 				RightMax = 5,		// right
 			};
 		};
+	}
+}
+
+namespace Croissant
+{
+	namespace Graphic
+	{
+		inline Math::Vector4 const&	Camera::GetRealLookDirection() const
+		{
+			return m_realLookDirection;
+		}
+
+		inline Math::Vector4 const&	Camera::GetRealRightDirection() const
+		{
+			return m_realRightDirection;
+		}
+
+		inline Math::Vector4 const&	Camera::GetRealUpDirection() const
+		{
+			return m_realUpDirection;
+		}
 	}
 }
 

@@ -10,11 +10,14 @@ namespace Croissant
 			m_lookDirection{ Math::Vector4::UnitZ },
 			m_upDirection{ Math::Vector4::UnitY },
 			m_rightDirection{ Math::Vector4::UnitX },
+			m_realLookDirection{ m_lookDirection },
+			m_realUpDirection{ m_upDirection },
+			m_realRightDirection{ m_rightDirection },
 			m_frustum{  },
 			m_projectionMatrix{},
 			m_viewMatrix{},
 			m_node{ nullptr },
-			m_nodeUpdateCallback{ [this](Core::Node const&, Math::Matrix4 const&) { this->UpdateProjectionViewMatrix();  } }
+			m_nodeUpdateCallback{ [this](Core::Node const&, Math::Matrix4 const&) { this->OnNodeUpdate();  } }
 		{
 			SetFrustum(90.0f, 1.0f, 1.0f, 10000.0f);
 		}
@@ -118,6 +121,7 @@ namespace Croissant
 			float invUDiff = 1.0f / (uMax - uMin);
 			float invRDiff = 1.0f / (rMax - rMin);
 
+			// essayer ce lien : http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/perspective-projections-in-lh-and-rh-systems-r3598
 			m_projectionMatrix(0, 0) = 2.0f * dMin * invRDiff;
 			m_projectionMatrix(0, 1) = 0.0f;
 			m_projectionMatrix(0, 2) = -(rMin + rMax) * invRDiff;
@@ -133,6 +137,7 @@ namespace Croissant
 			m_projectionMatrix(3, 0) = 0.0f;
 			m_projectionMatrix(3, 1) = 0.0f;
 			m_projectionMatrix(3, 2) = 1.0f;
+			#//m_projectionMatrix(3, 2) = -1.0f;
 			m_projectionMatrix(3, 3) = 0.0f;
 
 			UpdateProjectionViewMatrix();
@@ -177,6 +182,31 @@ namespace Croissant
 			UpdateProjectionViewMatrix();
 		}
 
+		void Camera::OnNodeUpdate()
+		{
+			UpdateRealDirections();
+			UpdateProjectionViewMatrix();
+		}
+
+		void Camera::UpdateRealDirections()
+		{
+			if (nullptr == m_node)
+			{
+				// real == set
+				m_realLookDirection = m_lookDirection;
+				m_realRightDirection = m_rightDirection;
+				m_realUpDirection = m_upDirection;
+			}
+			else
+			{
+				auto rotMat = m_node->GetModelToWorldMatrix();
+
+				m_realLookDirection = m_lookDirection * rotMat;
+				m_realRightDirection = m_rightDirection * rotMat;
+				m_realUpDirection = m_upDirection * rotMat;
+			}
+		}
+
 		void Camera::UpdateProjectionViewMatrix()
 		{
 			Math::Matrix4 mToW;
@@ -190,7 +220,8 @@ namespace Croissant
 				mToW.LoadIdentity();
 			}
 			
-			m_projectionViewMatrix = m_projectionMatrix * m_viewMatrix * mToW;
+			m_projectionViewMatrix = m_projectionMatrix * m_viewMatrix * mToW
+				;
 		}
 	}
 }

@@ -94,7 +94,7 @@ namespace Croissant
 				-m_components[0],
 				-m_components[1],
 				-m_components[2],
-				-m_components[3]
+				1
 			};
 		}
 
@@ -104,7 +104,7 @@ namespace Croissant
 				m_components[0] * val,
 				m_components[1] * val,
 				m_components[2] * val,
-				m_components[3] * val
+				1
 			};
 		}
 
@@ -114,8 +114,14 @@ namespace Croissant
 				X() + right.X(),
 				Y() + right.Y(),
 				Z() + right.Z(),
-				W() + right.Z()
+				1
 			};
+		}
+
+		std::ostream& operator<<(std::ostream& out, Vector4 const& vec)
+		{
+			out << "{ " << vec.X() << ", " << vec.Y() << ", " << vec.Z() << ", " << vec.W() << " }";
+			return out;
 		}
 	}
 }

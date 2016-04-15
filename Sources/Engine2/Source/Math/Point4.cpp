@@ -47,7 +47,7 @@ namespace Croissant
 		}
 
 		Point4::Point4()
-			: m_elements { type(0.0f), type(0.0f), type(0.0f), type(0.0f) }
+			: Point4(0.0f, 0.0f, 0.0f)
 		{
 		}
 
@@ -121,7 +121,7 @@ namespace Croissant
 				X()*right(0, 0) + Y()*right(1, 0) + Z()*right(2, 0) + W()*right(3, 0),
 				X()*right(0, 1) + Y()*right(1, 1) + Z()*right(2, 1) + W()*right(3, 1),
 				X()*right(0, 2) + Y()*right(1, 2) + Z()*right(2, 2) + W()*right(3, 2),
-				X()*right(0, 3) + Y()*right(1, 3) + Z()*right(2, 3) + W()*right(3, 3)
+				X()*right(0, 3) + Y()*right(1, 3) + Z()*right(2, 3) + W()*right(3, 3) // should always be 0
 			};
 		}
 

@@ -435,7 +435,7 @@ void main()
 		Croissant::Math::Vector4 right = Croissant::Math::Vector4::UnitX;
 		//Croissant::Math::Quaternion camRot{ Croissant::Math::Vector4::UnitX, 20 };
 		//auto camRotMat = camRot.ToMatrix();
-		cam.SetAxes(Croissant::Math::Vector4{ 0.0f, 0.0f, 1.0f }, Croissant::Math::Vector4::UnitY, Croissant::Math::Vector4::UnitX);
+		cam.SetAxes(Croissant::Math::Vector4::UnitZ, Croissant::Math::Vector4::UnitY, Croissant::Math::Vector4::UnitX);
 		//cam.SetAxes(look * camRotMat, up * camRotMat, right * camRotMat);
 		cam.SetFrustum(90.0f, static_cast<float>(win.Width()) / static_cast<float>(win.Height()), 1.0f, 1000.0f);
 		while (1)
@@ -552,35 +552,51 @@ void main()
 			if (keys.Up)
 			{
 				// up first if up and down simultaneously set
-				camNode->Move(Croissant::Math::Vector4::UnitZ*  secondSincePrevFrame.count());
+				camNode->Move(cam.GetRealLookDirection() * secondSincePrevFrame.count());
+				auto tp = cam.Position();
+
+				auto tpp = tp * camNode->GetModelToWorldMatrix();
+
 				//cam.Move(cam.LookVector() *  secondSincePrevFrame.count());
+				//std::cout << "camNode translation : " << camNode->GetTranslation() << std::endl;
+				std::cout << "Model to world matrix : " << camNode->GetModelToWorldMatrix() << std::endl;
+				std::cout << "P" << tp << ", P'" << tpp << std::endl;
 			}
 			else if (keys.Down)
 			{
-				camNode->Move(-Croissant::Math::Vector4::UnitZ*  secondSincePrevFrame.count());
+				camNode->Move(-cam.GetRealLookDirection() * secondSincePrevFrame.count());
+				auto tp = cam.Position();
+
+				auto tpp = tp * camNode->GetModelToWorldMatrix();
+
 				//cam.Move(-cam.LookVector() *  secondSincePrevFrame.count());
+				//std::cout << "camNode translation : " << camNode->GetTranslation() << std::endl;
+				std::cout << "Model to world matrix : " << camNode->GetModelToWorldMatrix() << std::endl;
+				std::cout << "P" << tp << ", P'" << tpp << std::endl;
 			}
 
 			if (keys.Right)
 			{
 				// up first if up and down simultaneously set
-				camNode->Move(Croissant::Math::Vector4::UnitX*  secondSincePrevFrame.count());
+				camNode->Move(cam.GetRealRightDirection() * secondSincePrevFrame.count());
 				//cam.Move(cam.RightVector() *  secondSincePrevFrame.count());
 			}
 			else if (keys.Left)
 			{
-				camNode->Move(-Croissant::Math::Vector4::UnitX*  secondSincePrevFrame.count());
+				camNode->Move(-cam.GetRealRightDirection() * secondSincePrevFrame.count());
 				//cam.Move(-cam.RightVector() *  secondSincePrevFrame.count());
 			}
 
 			if (keys.PageUp)
 			{
 				// up first if up and down simultaneously set
-				cam.Move(cam.UpVector() *  secondSincePrevFrame.count());
+				camNode->Move(-cam.GetRealUpDirection() * secondSincePrevFrame.count());
+				///cam.Move(cam.UpVector() *  secondSincePrevFrame.count());
 			}
 			else if (keys.PageDown)
 			{
-				cam.Move(-cam.UpVector() *  secondSincePrevFrame.count());
+				camNode->Move(cam.GetRealUpDirection() * secondSincePrevFrame.count());
+				//cam.Move(-cam.UpVector() *  secondSincePrevFrame.count());
 			}
 
 			// force matrix update
