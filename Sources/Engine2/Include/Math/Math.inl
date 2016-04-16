@@ -139,6 +139,7 @@ namespace Croissant
 
 		inline Point4		operator*(Point4 const& point, Matrix4f const& matrix)
 		{
+			// dans la multiplication P*M, la matrice doit être transposée
 			// Le nombre de colonne de la matrice de gauche est �gal au nombre de ligne de celle de droite
 			//	                    |--------------|
 			//  |--------------|    |xx, xy, xz, xw|
@@ -150,11 +151,12 @@ namespace Croissant
 			//   |------------------------------------------------------------------------------------------------|
 			// P'|xp*xx+yp*yx+zp*zx+wp*wx, xp*xy+yp*yy+zp*zy+wp*wy, xp*xz+yp*yz+zp*zz+wp*wz, xp*xw+yp*yw+zp*zw+wp*ww|
 			//   |------------------------------------------------------------------------------------------------|
+			auto transpose = matrix.GetTranspose();
 			return Point4{
-					point.X()*matrix(0, 0) + point.Y()*matrix(1, 0) + point.Z()*matrix(2, 0) + point.W()*matrix(3, 0),
-					point.X()*matrix(0, 1) + point.Y()*matrix(1, 1) + point.Z()*matrix(2, 1) + point.W()*matrix(3, 1),
-					point.X()*matrix(0, 2) + point.Y()*matrix(1, 2) + point.Z()*matrix(2, 2) + point.W()*matrix(3, 2),
-					point.X()*matrix(0, 3) + point.Y()*matrix(1, 3) + point.Z()*matrix(2, 3) + point.W()*matrix(3, 3) // should always be 0
+					point.X()*transpose(0, 0) + point.Y()*transpose(1, 0) + point.Z()*transpose(2, 0) + point.W()*transpose(3, 0),
+					point.X()*transpose(0, 1) + point.Y()*transpose(1, 1) + point.Z()*transpose(2, 1) + point.W()*transpose(3, 1),
+					point.X()*transpose(0, 2) + point.Y()*transpose(1, 2) + point.Z()*transpose(2, 2) + point.W()*transpose(3, 2),
+					point.X()*transpose(0, 3) + point.Y()*transpose(1, 3) + point.Z()*transpose(2, 3) + point.W()*transpose(3, 3) // should always be 0
 			};
 		}
 	}
