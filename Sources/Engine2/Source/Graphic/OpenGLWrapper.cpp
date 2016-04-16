@@ -14,7 +14,6 @@
 #include <gl/glext.h>
 
 #include <windows.h>
-#include <Math/Matrix4.hpp>
 
 #define DUMMY_WINDOW_CLASS_NAME             "oglversionchecksample"
 #define LOGGER_NAME "OpenGL"
@@ -1173,7 +1172,7 @@ namespace Croissant
 			return result;
 		}
 
-		void OpenGLWrapper::SetUniformMatrix4f(int32_t location, int32_t count, bool transpose, Math::Matrix4 const& matrix) const
+		void OpenGLWrapper::SetUniformMatrix4f(int32_t location, int32_t count, bool transpose, Math::Matrix4f const& matrix) const
 		{
 			ext_glUniformMatrix4fv(location, count, (transpose ? GL_TRUE : GL_FALSE), matrix.Data().data());
 			glCheckForError<GLFUNCINDEX_UNIFORM_MATRIX_4FV>(*this);

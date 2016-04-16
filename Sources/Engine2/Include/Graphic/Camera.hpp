@@ -3,9 +3,9 @@
 #  pragma once
 
 #include "Engine.hpp"
-#include "Math/Point4.hpp"
+#include "Math/Matrix.hpp"
 #include "Math/Vector4.hpp"
-#include "Math/Matrix4.hpp"
+#include "Math/Point4.hpp"
 #include <memory>
 #include <Core/Node.hpp>
 
@@ -35,7 +35,7 @@ namespace Croissant
 			inline Math::Vector4 const&	GetRealRightDirection() const;
 			inline Math::Vector4 const&	GetRealUpDirection() const;
 			void					Move(Math::Vector4 const& translation);
-			Math::Matrix4 const&	GetProjectionViewMatrix() const;
+			Math::Matrix4f const&	GetProjectionViewMatrix() const;
 			Math::Point4 const&		Position() const;
 			void					Rotate(Math::Quaternion const& quaternion);
 			void					Rotate(Math::EulerAngle const& angle);
@@ -55,9 +55,9 @@ namespace Croissant
 			Math::Vector4					m_realUpDirection;
 			Math::Vector4					m_realRightDirection;
 			std::array<float, 6>			m_frustum;
-			Math::Matrix4					m_projectionMatrix;
-			Math::Matrix4					m_viewMatrix;
-			Math::Matrix4					m_projectionViewMatrix;
+			Math::Matrix4f					m_projectionMatrix;
+			Math::Matrix4f					m_viewMatrix;
+			Math::Matrix4f					m_projectionViewMatrix;
 			node_ptr						m_node;
 			Core::Node::OnUpdateCallback	m_nodeUpdateCallback;
 

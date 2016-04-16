@@ -17,7 +17,7 @@ namespace Croissant
 			m_projectionMatrix{},
 			m_viewMatrix{},
 			m_node{ nullptr },
-			m_nodeUpdateCallback{ [this](Core::Node const&, Math::Matrix4 const&) { this->OnNodeUpdate();  } }
+			m_nodeUpdateCallback{ [this](Core::Node const&, Math::Matrix4f const&) { this->OnNodeUpdate();  } }
 		{
 			SetFrustum(90.0f, 1.0f, 1.0f, 10000.0f);
 		}
@@ -69,7 +69,7 @@ namespace Croissant
 			OnFrameChange();
 		}
 
-		Math::Matrix4 const& Camera::GetProjectionViewMatrix() const
+		Math::Matrix4f const& Camera::GetProjectionViewMatrix() const
 		{
 			return m_projectionViewMatrix;
 		}
@@ -81,7 +81,7 @@ namespace Croissant
 
 		void Camera::Rotate(Math::Quaternion const& quaternion)
 		{
-			auto mat = quaternion.ToMatrix();
+			auto mat = Math::ToMatrix(quaternion);
 
 			m_lookDirection = m_lookDirection * mat;
 			m_rightDirection = m_rightDirection * mat;
@@ -137,7 +137,7 @@ namespace Croissant
 			m_projectionMatrix(3, 0) = 0.0f;
 			m_projectionMatrix(3, 1) = 0.0f;
 			m_projectionMatrix(3, 2) = 1.0f;
-			#//m_projectionMatrix(3, 2) = -1.0f;
+			//m_projectionMatrix(3, 2) = -1.0f;
 			m_projectionMatrix(3, 3) = 0.0f;
 
 			UpdateProjectionViewMatrix();
@@ -209,15 +209,15 @@ namespace Croissant
 
 		void Camera::UpdateProjectionViewMatrix()
 		{
-			Math::Matrix4 mToW;
+			Math::Matrix4f mToW;
 
 			if (nullptr != m_node)
 			{
-				mToW = m_node->GetModelToWorldMatrix();
+				mToW = m_node->GetModelToWorldMatrix().GetInverse();
 			}
 			else
 			{
-				mToW.LoadIdentity();
+				mToW.MakeIdentity();
 			}
 			
 			m_projectionViewMatrix = m_projectionMatrix * (m_viewMatrix * mToW);

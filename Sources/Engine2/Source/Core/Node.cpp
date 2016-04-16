@@ -1,7 +1,7 @@
 #include "Core/Node.hpp"
+#include "Math/Math.hpp"
 #include <string>
 #include <algorithm>
-#include <Math/Math.inl>
 
 namespace Croissant
 {
@@ -27,7 +27,7 @@ namespace Croissant
 
 		void Node::Move(Math::Vector4 const& move)
 		{
-			// TODO : marquer la matrice comme modifi�e et non la calculer tout de suite
+			// TODO : marquer la matrice comme modifiée et non la calculer tout de suite
 			m_translation = m_translation + move;
 			m_needUpdate = true;
 		}
@@ -38,7 +38,7 @@ namespace Croissant
 			m_needUpdate = true;
 		}
 
-		Math::Matrix4 const& Node::GetModelToWorldMatrix() const
+		Math::Matrix4f const& Node::GetModelToWorldMatrix() const
 		{
 			Update();
 			return m_modelToWorldMatrix;
@@ -60,7 +60,7 @@ namespace Croissant
 
 			m_needUpdate = false;
 
-			Math::Matrix4 result;
+			Math::Matrix4f result;
 
 			if (nullptr != m_parent)
 			{
@@ -68,11 +68,11 @@ namespace Croissant
 			}
 			else
 			{
-				result.LoadIdentity();
+				result.MakeIdentity();
 			}
 
 			//result = result * m_rotation.ToMatrix() * Math::ToMatrix(-m_translation);
-			result = result * (Math::ToMatrix(m_translation) * m_rotation.ToMatrix());
+			result = result * (ToMatrix(m_translation) * ToMatrix(m_rotation));
 			m_modelToWorldMatrix = std::move(result);
 			std::for_each(m_onUpdateListeners.begin(), m_onUpdateListeners.end(), [this] (OnUpdateCallback* callback) {
 				(*callback)(*this, m_modelToWorldMatrix);

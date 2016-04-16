@@ -1,7 +1,8 @@
 #include "Math/EulerAngle.hpp"
 #include "Math/Quaternion.hpp"
 #include "Math/Vector4.hpp"
-#include "Math/Matrix4.hpp"
+#include "Math/Point4.hpp"
+#include "Math/Matrix.hpp"
 #include <cmath>
 
 #define PI 3.14159f
@@ -57,11 +58,11 @@ namespace Croissant
 			};
 		}
 
-		inline Math::Matrix4 ToMatrix(Math::Vector4 const& vector)
+		inline Math::Matrix4f ToMatrix(Math::Vector4 const& vector)
 		{
-			Math::Matrix4 result;
+			Math::Matrix4f result;
 
-			result.LoadIdentity();
+			result.MakeIdentity();
 			result(0, 3) = vector.X();
 			result(1, 3) = vector.Y();
 			result(2, 3) = vector.Z();
@@ -69,6 +70,51 @@ namespace Croissant
 			//result(3, 1) = vector.Y();
 			//result(3, 2) = vector.Z();
 			return result;
+		}
+
+		Matrix4f ToMatrix(Quaternion const& quaternion)
+		{
+			Matrix4f res;
+
+			res.MakeIdentity();
+			auto length = quaternion.Length();
+			float x = quaternion.X() / length;
+			float y = quaternion.Y() / length;
+			float z = quaternion.Z() / length;
+			float w = quaternion.W() / length;
+
+			float twoX = static_cast<float>(2)*x;
+			float twoY = static_cast<float>(2)*y;
+			float twoZ = static_cast<float>(2)*z;
+			float twoXX = twoX*x;
+			float twoXY = twoX*y;
+			float twoXZ = twoX*z;
+			float twoXW = twoX*w;
+			float twoYY = twoY*y;
+			float twoYZ = twoY*z;
+			float twoYW = twoY*w;
+			float twoZZ = twoZ*z;
+			float twoZW = twoZ*w;
+
+			//res(0, 0) = static_cast<float>(1) - twoYY - twoZZ;
+			//res(0, 1) = twoXY - twoZW;
+			//res(0, 2) = twoXZ + twoYW;
+			//res(1, 0) = twoXY + twoZW;
+			//res(1, 1) = static_cast<float>(1) - twoXX - twoZZ;
+			//res(1, 2) = twoYZ - twoXW;
+			//res(2, 0) = twoXZ - twoYW;
+			//res(2, 1) = twoYZ + twoXW;
+			//res(2, 2) = static_cast<float>(1) - twoXX - twoYY;
+			res(0, 0) = static_cast<float>(1) - twoYY - twoZZ;
+			res(0, 1) = twoXY - twoZW;
+			res(0, 2) = twoXZ + twoYW;
+			res(1, 0) = twoXY + twoZW;
+			res(1, 1) = static_cast<float>(1) - twoXX - twoZZ;
+			res(1, 2) = twoYZ + twoXW;
+			res(2, 0) = twoXZ - twoYW;
+			res(2, 1) = twoYZ - twoXW;
+			res(2, 2) = static_cast<float>(1) - twoXX - twoYY;
+			return res;
 		}
 
 		template<typename Real> Real	Min(Real const& left, Real const& right)
@@ -81,6 +127,36 @@ namespace Croissant
 			return std::max(left, right);
 		}
 
+		inline Vector4	operator*(Vector4 const& vector, Matrix4f const& matrix)
+		{
+			return Vector4{
+					vector.X()*matrix(0, 0) + vector.Y()*matrix(1, 0) + vector.Z()*matrix(2, 0) + vector.W()*matrix(3, 0),
+					vector.X()*matrix(0, 1) + vector.Y()*matrix(1, 1) + vector.Z()*matrix(2, 1) + vector.W()*matrix(3, 1),
+					vector.X()*matrix(0, 2) + vector.Y()*matrix(1, 2) + vector.Z()*matrix(2, 2) + vector.W()*matrix(3, 2),
+					vector.X()*matrix(0, 3) + vector.Y()*matrix(1, 3) + vector.Z()*matrix(2, 3) + vector.W()*matrix(3, 3)
+			};
+		}
+
+		inline Point4		operator*(Point4 const& point, Matrix4f const& matrix)
+		{
+			// Le nombre de colonne de la matrice de gauche est �gal au nombre de ligne de celle de droite
+			//	                    |--------------|
+			//  |--------------|    |xx, xy, xz, xw|
+			// P|xp, yp, zp, wp| X M|yx, yy, yz, yw|
+			//  |--------------|    |zx, zy, zz, zw|
+			//                      |wx, wy, wz, ww|
+			//                      |--------------|
+			// multiplication
+			//   |------------------------------------------------------------------------------------------------|
+			// P'|xp*xx+yp*yx+zp*zx+wp*wx, xp*xy+yp*yy+zp*zy+wp*wy, xp*xz+yp*yz+zp*zz+wp*wz, xp*xw+yp*yw+zp*zw+wp*ww|
+			//   |------------------------------------------------------------------------------------------------|
+			return Point4{
+					point.X()*matrix(0, 0) + point.Y()*matrix(1, 0) + point.Z()*matrix(2, 0) + point.W()*matrix(3, 0),
+					point.X()*matrix(0, 1) + point.Y()*matrix(1, 1) + point.Z()*matrix(2, 1) + point.W()*matrix(3, 1),
+					point.X()*matrix(0, 2) + point.Y()*matrix(1, 2) + point.Z()*matrix(2, 2) + point.W()*matrix(3, 2),
+					point.X()*matrix(0, 3) + point.Y()*matrix(1, 3) + point.Z()*matrix(2, 3) + point.W()*matrix(3, 3) // should always be 0
+			};
+		}
 	}
 }
 

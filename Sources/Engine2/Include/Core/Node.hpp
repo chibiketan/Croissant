@@ -3,9 +3,9 @@
 #  pragma once
 
 #  include "Engine.hpp"
+#  include "Math/Matrix.hpp"
 #  include "Math/Quaternion.hpp"
 #  include "Math/Vector4.hpp"
-#  include "Math/Matrix4.hpp"
 #  include <vector>
 #  include <memory>
 #  include <functional>
@@ -19,14 +19,14 @@ namespace Croissant
 		class ENGINE_API Node
 		{
 		public:
-			using OnUpdateCallback = std::function<void (Node const&, Math::Matrix4 const&)>;
+			using OnUpdateCallback = std::function<void (Node const&, Math::Matrix4f const&)>;
 
 			Node();
 			void AddOnUpdate(OnUpdateCallback& callback) const;
 			void RemoveOnUpdate(OnUpdateCallback& callback) const;
 			void Move(Math::Vector4 const& move);
 			void Rotate(Math::Quaternion const& rotation);
-			Math::Matrix4 const&		GetModelToWorldMatrix() const;
+			Math::Matrix4f const&		GetModelToWorldMatrix() const;
 			inline Math::Vector4 const&	GetTranslation() const;
 		private:
 			static std::string	GenerateName();
@@ -39,7 +39,7 @@ namespace Croissant
 			Math::Vector4							m_translation;
 			mutable bool							m_needUpdate;
 			mutable std::list<OnUpdateCallback*>	m_onUpdateListeners;
-			mutable Math::Matrix4					m_modelToWorldMatrix;
+			mutable Math::Matrix4f					m_modelToWorldMatrix;
 		};
 	}
 }

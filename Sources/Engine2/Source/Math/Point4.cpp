@@ -3,7 +3,6 @@
 //
 
 #include "Math/Point4.hpp"
-#include "Math/Matrix4.hpp"
 #include "Math/Vector4.hpp"
 #include <assert.h>
 #include <algorithm>
@@ -102,27 +101,6 @@ namespace Croissant
 				+ (m_elements[1] * v.Y())
 				+ (m_elements[2] * v.Z())
 				+ (m_elements[3] * v.W());
-		}
-
-		Point4 Point4::operator*(Matrix4 const& right) const
-		{
-			// Le nombre de colonne de la matrice de gauche est �gal au nombre de ligne de celle de droite
-			//	                    |--------------|
-			//  |--------------|    |xx, xy, xz, xw|    
-			// P|xp, yp, zp, wp| X M|yx, yy, yz, yw|
-			//  |--------------|    |zx, zy, zz, zw|    
-			//                      |wx, wy, wz, ww| 
-			//                      |--------------|
-			// multiplication
-			//   |------------------------------------------------------------------------------------------------|
-			// P'|xp*xx+yp*yx+zp*zx+wp*wx, xp*xy+yp*yy+zp*zy+wp*wy, xp*xz+yp*yz+zp*zz+wp*wz, xp*xw+yp*yw+zp*zw+wp*ww|
-			//   |------------------------------------------------------------------------------------------------|
-			return Point4{
-				X()*right(0, 0) + Y()*right(1, 0) + Z()*right(2, 0) + W()*right(3, 0),
-				X()*right(0, 1) + Y()*right(1, 1) + Z()*right(2, 1) + W()*right(3, 1),
-				X()*right(0, 2) + Y()*right(1, 2) + Z()*right(2, 2) + W()*right(3, 2),
-				X()*right(0, 3) + Y()*right(1, 3) + Z()*right(2, 3) + W()*right(3, 3) // should always be 0
-			};
 		}
 
 		bool Point4::operator==(Point4 const& right) const

@@ -10,6 +10,7 @@ namespace Croissant {
 		template<typename Number, size_t size>
 		class Matrix final {
 		public:
+			using ArrayType = std::array<Number, size * size>;
 			Matrix();
 
 			explicit Matrix(std::array<Number, size * size> const &source);
@@ -27,6 +28,7 @@ namespace Croissant {
 			Matrix	GetInverse() const;
 			Matrix &operator=(Matrix const &);
 			Matrix &operator=(Matrix &&);
+			Matrix	operator*(Matrix const& right);
 			Number const& operator()(size_t row, size_t col) const;
 			Number& operator()(size_t row, size_t col);
 
@@ -76,6 +78,8 @@ namespace Croissant {
 		template<typename Number, size_t size>
 		Matrix<Number, size> operator*(Matrix<Number, size> const& matrix, Number const& scalar);
 
+		// --------------------------------------------------------------------------- Using
+		using Matrix4f = Matrix<float, 4>;
 	}
 }
 
@@ -193,7 +197,7 @@ namespace Croissant
 		template <typename Number, size_t size>
 		Matrix<Number, size>::Matrix()
 		{
-			_Internal::MatrixHelper<Number, size, size * size - 1>::InitializeToZero(m_data);
+			_Internal::MatrixHelper<Number, size, size * size - 1>::InitializeToIdentity(m_data);
 		}
 
 		template <typename Number, size_t size>
@@ -372,6 +376,54 @@ namespace Croissant
 			return invDeterminant * adjointMatrix;
 		}
 
+		template<typename Number, size_t size>
+		Matrix<Number, size> Matrix<Number, size>::operator*(const Matrix& right)
+		{
+			// TODO optimisation du calcul par les templates et le preprocesseur ?
+			auto& rthis = *this;
+			Matrix4f result;
+
+			for (size_t row = 0; row < size; ++row)
+			{
+				for (size_t col = 0; col < size; ++col)
+				{
+					Number val { 0 };
+
+					for (size_t i = 0; i < size; ++i)
+					{
+						val = val + (rthis(row, i) * right(i, col));
+					}
+
+					result(row, col) = val;
+				}
+			}
+
+//			auto result = Matrix4f(std::array<Number, size * size> {
+//				// first line
+//				rthis(0, 0) * right(0, 0) + rthis(0, 1) * right(1, 0) + rthis(0, 2) * right(2, 0) + rthis(0, 3) * right(3, 0),
+//				rthis(0, 0) * right(0, 1) + rthis(0, 1) * right(1, 1) + rthis(0, 2) * right(2, 1) + rthis(0, 3) * right(3, 1),
+//				rthis(0, 0) * right(0, 2) + rthis(0, 1) * right(1, 2) + rthis(0, 2) * right(2, 2) + rthis(0, 3) * right(3, 2),
+//				rthis(0, 0) * right(0, 3) + rthis(0, 1) * right(1, 3) + rthis(0, 2) * right(2, 3) + rthis(0, 3) * right(3, 3),
+//				// second line
+//				rthis(1, 0) * right(0, 0) + rthis(1, 1) * right(1, 0) + rthis(1, 2) * right(2, 0) + rthis(1, 3) * right(3, 0),
+//				rthis(1, 0) * right(0, 1) + rthis(1, 1) * right(1, 1) + rthis(1, 2) * right(2, 1) + rthis(1, 3) * right(3, 1),
+//				rthis(1, 0) * right(0, 2) + rthis(1, 1) * right(1, 2) + rthis(1, 2) * right(2, 2) + rthis(1, 3) * right(3, 2),
+//				rthis(1, 0) * right(0, 3) + rthis(1, 1) * right(1, 3) + rthis(1, 2) * right(2, 3) + rthis(1, 3) * right(3, 3),
+//				// third line
+//				rthis(2, 0) * right(0, 0) + rthis(2, 1) * right(1, 0) + rthis(2, 2) * right(2, 0) + rthis(2, 3) * right(3, 0),
+//				rthis(2, 0) * right(0, 1) + rthis(2, 1) * right(1, 1) + rthis(2, 2) * right(2, 1) + rthis(2, 3) * right(3, 1),
+//				rthis(2, 0) * right(0, 2) + rthis(2, 1) * right(1, 2) + rthis(2, 2) * right(2, 2) + rthis(2, 3) * right(3, 2),
+//				rthis(2, 0) * right(0, 3) + rthis(2, 1) * right(1, 3) + rthis(2, 2) * right(2, 3) + rthis(2, 3) * right(3, 3),
+//				// fourth line
+//				rthis(3, 0) * right(0, 0) + rthis(3, 1) * right(1, 0) + rthis(3, 2) * right(2, 0) + rthis(3, 3) * right(3, 0),
+//				rthis(3, 0) * right(0, 1) + rthis(3, 1) * right(1, 1) + rthis(3, 2) * right(2, 1) + rthis(3, 3) * right(3, 1),
+//				rthis(3, 0) * right(0, 2) + rthis(3, 1) * right(1, 2) + rthis(3, 2) * right(2, 2) + rthis(3, 3) * right(3, 2),
+//				rthis(3, 0) * right(0, 3) + rthis(3, 1) * right(1, 3) + rthis(3, 2) * right(2, 3) + rthis(3, 3) * right(3, 3),
+//			});
+
+			return result;
+		}
+
 
 		template<typename Number, size_t size>
 		std::ostream &operator<<(std::ostream &out, Matrix<Number, size> const& matrix) {
@@ -418,8 +470,6 @@ namespace Croissant
 			return scalar * matrix;
 		};
 
-		// --------------------------------------------------------------------------- Using
-		using Matrix4f = Matrix<float, 4>;
 	}
 }
 

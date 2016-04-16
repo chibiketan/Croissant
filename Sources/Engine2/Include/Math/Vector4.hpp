@@ -1,15 +1,15 @@
 #ifndef CROISSANT_ENGINE_MATH_VECTOR4_HPP_INC
-#define CROISSANT_ENGINE_MATH_VECTOR4_HPP_INC
+#  define CROISSANT_ENGINE_MATH_VECTOR4_HPP_INC
+#  pragma once
 
-#include "Engine.hpp"
-#include <array>
-#include "Quaternion.hpp"
+#  include "Engine.hpp"
+#  include "Math/Quaternion.hpp"
+#  include <array>
 
 namespace Croissant
 {
 	namespace Math
 	{
-		class Matrix4;
 		class Point4;
 
 		class ENGINE_API Vector4
@@ -27,7 +27,6 @@ namespace Croissant
 			void			MakeUnit();
 			type			DotProduct(Vector4 const& v) const;
 			type			DotProduct(Point4 const& p) const;
-			Vector4		operator*(Matrix4 const& right) const;
 			Vector4		operator-() const;
 			Vector4		operator*(type val) const;
 			Vector4		operator+(Vector4 const& right) const;

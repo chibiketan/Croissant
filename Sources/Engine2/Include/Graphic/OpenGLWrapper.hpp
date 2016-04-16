@@ -10,7 +10,7 @@
 
 #include "Engine.hpp"
 #include "Math/Matrix.hpp"
-#include <Graphic/Enums.hpp>
+#include "Graphic/Enums.hpp"
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glext.h>
@@ -18,10 +18,6 @@
 
 namespace Croissant
 {
-	namespace Math{
-		class Matrix4;
-	}
-
 	namespace Core
 	{
 		class LogManager;
@@ -129,7 +125,7 @@ namespace Croissant
 			void		VertexAttribPointer(uint32_t index, int32_t size, GLenum type, bool normalzed, size_t stride, void const* data) const;
 			std::string	GetProgramInfoLog(uint32_t programId) const;
 			int32_t		GetUniformLocation(uint32_t programId, std::string const name) const;
-			void		SetUniformMatrix4f(int32_t location, int32_t count, bool transpose, Math::Matrix4 const& matrix) const;
+			void		SetUniformMatrix4f(int32_t location, int32_t count, bool transpose, Math::Matrix4f const& matrix) const;
 
 		private:
 			Core::LogManager&				m_logManager;

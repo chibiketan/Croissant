@@ -169,22 +169,6 @@ class B : public A {};
 
 int main(int, char**)
 {
-	Croissant::Math::Matrix4f testMat {std::array<float, 4*4>{
-			1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 1,
-			0, 0, 0, 1
-	}};
-
-	auto cofactor = testMat.CofactorMatrix();
-	auto inverse = testMat.GetInverse();
-
-	std::cout << "matrice : " << testMat << "\nDeteminant : " << testMat.Determinant() << std::endl;
-	std::cout << "cofactor : " << cofactor << std::endl;
-	std::cout << "inverse : " << inverse << std::endl;
-
-	return 0;
-
 	PressedKeys keys;
 	//Application<DBlockApplication> appTest;
 
@@ -193,11 +177,11 @@ int main(int, char**)
 	//return 0;
 	Croissant::Math::Point4 p(1.0f, 0.0f, 0.0f);
 	Croissant::Math::Quaternion Q { Croissant::Math::Vector4 { 0.0f, 0.0f, 1.0f }, 270.0f * PI / 180.0f };
-	auto P2 = p * Q.ToMatrix();
+	auto P2 = p * Croissant::Math::ToMatrix(Q);
 
 	std::cout << "P = " << p << std::endl;
 	std::cout << "P' = " << P2 << std::endl;
-	std::cout << "M" << std::endl << Q.ToMatrix() << std::endl;
+	std::cout << "M" << std::endl << Croissant::Math::ToMatrix(Q) << std::endl;
 
 	Croissant::Core::Application app;
 	std::string const baseTitle("Ma fenetre - fps : ");
@@ -437,7 +421,7 @@ void main()
 
 		// TODO : 
 		auto uniformWorldViewProjMatrix = opengl.GetUniformLocation(programId, "WorldViewProjMatrix");
-		Croissant::Math::Matrix4 translation{ Croissant::Math::Matrix4::ArrayType{
+		Croissant::Math::Matrix4f translation{ Croissant::Math::Matrix4f::ArrayType{
 			1.0f, 0.0f, 0.0f, 0.5f,
 			0.0f, 1.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, 1.0f, 0.0f,
@@ -451,7 +435,7 @@ void main()
 		cam.SetNode(camNode);
 		auto baseAngle = 0.0f;
 		auto step = 45.0f;
-		Croissant::Math::Matrix4 identity;
+		Croissant::Math::Matrix4f identity;
 
 		cam.SetPosition(Croissant::Math::Point4{ 0.0f, 0.0f, -5.0f });
 		Croissant::Math::Vector4 look{ 0.0f, 0.0f, 1.0f };
@@ -499,7 +483,7 @@ void main()
 			Croissant::Math::Vector4 tmp(0.0, 1.0, 0.0);
 			//tmp.MakeUnit();
 			Croissant::Math::Quaternion quat(tmp, angleZ);
-			auto rotation = quat.ToMatrix();
+			auto rotation = Croissant::Math::ToMatrix(quat);
 
 			auto evt = win.PeekEvent();
 

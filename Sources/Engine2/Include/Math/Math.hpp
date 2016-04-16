@@ -3,8 +3,7 @@
 #  pragma once
 
 #  include "Engine.hpp"
-#  include "Math/Matrix4.hpp"
-#  include "Math/Vector4.hpp"
+#  include "Math/Matrix.hpp"
 
 namespace Croissant
 {
@@ -12,14 +11,22 @@ namespace Croissant
 	{
 		class Quaternion;
 		class EulerAngle;
+		class Vector4;
+		class Point4;
 
 		inline float			Sin(float radian);
 		inline float			Cos(float radian);
 		inline float			ToRadian(float degree);
 		inline Quaternion		ToQuaternion(EulerAngle const& angle);
-		inline Math::Matrix4	ToMatrix(Math::Vector4 const& vector);
+		inline Matrix4f	ToMatrix(Vector4 const& vector);
+		inline Matrix4f	ToMatrix(Quaternion const& quaternion);
 		template<typename Real> Real	Min(Real const& left, Real const& right);
 		template<typename Real> Real	Max(Real const& left, Real const& right);
+
+
+		inline Vector4		operator*(Vector4 const& vector, Matrix4f const& matrix);
+		///<summary>Multiplication d'un point par une matrice qui donne un point</summary>
+		inline Point4		operator*(Point4 const& point, Matrix4f const& matrix);
 	}
 }
 
