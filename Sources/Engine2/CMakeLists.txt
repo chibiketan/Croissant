@@ -74,6 +74,7 @@ croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
 	Math/EulerAngle.hpp
 	Math/Math.hpp
 	Math/Math.inl
+	Math/Matrix.hpp
 	Math/Matrix4.hpp
 	Math/Point2.hpp
 	Math/Point4.hpp
@@ -97,7 +98,7 @@ else()
 	message("Building ${PROJECT_NAME} as static library")
 	add_library(${PROJECT_NAME} 
 		${${PROJECT_NAME}_Sources}
-    )
+	)
 endif()
 
 target_include_directories(${PROJECT_NAME}

@@ -71,7 +71,8 @@ namespace Croissant
 				result.LoadIdentity();
 			}
 
-			result = result * m_rotation.ToMatrix() * Math::ToMatrix(-m_translation);
+			//result = result * m_rotation.ToMatrix() * Math::ToMatrix(-m_translation);
+			result = result * (Math::ToMatrix(m_translation) * m_rotation.ToMatrix());
 			m_modelToWorldMatrix = std::move(result);
 			std::for_each(m_onUpdateListeners.begin(), m_onUpdateListeners.end(), [this] (OnUpdateCallback* callback) {
 				(*callback)(*this, m_modelToWorldMatrix);

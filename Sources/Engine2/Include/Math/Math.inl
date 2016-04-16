@@ -1,6 +1,7 @@
 #include "Math/EulerAngle.hpp"
 #include "Math/Quaternion.hpp"
 #include "Math/Vector4.hpp"
+#include "Math/Matrix4.hpp"
 #include <cmath>
 
 #define PI 3.14159f
@@ -70,6 +71,15 @@ namespace Croissant
 			return result;
 		}
 
+		template<typename Real> Real	Min(Real const& left, Real const& right)
+		{
+			return std::min(left, right);
+		}
+
+		template<typename Real> Real	Max(Real const& left, Real const& right)
+		{
+			return std::max(left, right);
+		}
 
 	}
 }

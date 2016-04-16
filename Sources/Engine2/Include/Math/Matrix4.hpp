@@ -28,6 +28,8 @@ namespace Croissant
 			Matrix4					operator*(Matrix4 const& right) const;
 			bool					operator==(Matrix4 const& right) const;
 			ENGINE_API friend std::ostream&	operator<<(std::ostream& out, Matrix4 const& obj);
+			///<summary>Calcul du déterminant de la matrice carrée</summary>
+			ValueType				Determinant() const;
 
 		private:
 			ArrayType	m_data;

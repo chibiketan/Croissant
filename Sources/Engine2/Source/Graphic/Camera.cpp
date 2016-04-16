@@ -220,7 +220,7 @@ namespace Croissant
 				mToW.LoadIdentity();
 			}
 			
-			m_projectionViewMatrix = m_projectionMatrix * m_viewMatrix * mToW
+			m_projectionViewMatrix = m_projectionMatrix * (m_viewMatrix * mToW);
 				;
 		}
 	}

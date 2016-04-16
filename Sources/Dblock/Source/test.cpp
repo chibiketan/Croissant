@@ -165,8 +165,26 @@ struct PressedKeys
 class A {};
 class B : public A {};
 
+#include "Math/Matrix.hpp"
+
 int main(int, char**)
 {
+	Croissant::Math::Matrix4f testMat {std::array<float, 4*4>{
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 1,
+			0, 0, 0, 1
+	}};
+
+	auto cofactor = testMat.CofactorMatrix();
+	auto inverse = testMat.GetInverse();
+
+	std::cout << "matrice : " << testMat << "\nDeteminant : " << testMat.Determinant() << std::endl;
+	std::cout << "cofactor : " << cofactor << std::endl;
+	std::cout << "inverse : " << inverse << std::endl;
+
+	return 0;
+
 	PressedKeys keys;
 	//Application<DBlockApplication> appTest;
 
