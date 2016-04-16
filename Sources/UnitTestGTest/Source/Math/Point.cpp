@@ -29,7 +29,7 @@ TEST_F(PointTest, RotateWithEulerAngle)
 	Croissant::Math::Point4 point{ 0.0, 1.0, 0.0 };
 	Croissant::Math::Point4 expected{ 0.0, -1.0, 0.0 };
 
-	auto result = point * Croissant::Math::ToQuaternion(angle).ToMatrix();
+	auto result = point * Croissant::Math::ToMatrix(Croissant::Math::ToQuaternion(angle));
 
 	ASSERT_EQ(expected, result);
 }

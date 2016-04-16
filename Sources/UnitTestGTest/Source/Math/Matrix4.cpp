@@ -1,4 +1,4 @@
-#include "Math/Matrix4.hpp"
+#include "Math/Matrix.hpp"
 
 #include "gtest/gtest.h"
 #include <cmath>
@@ -22,7 +22,7 @@ protected:
 
 TEST_F(Matrix4Test, DefaultConstructorIsIdentity)
 {
-	Croissant::Math::Matrix4 matrix;
+	Croissant::Math::Matrix4f matrix;
 
 	// line 1
 	ASSERT_FLOAT_EQ(1.0f, matrix(0, 0));
@@ -48,9 +48,9 @@ TEST_F(Matrix4Test, DefaultConstructorIsIdentity)
 
 TEST_F(Matrix4Test, MultiplicationOfIdentity)
 {
-	Croissant::Math::Matrix4 first;
-	Croissant::Math::Matrix4 second;
-	Croissant::Math::Matrix4 expected;
+	Croissant::Math::Matrix4f first;
+	Croissant::Math::Matrix4f second;
+	Croissant::Math::Matrix4f expected;
 	auto res = first * second;
 
 	ASSERT_EQ(expected, res);
@@ -61,7 +61,7 @@ TEST_F(Matrix4Test, MultiplicationOfYawPitchRoll)
 	auto angleX = 10.0f * PI / 180.0f;
 	auto angleY = 20.0f * PI / 180.0f;
 	auto angleZ = 30.0f * PI / 180.0f;
-	Croissant::Math::Matrix4 matrix;
+	Croissant::Math::Matrix4f matrix;
 
 	auto sinX = std::sin(angleX);
 	auto cosX = std::cos(angleX);
@@ -70,14 +70,14 @@ TEST_F(Matrix4Test, MultiplicationOfYawPitchRoll)
 	auto sinZ = std::sin(angleZ);
 	auto cosZ = std::cos(angleZ);
 	// source : http://planning.cs.uiuc.edu/node102.html
-	auto expected = Croissant::Math::Matrix4({
+	auto expected = Croissant::Math::Matrix4f({
 		cosZ * cosY,	cosZ * sinY * sinX - sinZ * cosX,	cosZ * sinY * cosX + sinZ * sinX,	0.0f,
 		sinZ * cosY,	sinZ * sinY * sinX + cosZ * cosX,	sinZ * sinY * cosX - cosZ * sinX,	0.0f,
 		-sinY,			cosY * sinX,						cosY * cosX,						0.0f,
 		0.0f,			0.0f,								0.0f,								1.0f
 	});
 
-	auto yaw = Croissant::Math::Matrix4({
+	auto yaw = Croissant::Math::Matrix4f({
 		cosZ,	-sinZ,	0.0f,	0.0f,
 		sinZ,	cosZ,	0.0f,	0.0f,
 		0.0f,	0.0f,	1.0f,	0.0f,
@@ -85,7 +85,7 @@ TEST_F(Matrix4Test, MultiplicationOfYawPitchRoll)
 	});
 
 	// rotation sur Y
-	auto pitch = Croissant::Math::Matrix4({
+	auto pitch = Croissant::Math::Matrix4f({
 		cosY,	0.0f,	sinY,	0.0f,
 		0.0f,	1.0f,	0.0f,	0.0f,
 		-sinY,	0.0f,	cosY,	0.0f,
@@ -93,7 +93,7 @@ TEST_F(Matrix4Test, MultiplicationOfYawPitchRoll)
 	});
 
 	// rotation sur X
-	auto roll = Croissant::Math::Matrix4({
+	auto roll = Croissant::Math::Matrix4f({
 		1.0f,	0.0f,	0.0f,	0.0f,
 		0.0f,	cosX,	-sinX,	0.0f,
 		0.0f,	sinX,	cosX,	0.0f,

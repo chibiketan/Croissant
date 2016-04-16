@@ -28,6 +28,7 @@ namespace Croissant {
 			Matrix	GetInverse() const;
 			Matrix &operator=(Matrix const &);
 			Matrix &operator=(Matrix &&);
+			bool	operator==(Matrix const&) const;
 			Matrix	operator*(Matrix const& right);
 			Number const& operator()(size_t row, size_t col) const;
 			Number& operator()(size_t row, size_t col);
@@ -232,6 +233,12 @@ namespace Croissant
 			m_data = std::move(ref.m_data);
 			_Internal::MatrixHelper<Number, size, size * size - 1>::InitializeToZero(ref.m_data);
 			return *this;
+		}
+
+		template <typename Number, size_t size>
+		bool Matrix<Number, size>::operator==(Matrix const& right) const
+		{
+			return m_data == right.m_data;
 		}
 
 		template <typename Number, size_t size>
