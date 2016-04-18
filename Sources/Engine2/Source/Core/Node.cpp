@@ -51,15 +51,9 @@ namespace Croissant
 			return std::string("Unnamed Node ") + std::to_string(nextNum++);
 		}
 
-		void Node::Update() const
+		void Node::PreUpdate() const
 		{
-			if (!m_needUpdate)
-			{
-				return;
-			}
-
-			m_needUpdate = false;
-
+			// TODO mettre ici les mises à jour à faire avant de demander aux fils de se mettre à jour
 			Math::Matrix4f result;
 
 			if (nullptr != m_parent)
@@ -71,12 +65,49 @@ namespace Croissant
 				result.MakeIdentity();
 			}
 
-			//result = result * m_rotation.ToMatrix() * Math::ToMatrix(-m_translation);
 			result = result * (ToMatrix(m_translation) * ToMatrix(m_rotation));
 			m_modelToWorldMatrix = std::move(result);
-			std::for_each(m_onUpdateListeners.begin(), m_onUpdateListeners.end(), [this] (OnUpdateCallback* callback) {
+		}
+
+		void Node::Update(bool goUp) const
+		{
+			m_needUpdate = false;
+			PreUpdate();
+			// TODO itérer sur les enfants pour les mettre à jour.
+			PostUpdate();
+			if (goUp && nullptr != m_parent)
+			{
+				auto parent = m_parent;
+
+				do
+				{
+					parent->PostUpdate();
+					parent = parent->m_parent;
+				} while (nullptr != parent);
+			}
+		}
+
+		void Node::PostUpdate() const
+		{
+			// TODO mettre ici les mises à jour à faire après avoir demandé aux fils mais avant de propager au père, par exemple mettre à jour les bounding boxes
+			NotifyUpdate();
+		}
+
+		void Node::NotifyUpdate() const
+		{
+			std::for_each(m_onUpdateListeners.begin(), m_onUpdateListeners.end(), [this](OnUpdateCallback* callback) {
 				(*callback)(*this, m_modelToWorldMatrix);
 			});
+		}
+
+		void Node::Update() const
+		{
+			if (!m_needUpdate)
+			{
+				return;
+			}
+
+			Update(false);
 		}
 	}
 }

@@ -1,27 +1,12 @@
 // TODO
-// 1) Afficher le repère du plan
-// 2) Tester le rendu d'un point qui se déplace à l'aide d'un quaternion
-// 3) Implémenter la translation via un vecteur
 // 4) Implémenter une caméra
-// 5) implémenter la matrice de transformation plan ==> vue
 // 6) Implémenter une classe Monde avec une caméra et un ensemble de node
 // 7) implémenter un node d'un monde qui contient 
-// 8) Implémenter une matrice de transformation model => plan
 // 9) Implémenter les fenêtres dans un module
 // 10) Implémenter le rendered dans un module
 
-//#include "Core/DebugMemoryManager.hpp"
-//#include "Core/Application.hpp"
-//#include "Event/IEventListener.hpp"
-//#include "Event/EventManager.hpp"
-//#include "Core/Logger.hpp"
-//#include "Core/LoggerOutputToFile.hpp"
-//#include "FileSystem/Directory.hpp"
-//#include "FileSystem/File.hpp"
-
 #include "Debug/MemoryManager.hpp"
 #include "Core/Application.hpp"
-
 #include <Exception/CroissantException.hpp>
 #include "Graphic/Window.hpp"
 #include "Graphic/WindowEvent.hpp"
@@ -33,34 +18,6 @@
 #include "Graphic/WindowMouseMoveEvent.hpp"
 
 #define PI 3.14159265f
-
-//#include <iostream>
-
-//class TraceEventListener : public Croissant::Event::IEventListener
-//{
-//public:
-//	TraceEventListener() : m_logger()
-//	{
-//		Croissant::FileSystem::Directory appDir(Croissant::FileSystem::Directory::PROGRAM_DIRECTORY);
-//		auto logDir = appDir.Child("Logs");
-//		Croissant::FileSystem::File file { "Events.log", logDir };
-//
-//		logDir.Create();
-//		m_logger.AddLoggerOutput(std::unique_ptr<Croissant::Core::ILoggerOutput>(CROISSANT_NEW Croissant::Core::LoggerOutputToFile(file.FullPath())));
-//	}
-//
-//	virtual ~TraceEventListener()
-//	{
-//
-//	}
-//
-//	virtual void ProcessEvent( Croissant::Event::Event* evt )
-//	{
-//		m_logger.WriteDebugLine("TraceEventListener", evt->ToString() + "\r\n");
-//	}
-//
-//	Croissant::Core::Logger m_logger;
-//};
 
 //--------------------------------------------------------------------------------------
 // Entry point to the program. Initializes everything and goes into a message processing
@@ -161,11 +118,11 @@ struct PressedKeys
 #include "Math/EulerAngle.hpp"
 #include "Core/Node.hpp"
 #include "Graphic/WindowEventNone.hpp"
+#include "Math/Matrix.hpp"
 
 class A {};
 class B : public A {};
 
-#include "Math/Matrix.hpp"
 
 int main(int, char**)
 {
@@ -175,14 +132,6 @@ int main(int, char**)
 	//appTest.Initialize();
 
 	//return 0;
-	Croissant::Math::Point4 p(1.0f, 0.0f, 0.0f);
-	Croissant::Math::Quaternion Q { Croissant::Math::Vector4 { 0.0f, 0.0f, 1.0f }, 270.0f * PI / 180.0f };
-	auto P2 = p * Croissant::Math::ToMatrix(Q);
-
-	std::cout << "P = " << p << std::endl;
-	std::cout << "P' = " << P2 << std::endl;
-	std::cout << "M" << std::endl << Croissant::Math::ToMatrix(Q) << std::endl;
-
 	Croissant::Core::Application app;
 	std::string const baseTitle("Ma fenetre - fps : ");
 
@@ -437,15 +386,10 @@ void main()
 		auto step = 45.0f;
 		Croissant::Math::Matrix4f identity;
 
-		cam.SetPosition(Croissant::Math::Point4{ 0.0f, 0.0f, -5.0f });
-		Croissant::Math::Vector4 look{ 0.0f, 0.0f, 1.0f };
-		Croissant::Math::Vector4 up = Croissant::Math::Vector4::UnitY;
-		Croissant::Math::Vector4 right = Croissant::Math::Vector4::UnitX;
-		//Croissant::Math::Quaternion camRot{ Croissant::Math::Vector4::UnitX, 20 };
-		//auto camRotMat = camRot.ToMatrix();
+		cam.SetPosition(Croissant::Math::Point4{ 0.0f, 0.0f, 0.0f });
 		cam.SetAxes(Croissant::Math::Vector4::UnitZ, Croissant::Math::Vector4::UnitY, Croissant::Math::Vector4::UnitX);
-		//cam.SetAxes(look * camRotMat, up * camRotMat, right * camRotMat);
 		cam.SetFrustum(90.0f, static_cast<float>(win.Width()) / static_cast<float>(win.Height()), 1.0f, 1000.0f);
+		camNode->Move(Croissant::Math::Vector4::UnitZ * -5);
 		while (1)
 		{
 			++fps;
@@ -523,76 +467,60 @@ void main()
 				}
 			}
 
-			//if (evt->GetType() == Croissant::Graphic::WindowEventType::MOUSEMOVE)
-			//{
-			//	auto& mouseMoveEvt = static_cast<Croissant::Graphic::WindowMouseMoveEvent const&>(*evt);
+			if (evt->GetType() == Croissant::Graphic::WindowEventType::MOUSEMOVE)
+			{
+				auto& mouseMoveEvt = static_cast<Croissant::Graphic::WindowMouseMoveEvent const&>(*evt);
 
-			//	// TODO : Utiliser des angles d'Euler plutôt qu'essayer de créer un quaternion
-			//	Croissant::Math::EulerAngle rotAngle{
-			//		mouseMoveEvt.DeltaX() * 0.3f,
-			//		mouseMoveEvt.DeltaY() * 0.3f,
-			//		0
-			//	};
+				// TODO : Utiliser des angles d'Euler plutôt qu'essayer de créer un quaternion
+				Croissant::Math::EulerAngle rotAngle{
+					-mouseMoveEvt.DeltaX() * 0.3f,
+					//mouseMoveEvt.DeltaY() * 0.3f,
+					0,
+					0
+				};
 
-			//	cam.Rotate(rotAngle);
+				//cam.Rotate(rotAngle);
+				camNode->Rotate(Croissant::Math::ToQuaternion(rotAngle));
 
-			//	//Croissant::Math::Quaternion tmpQuat{ Croissant::Math::Vector4::Zero, 1.0f };
+				//Croissant::Math::Quaternion tmpQuat{ Croissant::Math::Vector4::Zero, 1.0f };
 
-			//	//if (mouseMoveEvt.DeltaX() != 0)
-			//	//{
-			//	//	tmpQuat *= Croissant::Math::Quaternion{Croissant::Math::Vector4::UnitY, (mouseMoveEvt.DeltaX() / 100.0f) * (PI / 180.0f) };
-			//	//}
+				//if (mouseMoveEvt.DeltaX() != 0)
+				//{
+				//	tmpQuat *= Croissant::Math::Quaternion{Croissant::Math::Vector4::UnitY, (mouseMoveEvt.DeltaX() / 100.0f) * (PI / 180.0f) };
+				//}
 
-			//	//if (mouseMoveEvt.DeltaY() != 0)
-			//	//{
-			//	//	tmpQuat *= Croissant::Math::Quaternion{Croissant::Math::Vector4::UnitX, (mouseMoveEvt.DeltaY() / 100.0f) * (PI / 180.0f) };
-			//	//}
+				//if (mouseMoveEvt.DeltaY() != 0)
+				//{
+				//	tmpQuat *= Croissant::Math::Quaternion{Croissant::Math::Vector4::UnitX, (mouseMoveEvt.DeltaY() / 100.0f) * (PI / 180.0f) };
+				//}
 
-			//	//cam.Rotate(tmpQuat);
-			//	std::cout << "delta [" << mouseMoveEvt.DeltaX() << ", " << mouseMoveEvt.DeltaY() << "], " << rotAngle << std::endl;
-			//	win.CenterCursor();
-			//	//std::cout << "MouseMove : deltaX = " << mouseMoveEvt.DeltaX() << std::endl;
-			//	//std::cout << "MouseMove : deltaY = " << mouseMoveEvt.DeltaY() << std::endl;
-			//	//Croissant::Math::Vector4 rotAxe{ 0.0f, 0.0f, 0.0f };
-			//}
+				//cam.Rotate(tmpQuat);
+				std::cout << "delta [" << mouseMoveEvt.DeltaX() << ", " << mouseMoveEvt.DeltaY() << "], " << rotAngle << std::endl;
+				win.CenterCursor();
+				//std::cout << "MouseMove : deltaX = " << mouseMoveEvt.DeltaX() << std::endl;
+				//std::cout << "MouseMove : deltaY = " << mouseMoveEvt.DeltaY() << std::endl;
+				//Croissant::Math::Vector4 rotAxe{ 0.0f, 0.0f, 0.0f };
+			}
 
 			// move camera
 			if (keys.Up)
 			{
 				// up first if up and down simultaneously set
 				camNode->Move(cam.GetRealLookDirection() * secondSincePrevFrame.count());
-				auto tp = cam.Position();
-
-				auto tpp = tp * camNode->GetModelToWorldMatrix();
-
-				//cam.Move(cam.LookVector() *  secondSincePrevFrame.count());
-				//std::cout << "camNode translation : " << camNode->GetTranslation() << std::endl;
-				std::cout << "Model to world matrix : " << camNode->GetModelToWorldMatrix() << std::endl;
-				std::cout << "P" << tp << ", P'" << tpp << std::endl;
 			}
 			else if (keys.Down)
 			{
 				camNode->Move(-cam.GetRealLookDirection() * secondSincePrevFrame.count());
-				auto tp = cam.Position();
-
-				auto tpp = tp * camNode->GetModelToWorldMatrix();
-
-				//cam.Move(-cam.LookVector() *  secondSincePrevFrame.count());
-				//std::cout << "camNode translation : " << camNode->GetTranslation() << std::endl;
-				std::cout << "Model to world matrix : " << camNode->GetModelToWorldMatrix() << std::endl;
-				std::cout << "P" << tp << ", P'" << tpp << std::endl;
 			}
 
 			if (keys.Right)
 			{
 				// up first if up and down simultaneously set
 				camNode->Move(cam.GetRealRightDirection() * secondSincePrevFrame.count());
-				//cam.Move(cam.RightVector() *  secondSincePrevFrame.count());
 			}
 			else if (keys.Left)
 			{
 				camNode->Move(-cam.GetRealRightDirection() * secondSincePrevFrame.count());
-				//cam.Move(-cam.RightVector() *  secondSincePrevFrame.count());
 			}
 
 			if (keys.PageUp)
@@ -604,11 +532,10 @@ void main()
 			else if (keys.PageDown)
 			{
 				camNode->Move(cam.GetRealUpDirection() * secondSincePrevFrame.count());
-				//cam.Move(-cam.UpVector() *  secondSincePrevFrame.count());
 			}
 
 			// force matrix update
-			camNode->GetModelToWorldMatrix();
+			camNode->Update();
 
 			// clear
 			opengl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

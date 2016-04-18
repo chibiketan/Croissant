@@ -22,15 +22,21 @@ namespace Croissant
 			using OnUpdateCallback = std::function<void (Node const&, Math::Matrix4f const&)>;
 
 			Node();
-			void AddOnUpdate(OnUpdateCallback& callback) const;
-			void RemoveOnUpdate(OnUpdateCallback& callback) const;
-			void Move(Math::Vector4 const& move);
-			void Rotate(Math::Quaternion const& rotation);
+			void						AddOnUpdate(OnUpdateCallback& callback) const;
+			void						RemoveOnUpdate(OnUpdateCallback& callback) const;
+			void						Move(Math::Vector4 const& move);
+			void						Rotate(Math::Quaternion const& rotation);
 			Math::Matrix4f const&		GetModelToWorldMatrix() const;
 			inline Math::Vector4 const&	GetTranslation() const;
+			void						Update() const;
+
 		private:
-			static std::string	GenerateName();
-			void				Update() const;
+			static std::string			GenerateName();
+			void						PreUpdate() const;
+			void						Update(bool goUp) const;
+			void						PostUpdate() const;
+			void						NotifyUpdate() const;
+
 
 			std::string								m_name;
 			Node*									m_parent;
