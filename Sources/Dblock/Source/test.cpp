@@ -404,6 +404,17 @@ void main()
 				fps = 0;
 				firstFrameTime = Clock::now();
 				lastFrameTime = firstFrameTime;
+
+				// rotation chaque seconde
+					Croissant::Math::EulerAngle rotAngle{
+						0.0f,
+						0.0f,
+						10.0f
+					};
+
+					camNode->Rotate(Croissant::Math::ToQuaternion(rotAngle));
+					std::cout << "camNode rotation : " << camNode->GetRotation() << std::endl;
+
 			}
 
 			baseAngle += (step * secondSincePrevFrame.count());
@@ -467,40 +478,41 @@ void main()
 				}
 			}
 
-			if (evt->GetType() == Croissant::Graphic::WindowEventType::MOUSEMOVE)
-			{
-				auto& mouseMoveEvt = static_cast<Croissant::Graphic::WindowMouseMoveEvent const&>(*evt);
+			//if (evt->GetType() == Croissant::Graphic::WindowEventType::MOUSEMOVE)
+			//{
+			//	auto& mouseMoveEvt = static_cast<Croissant::Graphic::WindowMouseMoveEvent const&>(*evt);
 
-				// TODO : Utiliser des angles d'Euler plutôt qu'essayer de créer un quaternion
-				Croissant::Math::EulerAngle rotAngle{
-					-mouseMoveEvt.DeltaX() * 0.3f,
-					//mouseMoveEvt.DeltaY() * 0.3f,
-					0,
-					0
-				};
+			//	// TODO : Utiliser des angles d'Euler plutôt qu'essayer de créer un quaternion
+			//	Croissant::Math::EulerAngle rotAngle{
+			//		-mouseMoveEvt.DeltaX() * 0.3f,
+			//		//mouseMoveEvt.DeltaY() * 0.3f,
+			//		0,
+			//		0
+			//	};
 
-				//cam.Rotate(rotAngle);
-				camNode->Rotate(Croissant::Math::ToQuaternion(rotAngle));
+			//	//cam.Rotate(rotAngle);
+			//	camNode->Rotate(Croissant::Math::ToQuaternion(rotAngle));
+			//	std::cout << "camNode rotation : " << camNode->GetRotation() << std::endl;
 
-				//Croissant::Math::Quaternion tmpQuat{ Croissant::Math::Vector4::Zero, 1.0f };
+			//	//Croissant::Math::Quaternion tmpQuat{ Croissant::Math::Vector4::Zero, 1.0f };
 
-				//if (mouseMoveEvt.DeltaX() != 0)
-				//{
-				//	tmpQuat *= Croissant::Math::Quaternion{Croissant::Math::Vector4::UnitY, (mouseMoveEvt.DeltaX() / 100.0f) * (PI / 180.0f) };
-				//}
+			//	//if (mouseMoveEvt.DeltaX() != 0)
+			//	//{
+			//	//	tmpQuat *= Croissant::Math::Quaternion{Croissant::Math::Vector4::UnitY, (mouseMoveEvt.DeltaX() / 100.0f) * (PI / 180.0f) };
+			//	//}
 
-				//if (mouseMoveEvt.DeltaY() != 0)
-				//{
-				//	tmpQuat *= Croissant::Math::Quaternion{Croissant::Math::Vector4::UnitX, (mouseMoveEvt.DeltaY() / 100.0f) * (PI / 180.0f) };
-				//}
+			//	//if (mouseMoveEvt.DeltaY() != 0)
+			//	//{
+			//	//	tmpQuat *= Croissant::Math::Quaternion{Croissant::Math::Vector4::UnitX, (mouseMoveEvt.DeltaY() / 100.0f) * (PI / 180.0f) };
+			//	//}
 
-				//cam.Rotate(tmpQuat);
-				std::cout << "delta [" << mouseMoveEvt.DeltaX() << ", " << mouseMoveEvt.DeltaY() << "], " << rotAngle << std::endl;
-				win.CenterCursor();
-				//std::cout << "MouseMove : deltaX = " << mouseMoveEvt.DeltaX() << std::endl;
-				//std::cout << "MouseMove : deltaY = " << mouseMoveEvt.DeltaY() << std::endl;
-				//Croissant::Math::Vector4 rotAxe{ 0.0f, 0.0f, 0.0f };
-			}
+			//	//cam.Rotate(tmpQuat);
+			//	std::cout << "delta [" << mouseMoveEvt.DeltaX() << ", " << mouseMoveEvt.DeltaY() << "], " << rotAngle << std::endl;
+			//	win.CenterCursor();
+			//	//std::cout << "MouseMove : deltaX = " << mouseMoveEvt.DeltaX() << std::endl;
+			//	//std::cout << "MouseMove : deltaY = " << mouseMoveEvt.DeltaY() << std::endl;
+			//	//Croissant::Math::Vector4 rotAxe{ 0.0f, 0.0f, 0.0f };
+			//}
 
 			// move camera
 			if (keys.Up)

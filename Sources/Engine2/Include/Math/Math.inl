@@ -33,29 +33,38 @@ namespace Croissant
 			// X = sin(R / 2) * cos(P / 2) * cos(Y / 2) - cos(R /2) * sin(P / 2) * sin(Y / 2)
 			// Y = cos(R / 2) * sin(P / 2) * cos(Y / 2) + sin(R /2) * cos(P / 2) * sin(Y / 2)
 			// Z = cos(R / 2) * cos(P / 2) * sin(Y / 2) - sin(R /2) * sin(P / 2) * cos(Y / 2)
-			auto cr = Cos(ToRadian(angle.Roll()) / 2.0f);
-			auto cp = Cos(ToRadian(angle.Pitch()) / 2.0f);
-			auto cy = Cos(ToRadian(angle.Yaw()) / 2.0f);
-			auto sr = Sin(ToRadian(angle.Roll()) / 2.0f);
-			auto sp = Sin(ToRadian(angle.Pitch()) / 2.0f);
-			auto sy = Sin(ToRadian(angle.Yaw()) / 2.0f);
+			//auto cr = Cos(ToRadian(angle.Roll()) / 2.0f);
+			//auto cp = Cos(ToRadian(angle.Pitch()) / 2.0f);
+			//auto cy = Cos(ToRadian(angle.Yaw()) / 2.0f);
+			//auto sr = Sin(ToRadian(angle.Roll()) / 2.0f);
+			//auto sp = Sin(ToRadian(angle.Pitch()) / 2.0f);
+			//auto sy = Sin(ToRadian(angle.Yaw()) / 2.0f);
+
+			//auto vec = Vector4{
+			//	sy * sr * cp + cy * cr * sp,
+			//	sy * cr * cp + cy * sr * sp,
+			//	cy * sr * cp - sy * cr * sp
+			//};
+
+			//vec.MakeUnit();
 
 			//return Quaternion{
-			//	Vector4{
-			//		sy * sr * cp + cy * cr * sp,
-			//		sy * cr * cp + cy * sr * sp,
-			//		cy * sr * cp - sy * cr * sp
-			//	},
+			//	vec,
 			//	cy * cr * cp - sy * sr * sp
 			//};
-			return Quaternion{
-				Vector4{
-					cr * sp * cy + sr * cp * sy,
-					cr * cp * sy - sr * sp * cy,
-					sr * cp * cy - cr * sp * sy
-			},
-				cr * cp * cy + sr * sp * sy
-			};
+
+			Quaternion rotX{ Vector4::UnitX , ToRadian(angle.Pitch()) };
+			Quaternion rotY{ Vector4::UnitY , ToRadian(angle.Yaw()) };
+			Quaternion rotZ{ Vector4::UnitZ , ToRadian(angle.Roll()) };
+
+			return rotX * rotY * rotZ;
+
+			//return Quaternion{
+			//	cr * cp * cy + sr * sp * sy,
+			//	cr * sp * cy + sr * cp * sy,
+			//	cr * cp * sy - sr * sp * cy,
+			//	sr * cp * cy - cr * sp * sy
+			//};
 		}
 
 		inline Math::Matrix4f ToMatrix(Math::Vector4 const& vector)

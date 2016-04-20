@@ -15,6 +15,7 @@ namespace Croissant
 		{
 		public:
 			Quaternion(Vector4 const& vector, float angle);
+			Quaternion(float w, float x, float y, float z);
 			float	Length() const;
 			inline float 	X() const;
 			inline float	Y() const;
@@ -36,22 +37,22 @@ namespace Croissant
 	{
 		inline float Quaternion::X() const
 		{
-			return m_elements[0];
+			return m_elements[1];
 		}
 
 		inline float Quaternion::Y() const
 		{
-			return m_elements[1];
+			return m_elements[2];
 		}
 
 		inline float Quaternion::Z() const
 		{
-			return m_elements[2];
+			return m_elements[3];
 		}
 
 		inline float Quaternion::W() const
 		{
-			return m_elements[3];
+			return m_elements[0];
 		}
 
 	}

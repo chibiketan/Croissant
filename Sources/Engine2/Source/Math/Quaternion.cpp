@@ -3,22 +3,34 @@
 #include "Math/Matrix4.hpp"
 #include "Math/Math.hpp"
 
+// http://www.cprogramming.com/tutorial/3d/quaternions.html
+// layout :
+// w = m_elements[0]
+// x = m_elements[1]
+// y = m_elements[2]
+// z = m_elements[3]
+
 namespace Croissant
 {
 	namespace Math
 	{
 		Quaternion::Quaternion(Vector4 const& vector, float angle)
-			: m_elements { vector.X() * Sin(angle / 2.0f), vector.Y() * Sin(angle / 2.0f),
-			vector.Z() * Sin(angle / 2.0f), Cos(angle / 2.0f) }
+			: m_elements { Cos(angle / 2.0f), vector.X() * Sin(angle / 2.0f), vector.Y() * Sin(angle / 2.0f),
+			vector.Z() * Sin(angle / 2.0f) }
+		{
+		}
+
+		Quaternion::Quaternion(float w, float x, float y, float z)
+			: m_elements { w, x, y, z }
 		{
 		}
 
 		float Quaternion::Length() const
 		{
-			return std::sqrt(this->m_elements[0] * this->m_elements[0]
-				+ this->m_elements[1] * this->m_elements[1]
-				+ this->m_elements[2] * this->m_elements[2]
-				+ this->m_elements[3] * this->m_elements[3]);
+			return std::sqrt(W() * W()
+				+ X() * X()
+				+ Y() * Y()
+				+ Z() * Z());
 		}
 
 		Quaternion& Quaternion::operator*=(Quaternion const& right)
@@ -29,22 +41,22 @@ namespace Croissant
 			// j*(-x0*z1 + y0*w1 + z0*x1 + w0*y1) +
 			// k*(+x0*y1 - y0*x1 + z0*w1 + w0*z1) +
 			// 1*(-x0*x1 - y0*y1 - z0*z1 + w0*w1)
-			auto x = m_elements[0];
-			auto y = m_elements[1];
-			auto z = m_elements[2];
-			auto w = m_elements[3];
+			auto x = X();
+			auto y = Y();
+			auto z = Z();
+			auto w = W();
 
-			m_elements[0] = x * right.m_elements[3] + y * right.m_elements[2] - z * right.m_elements[1] + w * right.m_elements[0];
-			m_elements[1] = -x * right.m_elements[2] + y * right.m_elements[3] + z * right.m_elements[0] + w * right.m_elements[1];
-			m_elements[2] = x * right.m_elements[1] - y * right.m_elements[0] + z * right.m_elements[3] + w * right.m_elements[2];
-			m_elements[3] = -x * right.m_elements[0] - y * right.m_elements[1] - z * right.m_elements[2] + w * right.m_elements[3];
+			m_elements[0] = -x * right.X() - y * right.Y() - z * right.Z() + w * right.W();
+			m_elements[1] = x * right.W() + y * right.Z() - z * right.Y() + w * right.X();
+			m_elements[2] = -x * right.Z() + y * right.W() + z * right.X() + w * right.Y();
+			m_elements[3] = x * right.Y() - y * right.X() + z * right.W() + w * right.Z();
 
 			return *this;
 		}
 
 		Quaternion Quaternion::operator*(Quaternion const& right) const
 		{
-			auto result{ *this };
+			Quaternion result{ *this };
 
 			result *= right;
 			return result;
@@ -56,7 +68,7 @@ namespace Croissant
 			auto oldSetf = out.setf(std::ios_base::fixed, std::ios_base::floatfield);
 
 			out.precision(6);
-			out << "(" << quat.m_elements[0] << ", " << quat.m_elements[1] << ", " << quat.m_elements[2] << ", " << quat.m_elements[3] << ")";
+			out << "(W: " << quat.m_elements[0] << ", X: " << quat.m_elements[1] << ", Y: " << quat.m_elements[2] << ", Z: " << quat.m_elements[3] << ")";
 			out.setf(oldSetf);
 			out.precision(precision);
 			return out;

@@ -34,7 +34,7 @@ namespace Croissant
 
 		void Node::Rotate(Math::Quaternion const& rotation)
 		{
-			m_rotation *= rotation;
+			m_rotation = rotation * m_rotation;
 			m_needUpdate = true;
 		}
 

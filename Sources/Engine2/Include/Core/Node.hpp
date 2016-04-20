@@ -29,7 +29,7 @@ namespace Croissant
 			Math::Matrix4f const&		GetModelToWorldMatrix() const;
 			inline Math::Vector4 const&	GetTranslation() const;
 			void						Update() const;
-
+			inline Math::Quaternion const&	GetRotation() const;
 		private:
 			static std::string			GenerateName();
 			void						PreUpdate() const;
@@ -57,6 +57,11 @@ namespace Croissant
 		inline Math::Vector4 const&	Node::GetTranslation() const
 		{
 			return m_translation;
+		}
+
+		inline Math::Quaternion const&	Node::GetRotation() const
+		{
+			return m_rotation;
 		}
 	}
 }
