@@ -175,13 +175,17 @@ in vec3 VertexColor;
 
 /********************Uniformes********************/
 uniform mat4 WorldViewProjMatrix;
+uniform mat4 ModelWorldMatrix;
+uniform mat4 ViewMatrix;
+uniform mat4 ProjectionMatrix;
 
 /********************Fonctions********************/
 out vec3 vcolor;
 
 void main()
 {
-	gl_Position = WorldViewProjMatrix * vec4(VertexPosition, 1.0);
+	gl_Position = ProjectionMatrix * ViewMatrix * ModelWorldMatrix * vec4(VertexPosition, 1.0);
+	/*gl_Position = WorldViewProjMatrix * vec4(VertexPosition, 1.0);*/
 	/*gl_Position = matrix * vec4(VertexPosition, 1.0);*/
 	vcolor = VertexColor;
 }
@@ -226,15 +230,15 @@ void main()
 			throw Croissant::Exception::CroissantException("Erreur lors de la compilation du fragment shader");
 		}
 
-		// on associe � chaque nom de variable des shader un index pour y faire r�f�rence plus tard � partir du vertexbuffer 
+		// on associe à chaque nom de variable des shader un index pour y faire r�f�rence plus tard � partir du vertexbuffer 
 		opengl.BindAttribLocation(programId, 0, "VertexPosition");
 		opengl.BindAttribLocation(programId, 1, "VertexColor");
 		
-		// on marque les shader comme � attacher au programme
+		// on marque les shader comme à attacher au programme
 		opengl.AttachShader(programId, fragmentShaderId);
 		opengl.AttachShader(programId, vertexShaderId);
 
-		// on lie le programme et les shaders (cr�ation du programme dans la CG)
+		// on lie le programme et les shaders (création du programme dans la CG)
 		opengl.LinkProgram(programId);
 		auto programLinked = opengl.GetProgramInteger(programId, Croissant::Graphic::OpenGLProgramIntegerNameEnum::LinkStatus);
 
@@ -370,6 +374,10 @@ void main()
 
 		// TODO : 
 		auto uniformWorldViewProjMatrix = opengl.GetUniformLocation(programId, "WorldViewProjMatrix");
+		auto uniformModelWorldMatrix = opengl.GetUniformLocation(programId, "ModelWorldMatrix");
+		auto uniformViewMatrix = opengl.GetUniformLocation(programId, "ViewMatrix");
+		auto uniformProjectionMatrix = opengl.GetUniformLocation(programId, "ProjectionMatrix");
+
 		Croissant::Math::Matrix4f translation{ Croissant::Math::Matrix4f::ArrayType{
 			1.0f, 0.0f, 0.0f, 0.5f,
 			0.0f, 1.0f, 0.0f, 0.0f,
@@ -386,9 +394,10 @@ void main()
 		auto step = 45.0f;
 		Croissant::Math::Matrix4f identity;
 
-		cam.SetPosition(Croissant::Math::Point4{ 0.0f, 0.0f, 0.0f });
-		cam.SetAxes(Croissant::Math::Vector4::UnitZ, Croissant::Math::Vector4::UnitY, Croissant::Math::Vector4::UnitX);
-		cam.SetFrustum(90.0f, static_cast<float>(win.Width()) / static_cast<float>(win.Height()), 1.0f, 1000.0f);
+		cam.SetFieldOfViewDegree(90.0f);
+		cam.SetAspectRatio(static_cast<float>(win.Width()) / static_cast<float>(win.Height()));
+		cam.SetNearDistance(1.0f);
+		cam.SetFarDistance(1000.0f);
 		camNode->Move(Croissant::Math::Vector4::UnitZ * -5);
 		while (1)
 		{
@@ -406,15 +415,19 @@ void main()
 				lastFrameTime = firstFrameTime;
 
 				// rotation chaque seconde
-					Croissant::Math::EulerAngle rotAngle{
-						0.0f,
-						0.0f,
-						10.0f
-					};
+					//Croissant::Math::EulerAngle rotAngle{
+					//	10.0f,
+					//	10.0f,
+					//	0.0f
+					//};
 
-					camNode->Rotate(Croissant::Math::ToQuaternion(rotAngle));
-					std::cout << "camNode rotation : " << camNode->GetRotation() << std::endl;
-
+					//camNode->Rotate(Croissant::Math::ToQuaternion(rotAngle));
+				//camNode->Move(Croissant::Math::Vector4::UnitX);
+				//std::cout << "cam View matrix : " << cam.GetViewMatrix() << std::endl;
+				//std::cout << "cam ViewProjection matrix : " << cam.GetProjectionMatrix() << std::endl;
+					//std::cout << "camNode rotation : " << camNode->GetRotation() << std::endl;
+					//std::cout << "cam position : " << cam.GetPosition() << std::endl;
+					//std::cout << "cam right vector : " << cam.GetRightDirection() << std::endl;
 			}
 
 			baseAngle += (step * secondSincePrevFrame.count());
@@ -478,72 +491,71 @@ void main()
 				}
 			}
 
-			//if (evt->GetType() == Croissant::Graphic::WindowEventType::MOUSEMOVE)
-			//{
-			//	auto& mouseMoveEvt = static_cast<Croissant::Graphic::WindowMouseMoveEvent const&>(*evt);
+			if (evt->GetType() == Croissant::Graphic::WindowEventType::MOUSEMOVE)
+			{
+				auto& mouseMoveEvt = static_cast<Croissant::Graphic::WindowMouseMoveEvent const&>(*evt);
 
-			//	// TODO : Utiliser des angles d'Euler plutôt qu'essayer de créer un quaternion
-			//	Croissant::Math::EulerAngle rotAngle{
-			//		-mouseMoveEvt.DeltaX() * 0.3f,
-			//		//mouseMoveEvt.DeltaY() * 0.3f,
-			//		0,
-			//		0
-			//	};
+				// TODO : Utiliser des angles d'Euler plutôt qu'essayer de créer un quaternion
+				Croissant::Math::EulerAngle rotAngle{
+					-mouseMoveEvt.DeltaX() * 0.3f,
+					mouseMoveEvt.DeltaY() * 0.3f,
+					0
+				};
 
-			//	//cam.Rotate(rotAngle);
-			//	camNode->Rotate(Croissant::Math::ToQuaternion(rotAngle));
-			//	std::cout << "camNode rotation : " << camNode->GetRotation() << std::endl;
+				//cam.Rotate(rotAngle);
+				camNode->Rotate(Croissant::Math::ToQuaternion(rotAngle));
+				//std::cout << "camNode rotation : " << camNode->GetRotation() << std::endl;
 
-			//	//Croissant::Math::Quaternion tmpQuat{ Croissant::Math::Vector4::Zero, 1.0f };
+				//Croissant::Math::Quaternion tmpQuat{ Croissant::Math::Vector4::Zero, 1.0f };
 
-			//	//if (mouseMoveEvt.DeltaX() != 0)
-			//	//{
-			//	//	tmpQuat *= Croissant::Math::Quaternion{Croissant::Math::Vector4::UnitY, (mouseMoveEvt.DeltaX() / 100.0f) * (PI / 180.0f) };
-			//	//}
+				//if (mouseMoveEvt.DeltaX() != 0)
+				//{
+				//	tmpQuat *= Croissant::Math::Quaternion{Croissant::Math::Vector4::UnitY, (mouseMoveEvt.DeltaX() / 100.0f) * (PI / 180.0f) };
+				//}
 
-			//	//if (mouseMoveEvt.DeltaY() != 0)
-			//	//{
-			//	//	tmpQuat *= Croissant::Math::Quaternion{Croissant::Math::Vector4::UnitX, (mouseMoveEvt.DeltaY() / 100.0f) * (PI / 180.0f) };
-			//	//}
+				//if (mouseMoveEvt.DeltaY() != 0)
+				//{
+				//	tmpQuat *= Croissant::Math::Quaternion{Croissant::Math::Vector4::UnitX, (mouseMoveEvt.DeltaY() / 100.0f) * (PI / 180.0f) };
+				//}
 
-			//	//cam.Rotate(tmpQuat);
-			//	std::cout << "delta [" << mouseMoveEvt.DeltaX() << ", " << mouseMoveEvt.DeltaY() << "], " << rotAngle << std::endl;
-			//	win.CenterCursor();
-			//	//std::cout << "MouseMove : deltaX = " << mouseMoveEvt.DeltaX() << std::endl;
-			//	//std::cout << "MouseMove : deltaY = " << mouseMoveEvt.DeltaY() << std::endl;
-			//	//Croissant::Math::Vector4 rotAxe{ 0.0f, 0.0f, 0.0f };
-			//}
+				//cam.Rotate(tmpQuat);
+				//std::cout << "delta [" << mouseMoveEvt.DeltaX() << ", " << mouseMoveEvt.DeltaY() << "], " << rotAngle << std::endl;
+				win.CenterCursor();
+				//std::cout << "MouseMove : deltaX = " << mouseMoveEvt.DeltaX() << std::endl;
+				//std::cout << "MouseMove : deltaY = " << mouseMoveEvt.DeltaY() << std::endl;
+				//Croissant::Math::Vector4 rotAxe{ 0.0f, 0.0f, 0.0f };
+			}
 
 			// move camera
 			if (keys.Up)
 			{
 				// up first if up and down simultaneously set
-				camNode->Move(cam.GetRealLookDirection() * secondSincePrevFrame.count());
+				camNode->Move(cam.GetLookDirection() * secondSincePrevFrame.count());
 			}
 			else if (keys.Down)
 			{
-				camNode->Move(-cam.GetRealLookDirection() * secondSincePrevFrame.count());
+				camNode->Move(-cam.GetLookDirection() * secondSincePrevFrame.count());
 			}
 
 			if (keys.Right)
 			{
 				// up first if up and down simultaneously set
-				camNode->Move(cam.GetRealRightDirection() * secondSincePrevFrame.count());
+				camNode->Move(cam.GetRightDirection() * secondSincePrevFrame.count());
 			}
 			else if (keys.Left)
 			{
-				camNode->Move(-cam.GetRealRightDirection() * secondSincePrevFrame.count());
+				camNode->Move(-cam.GetRightDirection() * secondSincePrevFrame.count());
 			}
 
 			if (keys.PageUp)
 			{
 				// up first if up and down simultaneously set
-				camNode->Move(-cam.GetRealUpDirection() * secondSincePrevFrame.count());
+				camNode->Move(-cam.GetUpDirection() * secondSincePrevFrame.count());
 				///cam.Move(cam.UpVector() *  secondSincePrevFrame.count());
 			}
 			else if (keys.PageDown)
 			{
-				camNode->Move(cam.GetRealUpDirection() * secondSincePrevFrame.count());
+				camNode->Move(cam.GetUpDirection() * secondSincePrevFrame.count());
 			}
 
 			// force matrix update
@@ -560,11 +572,14 @@ void main()
 			opengl.EnableVertexAttribArray(0);
 			opengl.EnableVertexAttribArray(1);
 			// définition des constantes
-			opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, true, cam.GetProjectionViewMatrix());
+			//opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, true, cam.GetProjectionViewMatrix());
+			opengl.SetUniformMatrix4f(uniformViewMatrix, 1, true, cam.GetViewMatrix());
+			opengl.SetUniformMatrix4f(uniformProjectionMatrix, 1, true, cam.GetProjectionMatrix());
 			// définition des attributs des vertex
 			opengl.VertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vertexProp), nullptr);
 			opengl.VertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, true, sizeof(vertexProp), BUFFER_OFFSET(sizeof(planVertices[0].m_coord)));
 			// dessin effectif
+			opengl.SetUniformMatrix4f(uniformModelWorldMatrix, 1, true, Croissant::Math::Matrix4f::Identity());
 			opengl.DrawElements(GL_LINES, static_cast<GLsizei>(planIndexesSize), GL_UNSIGNED_INT, nullptr);
 			// desactivation des attributs de vertex
 			opengl.DisableVertexAttribArray(0);

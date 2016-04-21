@@ -25,51 +25,33 @@ namespace Croissant
 			using node_ptr = std::shared_ptr<Core::Node>;
 
 			Camera();
-			void SetFrustum(float fieldOfViewDegree, float ratio, float nearView, float distantView);
-			void SetAxes(Math::Vector4 const& lookVector, Math::Vector4 const& upVector, Math::Vector4 const& rightVector);
-			void SetPosition(Math::Point4 const& position);
-			Math::Vector4 const&	LookVector() const;
-			Math::Vector4 const&	RightVector() const;
-			Math::Vector4 const&	UpVector() const;
-			inline Math::Vector4 const&	GetRealLookDirection() const;
-			inline Math::Vector4 const&	GetRealRightDirection() const;
-			inline Math::Vector4 const&	GetRealUpDirection() const;
-			void					Move(Math::Vector4 const& translation);
-			Math::Matrix4f const&	GetProjectionViewMatrix() const;
-			Math::Point4 const&		Position() const;
-			void					Rotate(Math::Quaternion const& quaternion);
-			void					Rotate(Math::EulerAngle const& angle);
+			inline Math::Vector4	GetLookDirection() const;
+			inline Math::Vector4	GetRightDirection() const;
+			inline Math::Vector4	GetUpDirection() const;
+			inline Math::Matrix4f	GetProjectionViewMatrix() const;
+			inline Math::Point4		GetPosition() const;
+			inline void				SetFieldOfViewDegree(float val);
+			inline void				SetAspectRatio(float val);
+			inline void				SetNearDistance(float val);
+			inline void				SetFarDistance(float val);
 			void					SetNode(node_ptr node);
+			inline Math::Matrix4f const& GetViewMatrix() const;
+			inline Math::Matrix4f const& GetProjectionMatrix() const;
 		private:
-			void OnFrustumChange();
-			void OnFrameChange();
-			void OnNodeUpdate();
-			void UpdateRealDirections();
-			void UpdateProjectionViewMatrix();
+			void OnFrustumChange() const;
+			void OnFrameChange() const;
+			void OnNodeUpdate() const;
 
-			Math::Point4					m_position;
-			Math::Vector4					m_lookDirection;
-			Math::Vector4					m_upDirection;
-			Math::Vector4					m_rightDirection;
-			Math::Vector4					m_realLookDirection;
-			Math::Vector4					m_realUpDirection;
-			Math::Vector4					m_realRightDirection;
-			std::array<float, 6>			m_frustum;
-			Math::Matrix4f					m_projectionMatrix;
-			Math::Matrix4f					m_viewMatrix;
-			Math::Matrix4f					m_projectionViewMatrix;
+			float							m_fieldOfViewDegree;
+			float							m_aspectRatio;
+			float							m_nearDistance;
+			float							m_farDistance;
+			mutable Math::Matrix4f			m_projectionMatrix;
+			mutable Math::Matrix4f			m_viewMatrix;
 			node_ptr						m_node;
+			mutable bool					m_projectionNeedUpdate;
+			mutable bool					m_viewNeedUpdate;
 			Core::Node::OnUpdateCallback	m_nodeUpdateCallback;
-
-			enum class FrustumIndex
-			{
-				DirectionMin = 0,	// near
-				DirectionMax = 1,	// far
-				UpMin = 2,			// bottom
-				UpMax = 3,			// top
-				RightMin = 4,		// left
-				RightMax = 5,		// right
-			};
 		};
 	}
 }
@@ -78,19 +60,96 @@ namespace Croissant
 {
 	namespace Graphic
 	{
-		inline Math::Vector4 const&	Camera::GetRealLookDirection() const
+		inline Math::Point4 Camera::GetPosition() const
 		{
-			return m_realLookDirection;
+			Math::Point4 result{ 0, 0, 0 };
+
+			if (nullptr != m_node)
+			{
+				result = result * m_node->GetModelToWorldMatrix();
+			}
+
+			return result;
 		}
 
-		inline Math::Vector4 const&	Camera::GetRealRightDirection() const
+		inline Math::Vector4 Camera::GetLookDirection() const
 		{
-			return m_realRightDirection;
+			auto result{ Math::Vector4::UnitZ };
+
+			if (nullptr != m_node)
+			{
+				result = result * m_node->GetModelToWorldMatrix();
+			}
+
+			return result;
 		}
 
-		inline Math::Vector4 const&	Camera::GetRealUpDirection() const
+		inline Math::Vector4 Camera::GetRightDirection() const
 		{
-			return m_realUpDirection;
+			auto result{ Math::Vector4::UnitX };
+
+			if (nullptr != m_node)
+			{
+				result = result * m_node->GetModelToWorldMatrix();
+			}
+
+			return result;
+		}
+
+		inline Math::Vector4 Camera::GetUpDirection() const
+		{
+			auto result{ Math::Vector4::UnitY };
+
+			if (nullptr != m_node)
+			{
+				result = result * m_node->GetModelToWorldMatrix();
+			}
+
+			return result;
+		}
+	
+		inline void Camera::SetFieldOfViewDegree(float val)
+		{
+			m_fieldOfViewDegree = val;
+			m_projectionNeedUpdate = true;
+		}
+
+		inline void Camera::SetAspectRatio(float val)
+		{
+			m_aspectRatio = val;
+			m_projectionNeedUpdate = true;
+		}
+
+		inline void Camera::SetNearDistance(float val)
+		{
+			m_nearDistance = val;
+			m_projectionNeedUpdate = true;
+		}
+
+		inline void Camera::SetFarDistance(float val)
+		{
+			m_farDistance = val;
+			m_projectionNeedUpdate = true;
+		}
+
+		inline Math::Matrix4f Camera::GetProjectionViewMatrix() const
+		{
+			OnFrameChange();
+			OnFrustumChange();
+			return m_projectionMatrix * m_viewMatrix;
+		}
+
+		inline Math::Matrix4f const& Camera::GetViewMatrix() const
+		{
+			OnFrameChange();
+			return m_viewMatrix;
+		}
+
+		inline Math::Matrix4f const& Camera::GetProjectionMatrix() const
+		{
+			OnFrustumChange();
+			return m_projectionMatrix;
+			
 		}
 	}
 }

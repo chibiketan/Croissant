@@ -5,7 +5,7 @@
 #include "Math/Matrix.hpp"
 #include <cmath>
 
-#define PI 3.14159f
+#define PI CROISSANT_PI
 #define PI_FOR_RAD 0.0174532778f
 
 namespace Croissant
@@ -20,6 +20,11 @@ namespace Croissant
 		inline float Cos(float radian)
 		{
 			return std::cos(radian);
+		}
+
+		inline float Tan(float radian)
+		{
+			return std::tan(radian);
 		}
 
 		inline float ToRadian(float degree)
@@ -138,11 +143,12 @@ namespace Croissant
 
 		inline Vector4	operator*(Vector4 const& vector, Matrix4f const& matrix)
 		{
+			auto transpose = matrix.GetTranspose();
 			return Vector4{
-					vector.X()*matrix(0, 0) + vector.Y()*matrix(1, 0) + vector.Z()*matrix(2, 0) + vector.W()*matrix(3, 0),
-					vector.X()*matrix(0, 1) + vector.Y()*matrix(1, 1) + vector.Z()*matrix(2, 1) + vector.W()*matrix(3, 1),
-					vector.X()*matrix(0, 2) + vector.Y()*matrix(1, 2) + vector.Z()*matrix(2, 2) + vector.W()*matrix(3, 2),
-					vector.X()*matrix(0, 3) + vector.Y()*matrix(1, 3) + vector.Z()*matrix(2, 3) + vector.W()*matrix(3, 3)
+					vector.X()*transpose(0, 0) + vector.Y()*transpose(1, 0) + vector.Z()*transpose(2, 0) + vector.W()*transpose(3, 0),
+					vector.X()*transpose(0, 1) + vector.Y()*transpose(1, 1) + vector.Z()*transpose(2, 1) + vector.W()*transpose(3, 1),
+					vector.X()*transpose(0, 2) + vector.Y()*transpose(1, 2) + vector.Z()*transpose(2, 2) + vector.W()*transpose(3, 2),
+					vector.X()*transpose(0, 3) + vector.Y()*transpose(1, 3) + vector.Z()*transpose(2, 3) + vector.W()*transpose(3, 3)
 			};
 		}
 

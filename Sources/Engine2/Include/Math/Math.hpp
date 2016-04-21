@@ -5,6 +5,9 @@
 #  include "Engine.hpp"
 #  include "Math/Matrix.hpp"
 
+#define CROISSANT_PI 3.14159265359f
+#define CROISSANT_PI_2 1.57079632679f
+
 namespace Croissant
 {
 	namespace Math
@@ -16,6 +19,7 @@ namespace Croissant
 
 		inline float			Sin(float radian);
 		inline float			Cos(float radian);
+		inline float			Tan(float radian);
 		inline float			ToRadian(float degree);
 		inline Quaternion		ToQuaternion(EulerAngle const& angle);
 		inline Matrix4f	ToMatrix(Vector4 const& vector);
