@@ -23,7 +23,7 @@ namespace Croissant
 		OpenGLSystemInfo::OpenGLSystemInfo(OpenGLWrapper const& wrapper)
 			: m_logManager{ CROISSANT_GET_LOG(OpenGLSystemInfo) }, m_wrapper(wrapper)
 		{
-			m_logManager->Write("Entrée dans OpenGLSystemInfo constructeur");
+			m_logManager.Write("Entrée dans OpenGLSystemInfo constructeur");
 			m_major = m_wrapper.GetInteger(OpenGLValueNameEnum::MajorVersion);
 			m_minor = m_wrapper.GetInteger(OpenGLValueNameEnum::MinorVersion);
 			m_max3DTextureSize = m_wrapper.GetInteger(OpenGLValueNameEnum::Max3DTextureSize);
@@ -40,14 +40,14 @@ namespace Croissant
 
 			if (doubleBufferEnabled == 1)
 			{
-				m_logManager->Write(LOGGER_NAME, "double buffer supporté.");
+				m_logManager.Write("double buffer supporté.");
 			}
 			else
 			{
-				m_logManager->Write(LOGGER_NAME, "double buffer non supporté.");
+				m_logManager.Write("double buffer non supporté.");
 			}
 
-			m_logManager->Write("Sortie de OpenGLSystemInfo constructeur");
+			m_logManager.Write("Sortie de OpenGLSystemInfo constructeur");
 		}
 
 		uint32_t OpenGLSystemInfo::GetMajorVersion() const

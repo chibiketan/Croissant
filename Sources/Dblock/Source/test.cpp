@@ -200,7 +200,7 @@ namespace Croissant
 
 				if (vertexShaderResult == 0)
 				{
-					m_log->Write("Erreur lors de la compilation du vertex shader");
+					m_log.Write("Erreur lors de la compilation du vertex shader");
 					return false;
 				}
 
@@ -211,7 +211,7 @@ namespace Croissant
 
 				if (fragmentShaderResult == 0)
 				{
-					m_log->Write("Erreur lors de la compilation du fragment shader");
+					m_log.Write("Erreur lors de la compilation du fragment shader");
 					return false;
 				}
 
@@ -233,11 +233,11 @@ namespace Croissant
 
 					if (log.empty())
 					{
-						m_log->Write("Une erreur est survenue lors de l'�tape de linkage du programme.");
+						m_log.Write("Une erreur est survenue lors de l'�tape de linkage du programme.");
 					}
 					else
 					{
-						m_log->Write(log.c_str());
+						m_log.Write(log.c_str());
 					}
 
 					return false;
@@ -536,7 +536,7 @@ namespace Croissant
 			}
 
 		private:
-			std::shared_ptr<Core::LogManager::Log> m_log;
+			Core::LogManager::Log m_log;
 			PressedKeys m_keys;
 			Croissant::Graphic::Window m_win;
 			Croissant::Graphic::OpenGLRenderer m_renderer;

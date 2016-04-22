@@ -32,7 +32,7 @@ namespace Croissant
 		bool LogManager::m_init = false;
 		bool LogManager::m_exitRequested = false;
 		bool LogManager::m_shuttedDown = false;
-		std::map<std::string, std::shared_ptr<LogManager::Log>> LogManager::m_logs {};
+		std::map<std::string, std::unique_ptr<LogManager::LogFile>> LogManager::m_logs {};
 		Threading::AutoResetEvent LogManager::m_event{};
 		std::unique_ptr<Threading::Thread> LogManager::m_thread{};
 		std::mutex LogManager::m_mutex{};
@@ -46,11 +46,22 @@ namespace Croissant
 
 		// --------------------------------------------- LogManager::Log implementation
 
-		LogManager::Log::Log(std::string const& className, std::string const& fileName)
-			: m_className { className }
-			, m_fileName { fileName }, m_queue()
-			, m_file{ fileName + ".log", Croissant::FileSystem::Directory(Croissant::FileSystem::DEFAULT_DIRECTORY::PROGRAM_DIRECTORY).Child("Logs") }
-			, m_output(), m_mutex { }
+		LogManager::Log::Log(LogManager::LogFile& logFile, std::string const& className)
+			: m_className { className }, m_logFile { logFile }
+		{
+		}
+
+		void LogManager::Log::Write(std::string const& message) const
+		{
+			m_logFile.Add(m_className, message);
+		}
+
+		// --------------------------------------------- LogManager::LogFile
+		LogManager::LogFile::LogFile(std::string const& fileName)
+			: m_fileName{ fileName }, m_output()
+			, m_mutex{}
+			, m_file{ fileName + ".log", FileSystem::Directory(FileSystem::DEFAULT_DIRECTORY::PROGRAM_DIRECTORY).Child("Logs") }
+			, m_queue {}
 		{
 			if (!m_file.Exist())
 			{
@@ -60,32 +71,19 @@ namespace Croissant
 			m_output.open(m_file.FullPath(), std::ios::out | std::ios::trunc);
 		}
 
-		LogManager::Log::Log(Log&& ref)
-			: m_fileName { std::move(ref.m_fileName) }, m_queue { std::move(ref.m_queue) }
-			, m_file { std::move(ref.m_file) }, m_output()
-		{
-			ref.m_output.close();
-			m_output.open(m_file.FullPath(), std::ios::out | std::ios::app);
-		}
-
-		LogManager::Log::~Log()
+		LogManager::LogFile::~LogFile()
 		{
 			Flush();
 			m_output.close();
 		}
 
-		void LogManager::Log::Write(std::string const& message)
-		{
-			Write(m_className, message);
-		}
-
-		void LogManager::Log::Write(const std::string& moduleName, const std::string& message)
+		void LogManager::LogFile::Add(std::string const& moduleName, std::string const& message)
 		{
 			std::lock_guard<std::mutex> lock(m_mutex); // thread sync
 			m_queue.emplace(moduleName, message);
 		}
 
-		void LogManager::Log::Flush()
+		void LogManager::LogFile::Flush()
 		{
 			// on échange la liste des éléments avec une liste vide pour pouvoir la traiter tranquile (plante sous VS2015 sinon)
 			std::queue<LogEntry> tmpQueue;
@@ -95,6 +93,7 @@ namespace Croissant
 				// thread safe here
 				m_queue.swap(tmpQueue);
 			}
+
 			while (!tmpQueue.empty())
 			{
 				auto& entry = tmpQueue.front();
@@ -124,7 +123,7 @@ namespace Croissant
 			m_thread = std::make_unique<Threading::Thread>([]() { ThreadEntry(); return 0; });
 
 			auto log = GetLog("LogManager");
-			log->Write("LogManager", "Démarrage du LogManager");
+			log.Write("Démarrage du LogManager");
 			m_event.Signal();
 			return true;
 		}
@@ -138,7 +137,7 @@ namespace Croissant
 
 			auto log = GetLog("LogManager");
 
-			log->Write("LogManager", "Arrêt du LogManager");
+			log.Write("Arrêt du LogManager");
 			m_shuttedDown = false;
 			m_exitRequested = true;
 			m_init = false;
@@ -153,27 +152,29 @@ namespace Croissant
 
 		}
 
-		std::shared_ptr<LogManager::Log> LogManager::GetLog(std::string const& className, bool useDefaultFileName)
+		LogManager::Log LogManager::GetLog(std::string const& className, bool useDefaultFileName)
 		{
-			auto el = m_logs.find(className);
+			auto fileName = useDefaultFileName ? std::string("Default") : className;
+			auto el = m_logs.find(fileName);
 
 			if (m_logs.end() != el)
 			{
-				return el->second;
+				return Log{ *(el->second), className };
 			}
 
 			{
 				std::lock_guard<std::mutex> guard{ m_mutex };
-				el = m_logs.find(className);
+				el = m_logs.find(fileName);
 
 				if (m_logs.end() != el)
 				{
-					return el->second;
+					return Log{ *(el->second), className };
 				}
 
-				auto log = std::make_shared<LogManager::Log>(className, useDefaultFileName ? std::string("Default") : className);
+				auto log = std::make_unique<LogFile>(fileName);
 
-				return log;
+				m_logs.insert(std::make_pair(fileName, std::move(log)));
+				return Log{ *(m_logs[fileName]), className };
 			}
 		}
 

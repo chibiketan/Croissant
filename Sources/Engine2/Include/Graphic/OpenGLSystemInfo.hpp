@@ -48,7 +48,7 @@ namespace Croissant
 			uint32_t GetNumExtension() const;
 
 		private:
-			std::shared_ptr<Core::LogManager::Log>		m_logManager;
+			Core::LogManager::Log		m_logManager;
 			OpenGLWrapper const&	m_wrapper;
 			uint32_t				m_major = 0;
 			uint32_t				m_minor = 0;

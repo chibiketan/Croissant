@@ -129,7 +129,7 @@ namespace Croissant
 			void		SetUniformMatrix4f(int32_t location, int32_t count, bool transpose, Math::Matrix4f const& matrix) const;
 
 		private:
-			std::shared_ptr<Core::LogManager::Log>	m_logManager;
+			Core::LogManager::Log	m_logManager;
 
 			mutable GLint					m_lastGLError = 0;
 			glBindBuffer_t					ext_glBindBuffer = nullptr;

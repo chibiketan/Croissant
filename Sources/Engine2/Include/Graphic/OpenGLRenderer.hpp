@@ -124,7 +124,7 @@ namespace Croissant
 			OpenGLWrapper m_wrapper;
 			OpenGLSystemInfo m_systemInfo;
 			Window& m_window;
-			std::shared_ptr<Croissant::Core::LogManager::Log> m_logManager;
+			Core::LogManager::Log m_logManager;
 #if defined(CROISSANT_WINDOWS)
 			HDC m_ghDC;
 			HGLRC m_contextGl;

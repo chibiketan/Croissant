@@ -29,16 +29,17 @@ namespace Croissant
 
 			static bool Init();
 			static void Shutdown();
-			static std::shared_ptr<Log> GetLog(std::string const& className, bool useDefaultFileName = true);
+			static Log GetLog(std::string const& className, bool useDefaultFileName = true);
 
 		private:
+			class LogFile;
 			static int ThreadEntry();
 
 			static bool m_run ;
 			static bool m_init;
 			static bool m_exitRequested;
 			static bool m_shuttedDown;
-			static std::map<std::string, std::shared_ptr<Log>> m_logs;
+			static std::map<std::string, std::unique_ptr<LogFile>> m_logs;
 			static Croissant::Threading::AutoResetEvent m_event;
 			static std::unique_ptr<Threading::Thread> m_thread;
 			static std::mutex m_mutex;
@@ -56,25 +57,34 @@ namespace Croissant
 				time_t m_time;
 			};
 
+			class LogFile final
+			{
+			public:
+				explicit LogFile(std::string const& fileName);
+				~LogFile();
+				void Add(std::string const& moduleName, std::string const& message);
+				void Flush();
+
+			private:
+				std::string m_fileName;
+				std::ofstream m_output;
+				std::mutex m_mutex;
+				FileSystem::File m_file;
+				std::queue<LogEntry> m_queue;
+			};
+
 		public:
 			class 	Log
 			{
 			public:
-				Log(std::string const& className, std::string const& fileName);
-				Log(const Log&) = delete;
-				Log(Log&& ref);
-				~Log();
-				void Write(std::string const& message);
-				void Write(const std::string& moduleName, const std::string& message);
-				void Flush();
+				Log(LogFile& logFile, std::string const& className);
+				Log(const Log&) = default;
+				Log(Log&& ref) = default;
+				void Write(std::string const& message) const;
 
 			private:
 				std::string m_className;
-				std::string m_fileName;
-				std::queue<LogEntry> m_queue;
-				Croissant::FileSystem::File m_file;
-				std::ofstream m_output;
-				std::mutex m_mutex;
+				LogFile&	m_logFile;
 			};
 
 		};

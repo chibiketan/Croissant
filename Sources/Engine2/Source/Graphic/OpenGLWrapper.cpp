@@ -805,7 +805,7 @@ namespace Croissant
 
 			createDummyContext(ourWindowHandleToDeviceContext, ourOpenGLRenderingContext, windowHandle);
 
-			m_logManager->Write("Entrée dans OpenGLWrapper constructeur");
+			m_logManager.Write("Entrée dans OpenGLWrapper constructeur");
 			ext_glDebugMessageCallbackARB = LoadGLSymbol<glDebugMessageCallbackARB_t>("glDebugMessageCallbackARB", false);
 			ext_glBindBuffer = LoadGLSymbol<glBindBuffer_t>("glBindBuffer");
 			ext_glGenBuffers = LoadGLSymbol<glGenBuffers_t>("glGenBuffers");
@@ -849,20 +849,20 @@ namespace Croissant
 
 			int NumberOfExtensions;
 			glGetIntegerv(GL_NUM_EXTENSIONS, &NumberOfExtensions);
-			m_logManager->Write("openGL", "Liste des extensions openGL supportées :");
+			m_logManager.Write("Liste des extensions openGL supportées :");
 
 			for(int i=0; i<NumberOfExtensions; i++)
 			{
 				const GLubyte *ccc = ext_glGetStringi(GL_EXTENSIONS, i);
 
-				m_logManager->Write("openGL", string("extension OpenGL : ") + reinterpret_cast<const char*>(ccc));
+				m_logManager.Write(string("extension OpenGL : ") + reinterpret_cast<const char*>(ccc));
 			}
 
 
 
 			//deleteDummyContext(ourWindowHandleToDeviceContext, ourOpenGLRenderingContext, windowHandle);
 
-			m_logManager->Write("Sortie de OpenGLWrapper constructeur");
+			m_logManager.Write("Sortie de OpenGLWrapper constructeur");
 		}
 
 		void OpenGLWrapper::Enable(GLenum capacity) const
@@ -895,7 +895,7 @@ namespace Croissant
 			}
 			else
 			{
-				m_logManager->Write("Impossible de définir le context en mode DEBUG");
+				m_logManager.Write("Impossible de définir le context en mode DEBUG");
 			}
 		}
 

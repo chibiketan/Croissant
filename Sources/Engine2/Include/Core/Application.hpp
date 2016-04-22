@@ -105,7 +105,6 @@ namespace Croissant
 			bool	Initialize();
 			void	Shutdown();
 			int32_t	Run();
-			std::shared_ptr<LogManager::Log> GetLogManager() const;
 
 		private:
 			CROISSANT_DEFINE_HAS_METHOD(OnShutdown, bool, Application<App>&);
@@ -113,7 +112,7 @@ namespace Croissant
 			CROISSANT_DEFINE_HAS_METHOD(OnFrame, bool, int32_t&, FrameTime const&, FrameTime const&);
 
 			std::string	m_name;
-			std::shared_ptr<LogManager::Log>	m_logManager;
+			LogManager::Log	m_logManager;
 			FrameTime								m_lastFrameTime;
 
 		};

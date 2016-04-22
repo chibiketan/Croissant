@@ -47,10 +47,5 @@ namespace Croissant
 			return result;
 		}
 
-		template <typename App>
-		std::shared_ptr<LogManager::Log> Application<App>::GetLogManager() const
-		{
-			return m_logManager;
-		}
 	}
 }
