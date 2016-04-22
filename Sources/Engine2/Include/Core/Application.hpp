@@ -16,25 +16,26 @@ struct HasMethod##methodName\
 	static const bool Has = sizeof(Test<T>(nullptr)) == sizeof(int8_t);\
 };\
 \
-template<typename App, bool val = HasMethod##methodName<App>::Has>\
+template<typename TType, bool val = HasMethod##methodName<TType>::Has>\
 struct Function##methodName\
 {\
-			template<typename... Args> static methodReturn Execute(App&, Args&&... args);\
+			template<typename... Args> static methodReturn Execute(TType&, Args&&... args);\
 };\
 \
-template<typename App>\
-struct Function##methodName<App, false>\
+template<typename TType>\
+struct Function##methodName<TType, false>\
 {\
-	template<typename... Args> static methodReturn Execute(App&, Args&&... args)\
+	template<typename... Args> static methodReturn Execute(TType&, Args&&... args)\
 	{\
-		static_assert(false, "La classe de base doit implementer une methode " #methodReturn " " #methodName "(" #__VA_ARGS__ ");");\
+		static_assert(HasMethod##methodName<TType>::Has, "La classe de base doit implementer une methode " #methodReturn " " #methodName "(" #__VA_ARGS__ ");");\
+		return methodReturn{};\
 	}\
 };\
 \
-template<typename App>\
-struct Function##methodName<App, true>\
+template<typename TType>\
+struct Function##methodName<TType, true>\
 {\
-	template<typename... Args> static methodReturn Execute(App& ref, Args&&... args)\
+	template<typename... Args> static methodReturn Execute(TType& ref, Args&&... args)\
 	{\
 		return ref.methodName(std::forward<Args>(args)...);\
 	}\
