@@ -119,10 +119,11 @@ namespace Croissant
 		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		// -------------------------------- OpenGLRenderer::Impl definition
-		OpenGLRenderer::OpenGLRenderer(Window& window, Croissant::Core::LogManager& logManager)
-			: m_wrapper { logManager }, m_systemInfo { logManager, m_wrapper }, m_window{ window }, m_logManager { logManager }
+		OpenGLRenderer::OpenGLRenderer(Window& window)
+			: m_wrapper { }, m_systemInfo { m_wrapper }, m_window{ window }, m_logManager { }
 		{
-			m_logManager.Write("Initialisation du renderer OpenGL");
+			m_logManager = CROISSANT_GET_LOG(OpenGLRenderer);
+			m_logManager->Write("Initialisation du renderer OpenGL");
 			//serviceProvider.Resolve(m_frameProvider);
 
 			auto hwnd = m_window.GetSystemHandle();
@@ -155,7 +156,7 @@ namespace Croissant
 
 			//serviceProvider.Resolve(m_eventManager);
 			//m_eventManager->RegisterListener("Frame::Render", m_renderDelegate);
-		    m_logManager.Write("Renderer OpenGL initialisé avec succès");
+		    m_logManager->Write("Renderer OpenGL initialisé avec succès");
 		}
 
 		OpenGLRenderer::~OpenGLRenderer()
@@ -184,7 +185,7 @@ namespace Croissant
 			//						!DEBUG ONLY					//
 			//////////////////////////////////////////////////////
 
-			m_logManager.Write("Destruction du renderer OpenGL");
+			m_logManager->Write("Destruction du renderer OpenGL");
 		}
 
 		void OpenGLRenderer::SetupPixelFormat(HDC hdc)
@@ -419,13 +420,13 @@ namespace Croissant
 		OpenGLBufferBinding::OpenGLBufferBinding(OpenGLBuffer& buffer, OpenGLRenderer& renderer)
 			: m_buffer { buffer }, m_renderer { renderer }
 		{
-			m_renderer.m_logManager.Write(string("Binding du buffer n°" + std::to_string(m_buffer.GetIndex())));
+			CROISSANT_GET_LOG(OpenGLBufferBinding)->Write(string("Binding du buffer n°" + std::to_string(m_buffer.GetIndex())));
 			m_renderer.m_wrapper.BindBuffer(m_buffer.GetGLBufferType(), m_buffer.GetIndex());
 		}
 
 		OpenGLBufferBinding::~OpenGLBufferBinding()
 		{
-			m_renderer.m_logManager.Write(string("Binding du buffer n°" + std::to_string(m_buffer.GetIndex())));
+			CROISSANT_GET_LOG(OpenGLBufferBinding)->Write(string("Binding du buffer n°" + std::to_string(m_buffer.GetIndex())));
 			m_renderer.m_wrapper.BindBuffer(m_buffer.GetGLBufferType(), 0);
 		}
 
@@ -433,13 +434,13 @@ namespace Croissant
 		OpenGLBufferMapping::OpenGLBufferMapping(OpenGLBuffer& buffer, OpenGLRenderer& renderer)
 			: m_buffer { buffer }, m_renderer { renderer }, m_data { nullptr }
 		{
-			m_renderer.m_logManager.Write(string("Mapping du buffer n°" + std::to_string(m_buffer.GetIndex())));
+			CROISSANT_GET_LOG(OpenGLBufferMapping)->Write(string("Mapping du buffer n°" + std::to_string(m_buffer.GetIndex())));
 			m_data = m_renderer.m_wrapper.MapBuffer(m_buffer.GetGLBufferType(), GL_READ_WRITE);
 		}
 
 		OpenGLBufferMapping::~OpenGLBufferMapping()
 		{
-			m_renderer.m_logManager.Write(string("Unmapping du buffer n°" + std::to_string(m_buffer.GetIndex()) + " du type " + EnumConverter<BufferType>::ToString(m_buffer.GetType())));
+			CROISSANT_GET_LOG(OpenGLBufferMapping)->Write(string("Unmapping du buffer n°" + std::to_string(m_buffer.GetIndex()) + " du type " + EnumConverter<BufferType>::ToString(m_buffer.GetType())));
 			m_renderer.m_wrapper.UnmapBuffer(m_buffer.GetGLBufferType());
 		}
 	}

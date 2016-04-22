@@ -28,6 +28,16 @@ namespace Croissant
 			callback	m_func;
 		};
 
+		bool LogManager::m_run = false;
+		bool LogManager::m_init = false;
+		bool LogManager::m_exitRequested = false;
+		bool LogManager::m_shuttedDown = false;
+		std::map<std::string, std::shared_ptr<LogManager::Log>> LogManager::m_logs {};
+		Threading::AutoResetEvent LogManager::m_event{};
+		std::unique_ptr<Threading::Thread> LogManager::m_thread{};
+		std::mutex LogManager::m_mutex{};
+
+
 		// ------------------------------- LogManager::LogEntry Implémentation
 		LogManager::LogEntry::LogEntry(const std::string& moduleName, const std::string& message)
 			: m_message { message }, m_moduleName { moduleName }, m_time { time(nullptr) }
@@ -36,8 +46,9 @@ namespace Croissant
 
 		// --------------------------------------------- LogManager::Log implementation
 
-		LogManager::Log::Log(std::string fileName)
-			: m_fileName { fileName }, m_queue()
+		LogManager::Log::Log(std::string const& className, std::string const& fileName)
+			: m_className { className }
+			, m_fileName { fileName }, m_queue()
 			, m_file{ fileName + ".log", Croissant::FileSystem::Directory(Croissant::FileSystem::DEFAULT_DIRECTORY::PROGRAM_DIRECTORY).Child("Logs") }
 			, m_output(), m_mutex { }
 		{
@@ -61,6 +72,11 @@ namespace Croissant
 		{
 			Flush();
 			m_output.close();
+		}
+
+		void LogManager::Log::Write(std::string const& message)
+		{
+			Write(m_className, message);
 		}
 
 		void LogManager::Log::Write(const std::string& moduleName, const std::string& message)
@@ -93,27 +109,6 @@ namespace Croissant
 
 		// --------------------------------------------- LogManager::Impl implementation
 
-		LogManager::LogManager(std::string appName)
-		:	m_run { true }
-			, m_init { false }, m_exitRequested { false }, m_shuttedDown { false }, m_appName { appName },
-			 m_logs {}, m_event{},
-			 m_thread{ [this](){ this->ThreadEntry(); return 0; } }
-			 //m_thread{ MethodBinderHelper(&LogManager::ThreadEntry, this) }
-		{
-		}
-
-		LogManager::~LogManager()
-		{
-			m_shuttedDown = false;
-			m_exitRequested = true;
-			Shutdown();
-			while (!m_shuttedDown)
-			{
-				m_event.Signal(); // permet de s'assurer que le thread va sarrêter
-				// spin waiting pour la fin du thread d'écriture
-			}
-		}
-
 		bool LogManager::Init()
 		{
 			if (true == m_init)
@@ -121,10 +116,15 @@ namespace Croissant
 				return false;
 			}
 
-			m_logs.emplace(m_appName, m_appName);
+			// register atexist to shutdown logger
 			m_init = true;
 			m_run = true;
-			Write(m_appName, "Démarrage du LogManager");
+			atexit([]() { Shutdown(); });
+
+			m_thread = std::make_unique<Threading::Thread>([]() { ThreadEntry(); return 0; });
+
+			auto log = GetLog("LogManager");
+			log->Write("LogManager", "Démarrage du LogManager");
 			m_event.Signal();
 			return true;
 		}
@@ -136,31 +136,45 @@ namespace Croissant
 				return;
 			}
 
-			Write(m_appName, "Arrêt du LogManager");
+			auto log = GetLog("LogManager");
+
+			log->Write("LogManager", "Arrêt du LogManager");
+			m_shuttedDown = false;
+			m_exitRequested = true;
 			m_init = false;
 			m_run = false;
 			m_event.Signal();
 
-		}
-
-		void LogManager::Write(const std::string& message)
-		{
-			Write(m_appName, message);
-		}
-
-		void LogManager::Write(const std::string& moduleName, const std::string& message)
-		{
-			auto end = m_logs.end();
-			auto f = m_logs.find(moduleName);
-
-			if (f == end)
+			while (!m_shuttedDown)
 			{
-				f = m_logs.find(m_appName);
+				m_event.Signal(); // permet de s'assurer que le thread va sarrêter
+								  // spin waiting pour la fin du thread d'écriture
 			}
 
-			auto& log = f->second;
+		}
 
-			log.Write(moduleName, message);
+		std::shared_ptr<LogManager::Log> LogManager::GetLog(std::string const& className, bool useDefaultFileName)
+		{
+			auto el = m_logs.find(className);
+
+			if (m_logs.end() != el)
+			{
+				return el->second;
+			}
+
+			{
+				std::lock_guard<std::mutex> guard{ m_mutex };
+				el = m_logs.find(className);
+
+				if (m_logs.end() != el)
+				{
+					return el->second;
+				}
+
+				auto log = std::make_shared<LogManager::Log>(className, useDefaultFileName ? std::string("Default") : className);
+
+				return log;
+			}
 		}
 
 		int LogManager::ThreadEntry()
@@ -178,7 +192,7 @@ namespace Croissant
 					{
 						auto& log = begin->second;
 
-						log.Flush();
+						log->Flush();
 					}
 				}
 

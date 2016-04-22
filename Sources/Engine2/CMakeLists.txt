@@ -55,6 +55,7 @@ croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
     ${ENGINE_DEFINE_FILE}
     Engine.hpp
 	Core/Application.hpp
+	Core/Application.inl
 	Core/LogManager.hpp
 	Core/Node.hpp
 	Debug/MemoryManager.hpp

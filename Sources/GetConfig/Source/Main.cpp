@@ -10,12 +10,10 @@ int main(int argc, char** argv)
 	UNUSED(argc);
 	UNUSED(argv);
 
-	Croissant::Core::LogManager logManager("GetConfig");
-
-	logManager.Init();
+	Croissant::Core::LogManager::Init();
 	{
 		Croissant::Graphic::Window win(10U, 10U, "DUMMY");
-		Croissant::Graphic::OpenGLRenderer renderer(win, logManager);
+		Croissant::Graphic::OpenGLRenderer renderer(win);
 		auto& info = renderer.GetSystemInfo();
 
 		std::cout << "============================================================" << std::endl;
@@ -33,7 +31,7 @@ int main(int argc, char** argv)
 		std::cout << "Nombre d'extension OpenGL supportées : " << std::to_string(info.GetNumExtension()) << std::endl;
 	}
 	// logManager doit être arrêté une fois que tous ses utilisateurs sont détruits
-	logManager.Shutdown();
+
 	std::cout << std::endl << std::endl << "Appuyer sur une touche pour continuer" << std::endl;
 	std::getchar();
 	return 0;

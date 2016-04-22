@@ -9,6 +9,7 @@
 #define OPENGLWRAPPER_HPP_INC
 
 #include "Engine.hpp"
+#include "Core/LogManager.hpp"
 #include "Math/Matrix.hpp"
 #include "Graphic/Enums.hpp"
 #include <GL/gl.h>
@@ -81,7 +82,7 @@ namespace Croissant
 		{
 		public:
 			template<unsigned int funcIndex> friend inline bool glCheckForError(const OpenGLWrapper& wrapper);
-						OpenGLWrapper(Core::LogManager& logManager);
+						OpenGLWrapper();
 			int32_t		GetLastError() const;
 			void		DeleteBuffers(size_t size, uint32_t const* tab) const;
 			bool		EnableVSync(bool enable) const;
@@ -128,7 +129,7 @@ namespace Croissant
 			void		SetUniformMatrix4f(int32_t location, int32_t count, bool transpose, Math::Matrix4f const& matrix) const;
 
 		private:
-			Core::LogManager&				m_logManager;
+			std::shared_ptr<Core::LogManager::Log>	m_logManager;
 
 			mutable GLint					m_lastGLError = 0;
 			glBindBuffer_t					ext_glBindBuffer = nullptr;

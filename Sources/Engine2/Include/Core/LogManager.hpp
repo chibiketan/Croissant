@@ -19,31 +19,29 @@ namespace Croissant
 		class ENGINE_API LogManager final
 		{
 		public:
+			class Log;
+
+			LogManager() = delete;
 			LogManager(LogManager const&) = delete;
 			LogManager(LogManager&&) = delete;
 			LogManager& operator=(LogManager const&) = delete;
 			LogManager& operator=(LogManager&&) = delete;
 
-			LogManager(std::string appName);
-			~LogManager();
-			bool Init();
-			void Shutdown();
-			void Write(const std::string& message);
-			void Write(const std::string& moduleName, const std::string& message);
+			static bool Init();
+			static void Shutdown();
+			static std::shared_ptr<Log> GetLog(std::string const& className, bool useDefaultFileName = true);
 
 		private:
-			class Log;
-			int ThreadEntry();
+			static int ThreadEntry();
 
-			bool m_run;
-			bool m_init;
-			bool m_exitRequested;
-			bool m_shuttedDown;
-			std::string m_appName;
-			std::map<std::string, Log> m_logs;
-			Croissant::Threading::AutoResetEvent m_event;
-			Croissant::Threading::Thread m_thread;
-
+			static bool m_run ;
+			static bool m_init;
+			static bool m_exitRequested;
+			static bool m_shuttedDown;
+			static std::map<std::string, std::shared_ptr<Log>> m_logs;
+			static Croissant::Threading::AutoResetEvent m_event;
+			static std::unique_ptr<Threading::Thread> m_thread;
+			static std::mutex m_mutex;
 
 			class LogEntry
 			{
@@ -58,25 +56,34 @@ namespace Croissant
 				time_t m_time;
 			};
 
-			class Log
+		public:
+			class 	Log
 			{
 			public:
-				Log(std::string fileName);
+				Log(std::string const& className, std::string const& fileName);
 				Log(const Log&) = delete;
 				Log(Log&& ref);
 				~Log();
+				void Write(std::string const& message);
 				void Write(const std::string& moduleName, const std::string& message);
 				void Flush();
 
 			private:
+				std::string m_className;
 				std::string m_fileName;
 				std::queue<LogEntry> m_queue;
 				Croissant::FileSystem::File m_file;
 				std::ofstream m_output;
 				std::mutex m_mutex;
 			};
+
 		};
+
 	} // !namespace Core
 } // !namespace Croissant
+
+
+#  define CROISSANT_GET_LOG(clazz) Croissant::Core::LogManager::GetLog(#clazz)
+#  define CROISSANT_GET_LOG_WITH_FILE(clazz) Croissant::Core::LogManager::GetLog(#clazz, false)
 
 #endif

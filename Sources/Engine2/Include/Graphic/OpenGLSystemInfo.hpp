@@ -9,7 +9,9 @@
 #define OPENGLSYSTEMINFO_HPP_INC
 
 #include "Engine.hpp"
+#include "Core/LogManager.hpp"
 #include <cstdint>
+#include <memory>
 
 namespace Croissant
 {
@@ -25,7 +27,7 @@ namespace Croissant
 		class ENGINE_API OpenGLSystemInfo final
 		{
 		public:
-			OpenGLSystemInfo(Core::LogManager& logManager, OpenGLWrapper const& wrapper);
+			OpenGLSystemInfo(OpenGLWrapper const& wrapper);
 			/// <summary>Récupère le numéro de version major d'OpenGL supportée</summary>
 			uint32_t GetMajorVersion() const;
 			/// <summary>Récupère le numéro de version mineur d'OpenGL supportée</summary>
@@ -46,7 +48,7 @@ namespace Croissant
 			uint32_t GetNumExtension() const;
 
 		private:
-			Core::LogManager&		m_logManager;
+			std::shared_ptr<Core::LogManager::Log>		m_logManager;
 			OpenGLWrapper const&	m_wrapper;
 			uint32_t				m_major = 0;
 			uint32_t				m_minor = 0;

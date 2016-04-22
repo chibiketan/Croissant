@@ -11,6 +11,7 @@
 #include "Engine.hpp"
 #include "Graphic/OpenGLWrapper.hpp"
 #include "Graphic/OpenGLSystemInfo.hpp"
+#include "Core/LogManager.hpp"
 #include <memory>
 #include <string>
 #include <GL/gl.h>
@@ -20,11 +21,6 @@
 
 namespace Croissant
 {
-	namespace Core
-	{
-		class LogManager;
-	}
-
 	namespace Graphic
 	{
 		class Window;
@@ -113,7 +109,7 @@ namespace Croissant
 			friend class OpenGLBufferBinding;
 			friend class OpenGLBufferMapping;
 		public:
-			OpenGLRenderer(Window& window, Croissant::Core::LogManager& logManager);
+			OpenGLRenderer(Window& window);
 			~OpenGLRenderer();
 			void Render();
 			/// <summary>Récupère un objet qui représente les informations sur le contexte OpenGL courant</summary>
@@ -128,7 +124,7 @@ namespace Croissant
 			OpenGLWrapper m_wrapper;
 			OpenGLSystemInfo m_systemInfo;
 			Window& m_window;
-			Croissant::Core::LogManager& m_logManager;
+			std::shared_ptr<Croissant::Core::LogManager::Log> m_logManager;
 #if defined(CROISSANT_WINDOWS)
 			HDC m_ghDC;
 			HGLRC m_contextGl;
