@@ -1,36 +1,41 @@
-#ifndef ENGINE_HPP_INC
-#define ENGINE_HPP_INC
+#ifndef CROISSANT_ENGINE_HPP_INC
+#  define CROISSANT_ENGINE_HPP_INC
+#  pragma once
 
-#include "defines.hpp"
+#  include "defines.hpp"
 
-#if defined(COMPILER_MSVC)
-#  define WIN32_LEAN_AND_MEAN
-#  include <Windows.h>
-#endif
-
-#if defined(CROISSANT_HAS_TRACE)
-#  include <iostream>
-#  define TRACE(msg) (std::cout << msg << std::endl)
-#else
-#  define TRACE(msg)
-#endif
-
-#if defined(CROISSANT_LINUX)
-#  define ENGINE_API
-#  define BOOL int
-
-#elif defined(CROISSANT_WINDOWS)
-#  ifdef CROISSANT_SHARED_LIB
-#    ifdef ENGINE_EXPORTS
-#      define ENGINE_API __declspec(dllexport)
-#    else
-#      define ENGINE_API __declspec(dllimport)
-#    endif
-#  else
-#    define ENGINE_API
+#  if defined(COMPILER_MSVC)
+#    define WIN32_LEAN_AND_MEAN
+#    include <Windows.h>
 #  endif
-#endif
 
-#define UNUSED(a) (void)(a)
+#  if defined(CROISSANT_HAS_TRACE)
+#    include <iostream>
+#    define TRACE(msg) (std::cout << msg << std::endl)
+#  else
+#    define TRACE(msg)
+#  endif
 
-#endif
+#  if defined(CROISSANT_LINUX)
+#    define ENGINE_API
+#    define BOOL int
+
+#  elif defined(CROISSANT_WINDOWS)
+#    ifdef CROISSANT_SHARED_LIB
+#      ifdef ENGINE_EXPORTS
+#        define ENGINE_API __declspec(dllexport)
+#      else
+#        define ENGINE_API __declspec(dllimport)
+#      endif
+#    else
+#      define ENGINE_API
+#    endif
+#  endif
+
+#  define UNUSED(a) (void)(a)
+
+#  if defined(CROISSANT_HAS_TRACE)
+#    include "Core/LogManager.hpp"
+#  endif
+
+#endif // !CROISSANT_ENGINE_HPP_INC

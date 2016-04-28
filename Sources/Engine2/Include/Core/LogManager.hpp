@@ -12,6 +12,12 @@
 #include <fstream>
 #include <mutex>
 
+#  if defined(CROISSANT_HAS_TRACE)
+#    define CROISSANT_TRACE_DEBUG(msg) Croissant::Core::LogManager::GetLog("Trace", false).Write(msg);
+#  else
+#    define CROISSANT_TRACE_DEBUG(msg)
+#  endif
+
 namespace Croissant
 {
 	namespace Core

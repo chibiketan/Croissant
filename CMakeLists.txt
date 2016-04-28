@@ -11,26 +11,29 @@ find_package(PythonInterp REQUIRED)
 #-------------------------------------------------------------------------------
 #   define top-level options for the whole project
 #-------------------------------------------------------------------------------
-#option(ORYOL_CMAKE_VERBOSE "Verbose messages during cmake runs" OFF)
-#option(ORYOL_NO_ASSERTS_IN_RELEASE "Remove asserts in release-mode" OFF)
-#option(ORYOL_UNITTESTS "Enable unit tests" OFF)
-#option(ORYOL_UNITTESTS_RUN_AFTER_BUILD "Automatically run unit tests after building" OFF)
-#option(ORYOL_UNITTESTS_HEADLESS "If enabled don't run tests which require a display" OFF)
-#option(ORYOL_EXCEPTIONS "Enable C++ exceptions" OFF)
-#option(ORYOL_ALLOCATOR_DEBUG "Enable allocator debugging code (slow)" OFF)
-#option(ORYOL_SAMPLES "Compile sample programs" ON)
-#option(ORYOL_FORCE_NO_THREADS "Enable to simulate no support for std::thread" OFF)
-#option(ORYOL_COMPILE_VERBOSE "Enable very verbose compilation" OFF)
-#set(ORYOL_SAMPLE_URL "http://floooh.github.com/oryol/" CACHE STRING "Sample data URL")
+# CROISSANT_TRACE_LEVEL
+# 0 Error
+# 1 Warning
+# 2 Info
+# 3 Debug
 option(CROISSANT_USE_THREAD "Enable thread support into croissant" ON)
+option(CROISSANT_USE_TRACE "Enable trace support into croissant" ON)
+#option(CROISSANT_TRACE_LEVEL "Trace level in Croissant" 3)
 option(CROISSANT_MEMORY_DEBUG "Enable memory debug implementation into croissant" ON)
 option(CROISSANT_OPENGL_ERROR_THROW "Enable OpenGL call to throw when glGetError return error code" ON)
 option(CROISSANT_SHARED_LIB "Enable compile croissant into shared lib" OFF)
 
+# set the build type to use
+if (NOT CROISSANT_TRACE_LEVEL)
+	set(CROISSANT_TRACE_LEVEL 3 CACHE STRING "Trace level in Croissant" FORCE)
+endif()
+set_property(CACHE CROISSANT_TRACE_LEVEL PROPERTY STRINGS 0 1 2 3)
+
+
 
 
 #-------------------------------------------------------------------------------
-#   oryol_apply_target_group(target)
+#   croissant_apply_target_group(target)
 #   Apply IDE group name to target.
 #
 macro(croissant_apply_target_group target)
@@ -173,7 +176,7 @@ macro(croissant_setup)
     endif( UNIX )
 
 	# ---------------------------
-	#	Détecter le type de compilteur et définir un #define indiquant le compilateur
+	#	Détecter le type de compilateur et définir un #define indiquant le compilateur
 	# ---------------------------
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	  # using Clang
@@ -249,42 +252,15 @@ macro(croissant_setup)
     	list(APPEND CROISSANT_PLATFORM_DEFINES -DCROISSANT_OPENGL_ERROR_THROW)
 	endif()
 
-    # if (ORYOL_UNITTESTS)
-        # add_definitions(-DORYOL_UNITTESTS=1)
-        # if (ORYOL_UNITTESTS_HEADLESS)
-            # add_definitions(-DORYOL_UNITTESTS_HEADLESS=1)
-        # else()
-            # add_definitions(-DORYOL_UNITTESTS_HEADLESS=0)
-        # endif()
-    # else()
-        # add_definitions(-DORYOL_UNITTESTS=0)
-    # endif()
-    # if (ORYOL_OPENGL)
-        # add_definitions(-DORYOL_OPENGL=1)
-        # if (ORYOL_OPENGLES2)
-            # add_definitions(-DORYOL_OPENGLES2=1)
-        # else()
-            # add_definitions(-DORYOL_OPENGLES2=0)
-        # endif()
-        # if (ORYOL_OPENGLES3)
-            # add_definitions(-DORYOL_OPENGLES3=1)
-        # else()
-            # add_definitions(-DORYOL_OPENGLES3=0)
-        # endif()
-        # if (ORYOL_OPENGL_CORE_PROFILE)
-            # add_definitions(-DORYOL_OPENGL_CORE_PROFILE=1)
-        # else()
-            # add_definitions(-DORYOL_OPENGL_CORE_PROFILE=0)
-        # endif()
-    # else()
-        # add_definitions(-DORYOL_OPENGL=0)
-        # add_definitions(-DORYOL_OPENGLES2=0)
-    # endif()
-    # if (ORYOL_NO_ASSERTS_IN_RELEASE)
-        # add_definitions(-DORYOL_NO_ASSERT=1)
-    # else()
-        # add_definitions(-DORYOL_NO_ASSERT=0)
-    # endif()
+	# ---------------------------
+	#	Définir les éléments pour les traces
+	# ---------------------------
+	if (${CROISSANT_USE_TRACE})
+		list(APPEND CROISSANT_PLATFORM_DEFINES -DCROISSANT_HAS_TRACE -DCROISSANT_TRACE_LEVEL=${CROISSANT_TRACE_LEVEL})
+	endif()
+
+
+
     if (CROISSANT_USE_THREAD)
 		# TODO test thread capabilities
 		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
