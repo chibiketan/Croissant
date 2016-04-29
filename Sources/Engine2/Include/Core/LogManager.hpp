@@ -6,17 +6,10 @@
 #include "Threading/Thread.hpp"
 #include "Threading/AutoResetEvent.hpp"
 #include <memory>
-#include <string>
 #include <queue>
 #include <map>
 #include <fstream>
 #include <mutex>
-
-#  if defined(CROISSANT_HAS_TRACE)
-#    define CROISSANT_TRACE_DEBUG(msg) Croissant::Core::LogManager::GetLog("Trace", false).Write(msg);
-#  else
-#    define CROISSANT_TRACE_DEBUG(msg)
-#  endif
 
 namespace Croissant
 {
@@ -94,6 +87,62 @@ namespace Croissant
 			};
 
 		};
+
+#  if defined(CROISSANT_HAS_TRACE)
+		inline void WriteTrace(std::string const& lvl, std::string const& msg)
+		{
+			LogManager::GetLog("Trace", false).Write(msg);
+		}
+
+		inline void WriteTraceDebug(std::string const& msg)
+		{
+#    if CROISSANT_TRACE_LEVEL >= 3
+			WriteTrace("Debug", msg);
+#    endif
+		}
+
+		inline void WriteTraceInfo(std::string const& msg)
+		{
+#    if CROISSANT_TRACE_LEVEL >= 2
+			WriteTrace("Info", msg);
+#    endif
+		}
+		
+		inline void WriteTraceWarn(std::string const& msg)
+		{
+#    if CROISSANT_TRACE_LEVEL >= 1
+			WriteTrace("Warn", msg);
+#    endif
+		}
+
+		inline void WriteTraceError(std::string const& msg)
+		{
+#    if CROISSANT_TRACE_LEVEL >= 0
+			WriteTrace("Error", msg);
+#    endif
+		}
+#  else // !defined(CROISSANT_HAS_TRACE)
+		inline void WriteTrace(std::string const& lvl, std::string const& msg)
+		{
+		}
+
+		inline void WriteTraceDebug(std::string const& msg)
+		{
+		}
+
+		inline void WriteTraceInfo(std::string const& msg)
+		{
+		}
+
+		inline void WriteTraceWarn(std::string const& msg)
+		{
+		}
+
+		inline void WriteTraceError(std::string const& msg)
+		{
+		}
+#  endif
+
 
 	} // !namespace Core
 } // !namespace Croissant

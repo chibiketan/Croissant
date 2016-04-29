@@ -177,7 +177,7 @@ namespace Croissant
 
 			bool OnInitialize(Core::Application<DBlockApplication>& app)
 			{
-				CROISSANT_TRACE_DEBUG("Début de OnInitialize");
+				Core::WriteTraceDebug("Début de OnInitialize");
 				auto vpWidth = 1920;
 				auto vpHeight = 1080;
 
@@ -296,7 +296,7 @@ namespace Croissant
 				m_cam.SetFarDistance(1000.0f);
 				m_camNode->Move(Croissant::Math::Vector4::UnitZ * -5);
 
-				CROISSANT_TRACE_DEBUG("Fin de OnInitialize");
+				Core::WriteTraceDebug("Fin de OnInitialize");
 				return true;
 			}
 			
