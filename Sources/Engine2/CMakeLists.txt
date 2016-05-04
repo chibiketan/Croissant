@@ -22,7 +22,9 @@ execute_process(
 
 
 croissant_files(${PROJECT_NAME} ${ENGINE_SOURCE}
+	Core/AbstractBuffer.cpp
 	Core/Application.cpp
+	Core/IndexBuffer.cpp
 	Core/LogManager.cpp
 	Core/Node.cpp
 	Debug/MemoryManager.cpp
@@ -30,6 +32,7 @@ croissant_files(${PROJECT_NAME} ${ENGINE_SOURCE}
 	FileSystem/Directory.cpp
 	FileSystem/File.cpp
 	Graphic/Camera.cpp
+	Graphic/OpenGLBuffer.cpp
 	Graphic/OpenGLRenderer.cpp
 	Graphic/OpenGLSystemInfo.cpp
 	Graphic/OpenGLWrapper.cpp
@@ -54,8 +57,10 @@ croissant_files(${PROJECT_NAME} ${ENGINE_SOURCE}
 croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
     ${ENGINE_DEFINE_FILE}
     Engine.hpp
+	Core/AbstractBuffer.hpp
 	Core/Application.hpp
 	Core/Application.inl
+	Core/IndexBuffer.hpp
 	Core/LogManager.hpp
 	Core/Node.hpp
 	Debug/MemoryManager.hpp
@@ -63,6 +68,7 @@ croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
 	FileSystem/Directory.hpp
 	FileSystem/File.hpp
 	Graphic/Camera.hpp
+	Graphic/OpenGLBuffer.hpp
 	Graphic/OpenGLRenderer.hpp
 	Graphic/OpenGLSystemInfo.hpp
 	Graphic/OpenGLWrapper.hpp
