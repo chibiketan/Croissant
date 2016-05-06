@@ -15,6 +15,7 @@
 
 #include <windows.h>
 
+#define CAST(p) static_cast<size_t>(p)
 #define DUMMY_WINDOW_CLASS_NAME             "oglversionchecksample"
 #define LOGGER_NAME "OpenGL"
 
@@ -899,9 +900,9 @@ namespace Croissant
 			}
 		}
 
-		void OpenGLWrapper::BindBuffer(GLenum type, uint32_t shaderId) const
+		void OpenGLWrapper::BindBuffer(OpenGLBufferTargetEnum target, uint32_t shaderId) const
 		{
-			ext_glBindBuffer(type, shaderId);
+			ext_glBindBuffer(s_bufferTargets[CAST(target)], shaderId);
 			glCheckForError<GLFUNCINDEX_BIND_BUFFER>(*this);
 		}
 
@@ -911,9 +912,9 @@ namespace Croissant
 			glCheckForError<GLFUNCINDEX_GEN_BUFFERS>(*this);
 		}
 
-		void OpenGLWrapper::BufferData(GLenum target, size_t size, void const* buffer, GLenum usageType) const
+		void OpenGLWrapper::BufferData(OpenGLBufferTargetEnum target, size_t size, void const* buffer, OpenGLBufferUsageEnum usageType) const
 		{
-			ext_glBufferData(target, static_cast<GLsizei>(size), buffer, usageType);
+			ext_glBufferData(s_bufferTargets[CAST(target)], static_cast<GLsizei>(size), buffer, s_bufferUsages[CAST(usageType)]);
 			glCheckForError<GLFUNCINDEX_BUFFER_DATA>(*this);
 		}
 
@@ -1059,9 +1060,9 @@ namespace Croissant
 			glCheckForError<GLFUNCINDEX_DRAW_ELEMENTS>(*this);
 		}
 
-		void* OpenGLWrapper::MapBuffer(GLenum target, GLenum access) const
+		void* OpenGLWrapper::MapBuffer(OpenGLBufferTargetEnum target, OpenGLMapBufferAccessEnum access) const
 		{
-			auto ret = ext_glMapBuffer(target, access);
+			auto ret = ext_glMapBuffer(s_bufferTargets[CAST(target)], s_mapBufferAccesses[CAST(access)]);
 
 			if (nullptr == ret)
 			{
@@ -1071,9 +1072,9 @@ namespace Croissant
 			return ret;
 		}
 
-		GLboolean OpenGLWrapper::UnmapBuffer(GLenum target) const
+		GLboolean OpenGLWrapper::UnmapBuffer(OpenGLBufferTargetEnum target) const
 		{
-			auto ret = ext_glUnmapBuffer(target);
+			auto ret = ext_glUnmapBuffer(s_bufferTargets[CAST(target)]);
 
 			if (GL_FALSE == ret)
 			{
@@ -1386,6 +1387,41 @@ namespace Croissant
 			GL_GEOMETRY_VERTICES_OUT,					//
 			GL_GEOMETRY_INPUT_TYPE,						//
 			GL_GEOMETRY_OUTPUT_TYPE						//
+		};
+
+		GLenum OpenGLWrapper::s_bufferTargets[]{
+			GL_ARRAY_BUFFER,
+			GL_ATOMIC_COUNTER_BUFFER,
+			GL_COPY_READ_BUFFER,
+			GL_COPY_WRITE_BUFFER,
+			GL_DISPATCH_INDIRECT_BUFFER,
+			GL_DRAW_INDIRECT_BUFFER,
+			GL_ELEMENT_ARRAY_BUFFER,
+			GL_PIXEL_PACK_BUFFER,
+			GL_PIXEL_UNPACK_BUFFER,
+			GL_QUERY_BUFFER,
+			GL_SHADER_STORAGE_BUFFER,
+			GL_TEXTURE_BUFFER,
+			GL_TRANSFORM_FEEDBACK_BUFFER,
+			GL_UNIFORM_BUFFER
+		};
+
+		GLenum OpenGLWrapper::s_bufferUsages[]{
+			GL_STREAM_DRAW,
+			GL_STREAM_READ,
+			GL_STREAM_COPY,
+			GL_STATIC_DRAW,
+			GL_STATIC_READ,
+			GL_STATIC_COPY,
+			GL_DYNAMIC_DRAW,
+			GL_DYNAMIC_READ,
+			GL_DYNAMIC_COPY
+		};
+
+		GLenum OpenGLWrapper::s_mapBufferAccesses[]{
+			GL_READ_ONLY,
+			GL_WRITE_ONLY,
+			GL_READ_WRITE
 		};
 
 	} // !namespace Graphic

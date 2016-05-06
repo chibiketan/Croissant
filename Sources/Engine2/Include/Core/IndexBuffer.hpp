@@ -1,7 +1,9 @@
 #ifndef CROISSANT_ENGINE_CORE_INDEXBUFFER_HPP_INC
 #  define CROISSANT_ENGINE_CORE_INDEXBUFFER_HPP_INC
+#  pragma once
 
 #  include "Engine.hpp"
+#  include "Core/Enums.hpp"
 #  include <memory>
 
 namespace Croissant
@@ -13,10 +15,12 @@ namespace Croissant
 		class ENGINE_API IndexBuffer final
 		{
 		public:
-			IndexBuffer(std::unique_ptr<AbstractBuffer>&& internalBuffer);
+			IndexBuffer(std::shared_ptr<AbstractBuffer> internalBuffer);
+			void*	Map(BufferAccessEnum access) const;
+			void	Unmap() const;
 
 		private:
-			std::unique_ptr<AbstractBuffer> m_internalBuffer;
+			std::shared_ptr<AbstractBuffer> m_internalBuffer;
 		};
 	}
 }

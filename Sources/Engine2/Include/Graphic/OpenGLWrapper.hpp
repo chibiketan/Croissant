@@ -1,21 +1,15 @@
-/*
- * OpenGLWrapper.hpp
- *
- *  Created on: 6 févr. 2015
- *      Author: Nadege
- */
+#ifndef CROISSANT_ENGINE_GRAPHIC_OPENGLWRAPPER_HPP_INC
+#  define CROISSANT_ENGINE_GRAPHIC_OPENGLWRAPPER_HPP_INC
+#  pragma once
 
-#ifndef OPENGLWRAPPER_HPP_INC
-#define OPENGLWRAPPER_HPP_INC
-
-#include "Engine.hpp"
-#include "Core/LogManager.hpp"
-#include "Math/Matrix.hpp"
-#include "Graphic/Enums.hpp"
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glext.h>
-#include <string>
+#  include "Engine.hpp"
+#  include "Core/LogManager.hpp"
+#  include "Math/Matrix.hpp"
+#  include "Graphic/Enums.hpp"
+#  include <GL/gl.h>
+#  include <GL/glu.h>
+#  include <GL/glext.h>
+#  include <string>
 
 namespace Croissant
 {
@@ -94,9 +88,9 @@ namespace Croissant
 			void		DeleteProgram(uint32_t programId) const;
 			void		DeleteShader(uint32_t shaderId) const;
 			void		DetachShader(uint32_t programId, uint32_t shaderId) const;
-			void		BindBuffer(GLenum type, uint32_t shaderId) const;
+			void		BindBuffer(OpenGLBufferTargetEnum target, uint32_t shaderId) const;
 			void		GenBuffers(size_t size, uint32_t* tab) const;
-			void		BufferData(GLenum target, size_t size, void const* buffer, GLenum usageType) const;
+			void		BufferData(OpenGLBufferTargetEnum target, size_t size, void const* buffer, OpenGLBufferUsageEnum usageType) const;
 			void		RegisterDebugMessageCallback(DebugMessageCallback_t callback) const;
 			void		Enable(GLenum capacity) const;
 			void		ClearIndex(GLfloat colorIndex) const;
@@ -112,8 +106,8 @@ namespace Croissant
 			void		ColorPointer(GLint size, GLenum type, GLsizei stride, GLvoid const* pointer) const;
 			void		PolygonMode(GLenum face, GLenum mode) const;
 			void		DrawElements(GLenum mode, GLsizei count, GLenum type, GLvoid const* indices) const;
-			void*		MapBuffer(GLenum target, GLenum access) const;
-			GLboolean	UnmapBuffer(GLenum target) const;
+			void*		MapBuffer(OpenGLBufferTargetEnum target, OpenGLMapBufferAccessEnum access) const;
+			GLboolean	UnmapBuffer(OpenGLBufferTargetEnum target) const;
 			int32_t		GetInteger(OpenGLValueNameEnum valueName) const;
 			void		CompileShader(uint32_t shaderId) const;
 			int32_t		GetShaderInteger(uint32_t shaderId, OpenGLShaderIntegerNameEnum name) const;
@@ -175,6 +169,9 @@ namespace Croissant
 			static GLenum					s_valueNames[static_cast<int>(OpenGLValueNameEnum::MAX_ELEMENT) + 1];
 			static GLenum					s_shaderIntegerNames[static_cast<int>(OpenGLShaderIntegerNameEnum::MAX_ELEMENT) + 1];
 			static GLenum					s_programIntegerNames[static_cast<int>(OpenGLProgramIntegerNameEnum::MAX_ELEMENT) + 1];
+			static GLenum					s_bufferUsages[static_cast<int>(OpenGLBufferUsageEnum::MAX_ELEMENT) + 1];
+			static GLenum					s_bufferTargets[static_cast<int>(OpenGLBufferTargetEnum::MAX_ELEMENT) + 1];
+			static GLenum					s_mapBufferAccesses[static_cast<int>(OpenGLMapBufferAccessEnum::MAX_ELEMENT) + 1];
 		};
 	}
 }
@@ -184,4 +181,4 @@ namespace Croissant
 
 
 
-#endif /* SOURCES_ENGINE2_INCLUDE_GRAPHIC_OPENGLWRAPPER_HPP_INC */
+#endif /* CROISSANT_ENGINE_GRAPHIC_OPENGLWRAPPER_HPP_INC */

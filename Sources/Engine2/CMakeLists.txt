@@ -60,6 +60,9 @@ croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
 	Core/AbstractBuffer.hpp
 	Core/Application.hpp
 	Core/Application.inl
+	Core/BufferAccessor.hpp
+	Core/BufferAccessor.inl
+	Core/Enums.hpp
 	Core/IndexBuffer.hpp
 	Core/LogManager.hpp
 	Core/Node.hpp
@@ -68,6 +71,7 @@ croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
 	FileSystem/Directory.hpp
 	FileSystem/File.hpp
 	Graphic/Camera.hpp
+	Graphic/Enums.hpp
 	Graphic/OpenGLBuffer.hpp
 	Graphic/OpenGLRenderer.hpp
 	Graphic/OpenGLSystemInfo.hpp

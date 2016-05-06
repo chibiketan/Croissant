@@ -58,51 +58,6 @@ namespace Croissant
 			VERTEX
 		};
 
-		class ENGINE_API OpenGLBuffer
-		{
-		public:
-			OpenGLBuffer(OpenGLRenderer& renderer, BufferType type, int32_t size);
-			OpenGLBuffer(OpenGLBuffer const&) = delete;
-			OpenGLBuffer(OpenGLBuffer&& ref) noexcept;
-			~OpenGLBuffer();
-			OpenGLBuffer& operator=(OpenGLBuffer const&) = delete;
-			OpenGLBuffer& operator=(OpenGLBuffer&&) noexcept;
-			uint32_t GetIndex() const;
-			int32_t GetSize() const;
-			GLenum GetGLBufferType() const;
-			BufferType GetType() const;
-
-		private:
-			BufferType m_type;
-			uint32_t m_index;
-			int32_t m_size;
-			OpenGLRenderer& m_renderer;
-		};
-
-		class ENGINE_API OpenGLBufferBinding
-		{
-		public:
-			OpenGLBufferBinding(OpenGLBuffer& buffer, OpenGLRenderer& renderer);
-			~OpenGLBufferBinding();
-
-		private:
-
-			OpenGLBuffer&	m_buffer;
-			OpenGLRenderer&	m_renderer;
-		};
-
-		class ENGINE_API OpenGLBufferMapping
-		{
-		public:
-			OpenGLBufferMapping(OpenGLBuffer& buffer, OpenGLRenderer& renderer);
-			~OpenGLBufferMapping();
-
-		private:
-			OpenGLBuffer&	m_buffer;
-			OpenGLRenderer&	m_renderer;
-			void*			m_data;
-		};
-
 		class ENGINE_API OpenGLRenderer
 		{
 			friend class OpenGLBuffer;
@@ -134,18 +89,6 @@ namespace Croissant
 
 
 
-			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			//         FOR TESTS ONLY
-			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-			uint32_t verticesBufferId = 0;
-			uint32_t indexesBufferId = 0;
-			size_t verticesSize;
-			size_t indexesSize;
-			uint32_t vertexShaderId = 0;
-			uint32_t pixelShaderId = 0;
-			uint32_t programId = 0;
-			void CreateObjects();
 		};
 	}
 }

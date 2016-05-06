@@ -248,37 +248,37 @@ namespace Croissant
 
 
 				opengl.GenBuffers(1, &m_verticesBufferId);
-				opengl.BindBuffer(GL_ARRAY_BUFFER, m_verticesBufferId);
-				opengl.BufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, m_verticesBufferId);
+				opengl.BufferData(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, sizeof(vertices), vertices, Graphic::OpenGLBufferUsageEnum::StaticDraw);
 
 				opengl.GenBuffers(1, &m_planVerticesBufferId);
-				opengl.BindBuffer(GL_ARRAY_BUFFER, m_planVerticesBufferId);
-				opengl.BufferData(GL_ARRAY_BUFFER, sizeof(planVertices), planVertices, GL_STATIC_DRAW);
+				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, m_planVerticesBufferId);
+				opengl.BufferData(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, sizeof(planVertices), planVertices, Graphic::OpenGLBufferUsageEnum::StaticDraw);
 
 				opengl.GenBuffers(1, &m_pointVerticesBufferId);
-				opengl.BindBuffer(GL_ARRAY_BUFFER, m_pointVerticesBufferId);
-				opengl.BufferData(GL_ARRAY_BUFFER, sizeof(pointVertices), pointVertices, GL_STATIC_DRAW);
+				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, m_pointVerticesBufferId);
+				opengl.BufferData(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, sizeof(pointVertices), pointVertices, Graphic::OpenGLBufferUsageEnum::StaticDraw);
 
 				opengl.GenBuffers(1, &m_indexesBufferId);
-				opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexesBufferId);
-				opengl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexes), indexes, GL_STATIC_DRAW);
+				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, m_indexesBufferId);
+				opengl.BufferData(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, sizeof(indexes), indexes, Graphic::OpenGLBufferUsageEnum::StaticDraw);
 				
-				opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-				opengl.BindBuffer(GL_ARRAY_BUFFER, 0);
+				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, 0);
+				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, 0);
 
 				// plan index buffer
 				opengl.GenBuffers(1, &m_planIndexesBufferId);
-				opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_planIndexesBufferId);
-				opengl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(planIndexes), planIndexes, GL_STATIC_DRAW);
-				opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-				opengl.BindBuffer(GL_ARRAY_BUFFER, 0);
+				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, m_planIndexesBufferId);
+				opengl.BufferData(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, sizeof(planIndexes), planIndexes, Graphic::OpenGLBufferUsageEnum::StaticDraw);
+				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, 0);
+				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, 0);
 
 				// point index buffer
 				opengl.GenBuffers(1, &m_pointIndexesBufferId);
-				opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_pointIndexesBufferId);
-				opengl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(pointIndexes), pointIndexes, GL_STATIC_DRAW);
-				opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-				opengl.BindBuffer(GL_ARRAY_BUFFER, 0);
+				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, m_pointIndexesBufferId);
+				opengl.BufferData(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, sizeof(pointIndexes), pointIndexes, Graphic::OpenGLBufferUsageEnum::StaticDraw);
+				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, 0);
+				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, 0);
 
 				// on récupère les variables
 				m_uniformWorldViewProjMatrix = opengl.GetUniformLocation(m_programId, "WorldViewProjMatrix");
@@ -463,8 +463,8 @@ namespace Croissant
 				// render
 
 				// render plan
-				opengl.BindBuffer(GL_ARRAY_BUFFER, m_planVerticesBufferId);
-				opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_planIndexesBufferId);
+				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, m_planVerticesBufferId);
+				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, m_planIndexesBufferId);
 				opengl.EnableVertexAttribArray(0);
 				opengl.EnableVertexAttribArray(1);
 				// définition des constantes
@@ -481,13 +481,13 @@ namespace Croissant
 				opengl.DisableVertexAttribArray(0);
 				opengl.DisableVertexAttribArray(1);
 				// suppression du binding sur les buffers
-				opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-				opengl.BindBuffer(GL_ARRAY_BUFFER, 0);
+				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, 0);
+				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, 0);
 
 
 				//			// render cube
-				//			opengl.BindBuffer(GL_ARRAY_BUFFER, verticesBufferId);
-				//			opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexesBufferId);
+				//			opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, verticesBufferId);
+				//			opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, indexesBufferId);
 				//
 				//			opengl.EnableVertexAttribArray(0);
 				//			opengl.EnableVertexAttribArray(1);
@@ -507,15 +507,15 @@ namespace Croissant
 				//			opengl.DisableVertexAttribArray(0);
 				//			opengl.DisableVertexAttribArray(1);
 				//
-				//			opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-				//			opengl.BindBuffer(GL_ARRAY_BUFFER, 0);
+				//			opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, 0);
+				//			opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, 0);
 
 				////render point
 				//Croissant::Math::Quaternion quatPoint(Croissant::Math::Vector4{ 0.0f, 0.0f, 1.0f }, angleZ);
 				//rotation = quatPoint.ToMatrix();
 
-				//opengl.BindBuffer(GL_ARRAY_BUFFER, pointVerticesBufferId);
-				//opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, pointIndexesBufferId);
+				//opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, pointVerticesBufferId);
+				//opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, pointIndexesBufferId);
 				//opengl.EnableVertexAttribArray(0);
 				//opengl.EnableVertexAttribArray(1);
 				//// définition des constantes
@@ -529,8 +529,8 @@ namespace Croissant
 				//opengl.DisableVertexAttribArray(0);
 				//opengl.DisableVertexAttribArray(1);
 				//// suppression du binding sur les buffers
-				//opengl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-				//opengl.BindBuffer(GL_ARRAY_BUFFER, 0);
+				//opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, 0);
+				//opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, 0);
 
 
 				m_renderer.Render();

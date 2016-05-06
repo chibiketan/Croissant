@@ -223,6 +223,50 @@ namespace Croissant
 
 			MAX_ELEMENT = GeometryOutputType
 		};
+
+		enum class OpenGLBufferTargetEnum
+		{
+			ArrayBuffer = 0,			// GL_ARRAY_BUFFER
+			AtomicCounterBuffer,		// GL_ATOMIC_COUNTER_BUFFER
+			CopyReadBuffer,				// GL_COPY_READ_BUFFER
+			CopyWriteBuffer,			// GL_COPY_WRITE_BUFFER
+			DispatchIndirectBuffer,		// GL_DISPATCH_INDIRECT_BUFFER
+			DrawIndirectBuffer,			// GL_DRAW_INDIRECT_BUFFER
+			ElementArrayBuffer,			// GL_ELEMENT_ARRAY_BUFFER
+			PixelPackBuffer,			// GL_PIXEL_PACK_BUFFER
+			PixelUnpackBuffer,			// GL_PIXEL_UNPACK_BUFFER
+			QueryBuffer,				// GL_QUERY_BUFFER
+			ShaderStorageBuffer,		// GL_SHADER_STORAGE_BUFFER
+			TextureBuffer,				// GL_TEXTURE_BUFFER
+			TransformFeedbackBuffer,	// GL_TRANSFORM_FEEDBACK_BUFFER
+			UniformBuffer,				// GL_UNIFORM_BUFFER
+
+			MAX_ELEMENT = UniformBuffer
+		};
+
+		enum class OpenGLBufferUsageEnum
+		{
+			StreamDraw = 0,		// GL_STREAM_DRAW
+			StreamRead,			// GL_STREAM_READ
+			StreamCopy,			// GL_STREAM_COPY
+			StaticDraw,			// GL_STATIC_DRAW
+			StaticRead,			// GL_STATIC_READ
+			StaticCopy,			// GL_STATIC_COPY
+			DynamicDraw,		// GL_DYNAMIC_DRAW
+			DynamicRead,		// GL_DYNAMIC_READ
+			DynamicCopy,		// GL_DYNAMIC_COPY
+
+			MAX_ELEMENT = DynamicCopy
+		};
+	
+		enum class OpenGLMapBufferAccessEnum
+		{
+			ReadOnly = 0,	// GL_READ_ONLY
+			WriteOnly,		// GL_WRITE_ONLY
+			ReadWrite,		// GL_READ_WRITE
+
+			MAX_ELEMENT = ReadWrite
+		};
 	}
 }
 
