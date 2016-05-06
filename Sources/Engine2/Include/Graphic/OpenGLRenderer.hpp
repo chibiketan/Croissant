@@ -1,26 +1,25 @@
-/*
- * OpenGLRenderer.hpp
- *
- *  Created on: 1 sept. 2014
- *      Author: Gregory_Compte
- */
+#ifndef CROISSANT_ENGINE_GRAPHIC_OPENGLRENDERER_HPP_INC
+#  define CROISSANT_ENGINE_GRAPHIC_OPENGLRENDERER_HPP_INC
 
-#ifndef OPENGLRENDERER_HPP_INC
-#define OPENGLRENDERER_HPP_INC
-
-#include "Engine.hpp"
-#include "Graphic/OpenGLWrapper.hpp"
-#include "Graphic/OpenGLSystemInfo.hpp"
-#include "Core/LogManager.hpp"
-#include <memory>
-#include <string>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glext.h>
-#include <map>
+#  include "Engine.hpp"
+#  include "Core/Enums.hpp"
+#  include "Graphic/OpenGLWrapper.hpp"
+#  include "Graphic/OpenGLSystemInfo.hpp"
+#  include "Core/LogManager.hpp"
+#  include <memory>
+#  include <string>
+#  include <GL/gl.h>
+#  include <GL/glu.h>
+#  include <GL/glext.h>
+#  include <map>
 
 namespace Croissant
 {
+	namespace Core
+	{
+		class AbstractBuffer;
+	}
+
 	namespace Graphic
 	{
 		class Window;
@@ -70,6 +69,7 @@ namespace Croissant
 			/// <summary>Récupère un objet qui représente les informations sur le contexte OpenGL courant</summary>
 			OpenGLSystemInfo const& GetSystemInfo() const;
 			OpenGLWrapper const& GetOpenGLWrapper() const;
+			std::shared_ptr<Core::AbstractBuffer>	CreateBuffer(uint32_t size, Core::BufferTypeEnum type);
 
 		private:
 			void SetupPixelFormat(HDC hdc);
@@ -94,4 +94,4 @@ namespace Croissant
 }
 
 
-#endif /* OPENGLRENDERER_HPP_INC */
+#endif /* !CROISSANT_ENGINE_GRAPHIC_OPENGLRENDERER_HPP_INC */

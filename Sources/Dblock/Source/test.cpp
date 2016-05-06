@@ -21,6 +21,7 @@
 #include "Core/Node.hpp"
 #include "Graphic/WindowEventNone.hpp"
 #include "Math/Matrix.hpp"
+#include "Core/BufferAccessor.hpp"
 
 #define PI 3.14159265f
 
@@ -36,6 +37,7 @@
 #include <Math/Matrix4.hpp>
 #include "Math/Point4.hpp"
 #include <Graphic/Camera.hpp>
+#include <Core/IndexBuffer.hpp>
 
 using Clock = std::chrono::high_resolution_clock;
 using Time = Clock::time_point;
@@ -245,6 +247,7 @@ namespace Croissant
 				}
 
 				// TODO supprimer les shaders ?
+				
 
 
 				opengl.GenBuffers(1, &m_verticesBufferId);
@@ -267,11 +270,11 @@ namespace Croissant
 				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, 0);
 
 				// plan index buffer
-				opengl.GenBuffers(1, &m_planIndexesBufferId);
-				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, m_planIndexesBufferId);
-				opengl.BufferData(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, sizeof(planIndexes), planIndexes, Graphic::OpenGLBufferUsageEnum::StaticDraw);
-				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, 0);
-				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, 0);
+				m_planIndexBuffer = std::make_shared<Core::IndexBuffer>(m_renderer.CreateBuffer(sizeof(m_planIndexBuffer), Core::BufferTypeEnum::Index));
+				auto address = m_planIndexBuffer->Map(Core::BufferAccessEnum::Write);
+				memcpy(address, planIndexes, planIndexesSize);
+				m_planIndexBuffer->Unmap();
+				address = nullptr;
 
 				// point index buffer
 				opengl.GenBuffers(1, &m_pointIndexesBufferId);
@@ -464,7 +467,7 @@ namespace Croissant
 
 				// render plan
 				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, m_planVerticesBufferId);
-				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, m_planIndexesBufferId);
+				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, m_planIndexBuffer->GetBufferId());
 				opengl.EnableVertexAttribArray(0);
 				opengl.EnableVertexAttribArray(1);
 				// définition des constantes
@@ -548,7 +551,6 @@ namespace Croissant
 			uint32_t m_verticesBufferId;
 			uint32_t m_indexesBufferId;
 			uint32_t m_planVerticesBufferId;
-			uint32_t m_planIndexesBufferId;
 			uint32_t m_pointVerticesBufferId;
 			uint32_t m_pointIndexesBufferId;
 			int32_t m_uniformWorldViewProjMatrix;
@@ -557,6 +559,7 @@ namespace Croissant
 			int32_t m_uniformProjectionMatrix;
 			std::shared_ptr<Core::Node> m_camNode;
 			Croissant::Graphic::Camera m_cam;
+			std::shared_ptr<Core::IndexBuffer>	m_planIndexBuffer;
 		};
 	}
 }

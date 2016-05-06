@@ -1,10 +1,4 @@
 #include "..\..\Include\Graphic\OpenGLRenderer.hpp"
-/*
- * OpenGLRenderer.cpp
- *
- *  Created on: 3 sept. 2014
- *      Author: Gregory_Compte
- */
 // http://www.irit.fr/~Mathias.Paulin/M2IM/RenduTempsReel/VBO.html
 
 #include "Debug/MemoryManager.hpp"
@@ -12,6 +6,7 @@
 #include "Graphic/Window.hpp"
 #include "Core/LogManager.hpp"
 #include "Exception/CroissantException.hpp"
+#include "Graphic/OpenGLBuffer.hpp"
 #include <iostream>
 #include <chrono>
 
@@ -185,5 +180,23 @@ namespace Croissant
 			return m_wrapper;
 		}
 
+		std::shared_ptr<Core::AbstractBuffer> OpenGLRenderer::CreateBuffer(uint32_t size, Core::BufferTypeEnum type)
+		{
+			OpenGLBufferUsageEnum glUsage;
+			OpenGLBufferTargetEnum glAccess;
+
+			glUsage = OpenGLBufferUsageEnum::StaticDraw;
+
+			if (type == Core::BufferTypeEnum::Index)
+			{
+				glAccess = OpenGLBufferTargetEnum::ArrayBuffer;
+			}
+			else
+			{
+				glAccess = OpenGLBufferTargetEnum::ElementArrayBuffer;
+			}
+
+			return std::make_shared<Croissant::Graphic::OpenGLBuffer>(m_wrapper, size, glAccess, glUsage);
+		}
 	}
 }

@@ -13,6 +13,8 @@ namespace Croissant
 		{
 		public:
 			BufferAccessor(TBuffer& buffer, BufferAccessEnum access);
+			BufferAccessor(BufferAccessor const&) = delete;
+			BufferAccessor(BufferAccessor&&) = delete;
 			~BufferAccessor();
 			size_t	GetSize() const;
 			TData&	operator[](size_t index);

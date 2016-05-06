@@ -19,5 +19,10 @@ namespace Croissant
 		{
 			m_internalBuffer->Unmap();
 		}
+
+		uint32_t IndexBuffer::GetBufferId() const
+		{
+			return m_internalBuffer->GetBufferId();
+		}
 	}
 }

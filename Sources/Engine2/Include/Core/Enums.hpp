@@ -20,6 +20,12 @@ namespace Croissant
 
 			MAX_ELEMENT = ReadWrite
 		};
+
+		enum class BufferTypeEnum
+		{
+			Index,
+			Vertex
+		};
 	}
 }
 

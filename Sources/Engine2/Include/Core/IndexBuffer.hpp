@@ -18,10 +18,13 @@ namespace Croissant
 			IndexBuffer(std::shared_ptr<AbstractBuffer> internalBuffer);
 			void*	Map(BufferAccessEnum access) const;
 			void	Unmap() const;
+			uint32_t	GetBufferId() const;
 
 		private:
 			std::shared_ptr<AbstractBuffer> m_internalBuffer;
 		};
+
+
 	}
 }
 
