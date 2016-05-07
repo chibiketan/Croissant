@@ -27,6 +27,7 @@ croissant_files(${PROJECT_NAME} ${ENGINE_SOURCE}
 	Core/IndexBuffer.cpp
 	Core/LogManager.cpp
 	Core/Node.cpp
+	Core/VertexBuffer.cpp
 	Debug/MemoryManager.cpp
 	Exception/CroissantException.cpp
 	FileSystem/Directory.cpp
@@ -66,6 +67,9 @@ croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
 	Core/IndexBuffer.hpp
 	Core/LogManager.hpp
 	Core/Node.hpp
+	Core/VertexBuffer.hpp
+	Core/VertexBufferDescriptor.hpp
+	Core/VertexBufferDescriptor.inl
 	Debug/MemoryManager.hpp
 	Exception/CroissantException.hpp
 	FileSystem/Directory.hpp

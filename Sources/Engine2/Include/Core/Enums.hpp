@@ -26,6 +26,13 @@ namespace Croissant
 			Index,
 			Vertex
 		};
+	
+		enum class VertexComponentEnum
+		{
+			Position = 0,
+			Color,
+			MAX_ELEMENT = Color
+		};
 	}
 }
 
