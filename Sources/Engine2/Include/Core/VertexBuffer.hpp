@@ -15,6 +15,9 @@ namespace Croissant
 		{
 		public:
 			explicit VertexBuffer(VertexBufferDescriptor descriptor, uint32_t size, std::shared_ptr<AbstractBuffer> internalBuffer);
+			void*		Map(BufferAccessEnum access) const;
+			void		Unmap() const;
+			uint32_t	GetSize() const;
 
 		private:
 			VertexBufferDescriptor			m_descriptor;
@@ -24,4 +27,15 @@ namespace Croissant
 	}
 }
 
+namespace Croissant
+{
+	namespace Core
+	{
+		inline uint32_t VertexBuffer::GetSize() const
+		{
+			return m_size;
+		}
+
+	}
+}
 #endif

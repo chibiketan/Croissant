@@ -10,5 +10,14 @@ namespace Croissant
 		{
 		}
 
+		void* VertexBuffer::Map(BufferAccessEnum access) const
+		{
+			return m_internalBuffer->Map(access);
+		}
+
+		void VertexBuffer::Unmap() const
+		{
+			m_internalBuffer->Unmap();
+		}
 	}
 }
