@@ -17,14 +17,15 @@ namespace Croissant
 			class DescriptorElement final
 			{
 			public:
+				friend VertexBufferDescriptor;
+
 				DescriptorElement();
 				DescriptorElement(DescriptorElement const&) = default;
-				DescriptorElement(DescriptorElement&&) = default;
+				DescriptorElement(DescriptorElement&&) = delete;
+				DescriptorElement&	operator=(DescriptorElement const&) = default;
 				bool		IsActive() const;
 				uint32_t	GetOffset() const;
 				uint32_t	GetSize() const;
-				void		Deactivate();
-				void		Activate(uint32_t offset, uint32_t size);
 
 			private:
 				bool		m_isActive;
@@ -36,6 +37,8 @@ namespace Croissant
 			VertexBufferDescriptor(VertexBufferDescriptor const&) = default;
 			VertexBufferDescriptor(VertexBufferDescriptor&&) = default;
 			DescriptorElement const&	GetDescriptor(VertexComponentEnum component);
+			void						Deactivate(VertexComponentEnum component);
+			void						Activate(VertexComponentEnum component, uint32_t offset, uint32_t size);
 
 		private:
 			std::array<DescriptorElement, CAST(VertexComponentEnum::MAX_ELEMENT) + 1>	m_elements;

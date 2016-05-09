@@ -1,5 +1,6 @@
 #include "Core/Node.hpp"
 #include "Math/Math.hpp"
+#include "Core/Mesh.hpp"
 #include <string>
 #include <algorithm>
 
@@ -10,7 +11,7 @@ namespace Croissant
 		Node::Node()
 			: m_name { Node::GenerateName() }, m_parent { nullptr }, m_children(5),
 			m_rotation{ Math::Vector4::Zero, 1}, m_translation { Math::Vector4::Zero },
-			m_onUpdateListeners{},
+			m_meshes {}, m_onUpdateListeners{},
 			m_needUpdate{ false }
 		{
 		}
@@ -108,6 +109,16 @@ namespace Croissant
 			}
 
 			Update(false);
+		}
+
+		void Node::AddMesh(std::shared_ptr<Mesh> mesh)
+		{
+			m_meshes.push_back(mesh);
+		}
+
+		std::vector<std::shared_ptr<Mesh>> const& Node::GetMeshes() const
+		{
+			return m_meshes;
 		}
 	}
 }

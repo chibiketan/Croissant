@@ -16,6 +16,7 @@ namespace Croissant
 
 	namespace Core
 	{
+		class Mesh;
 		class ENGINE_API Node
 		{
 		public:
@@ -29,7 +30,10 @@ namespace Croissant
 			Math::Matrix4f const&		GetModelToWorldMatrix() const;
 			inline Math::Vector4 const&	GetTranslation() const;
 			void						Update() const;
-			inline Math::Quaternion const&	GetRotation() const;
+			inline Math::Quaternion const&				GetRotation() const;
+			void										AddMesh(std::shared_ptr<Mesh> mesh);
+			std::vector<std::shared_ptr<Mesh>> const&	GetMeshes() const;
+		
 		private:
 			static std::string			GenerateName();
 			void						PreUpdate() const;
@@ -43,6 +47,7 @@ namespace Croissant
 			std::vector<std::unique_ptr<Node>>		m_children;
 			Math::Quaternion						m_rotation;
 			Math::Vector4							m_translation;
+			std::vector<std::shared_ptr<Mesh>>		m_meshes;
 			mutable bool							m_needUpdate;
 			mutable std::list<OnUpdateCallback*>	m_onUpdateListeners;
 			mutable Math::Matrix4f					m_modelToWorldMatrix;

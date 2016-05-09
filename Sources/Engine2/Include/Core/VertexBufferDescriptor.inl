@@ -17,6 +17,24 @@ namespace Croissant
 			return m_elements[CAST(component)];
 		}
 
+		inline void VertexBufferDescriptor::Deactivate(VertexComponentEnum component)
+		{
+			auto& descriptor = m_elements[CAST(component)];
+
+			descriptor.m_isActive = false;
+			descriptor.m_offset = 0;
+			descriptor.m_size = 0;
+		}
+
+		inline void VertexBufferDescriptor::Activate(VertexComponentEnum component, uint32_t offset, uint32_t size)
+		{
+			auto& descriptor = m_elements[CAST(component)];
+
+			descriptor.m_isActive = true;
+			descriptor.m_offset = offset;
+			descriptor.m_size = size;
+		}
+
 		// ------------------------------------------------- implémentation DescriptorElement
 		inline VertexBufferDescriptor::DescriptorElement::DescriptorElement()
 			: m_isActive { false }, m_offset { 0 }, m_size { 0 }
@@ -36,20 +54,6 @@ namespace Croissant
 		inline uint32_t VertexBufferDescriptor::DescriptorElement::GetSize() const
 		{
 			return m_size;
-		}
-
-		inline void VertexBufferDescriptor::DescriptorElement::Deactivate()
-		{
-			m_isActive = false;
-			m_offset = 0;
-			m_size = 0;
-		}
-
-		inline void VertexBufferDescriptor::DescriptorElement::Activate(uint32_t offset, uint32_t size)
-		{
-			m_isActive = true;
-			m_offset = offset;
-			m_size = size;
 		}
 	}
 }

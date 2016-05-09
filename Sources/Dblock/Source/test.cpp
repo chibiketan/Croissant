@@ -22,6 +22,7 @@
 #include "Graphic/WindowEventNone.hpp"
 #include "Math/Matrix.hpp"
 #include "Core/BufferAccessor.hpp"
+#include "Core/VertexBuffer.hpp"
 
 #define PI 3.14159265f
 
@@ -38,6 +39,7 @@
 #include "Math/Point4.hpp"
 #include <Graphic/Camera.hpp>
 #include <Core/IndexBuffer.hpp>
+#include <Core/Mesh.hpp>
 
 using Clock = std::chrono::high_resolution_clock;
 using Time = Clock::time_point;
@@ -48,6 +50,12 @@ struct vertexProp
 {
 	float m_coord[3];
 	uint8_t m_color[3];
+};
+
+struct vertexProp2
+{
+	Croissant::Math::Point4			Position;
+	Croissant::Math::Tuple<uint8_t, 4>	Color;
 };
 
 #define BUFFER_OFFSET(val) reinterpret_cast<void*>(val)
@@ -154,6 +162,20 @@ auto planIndexesSize = sizeof(planIndexes);
 auto pointIndexesSize = sizeof(pointIndexes);
 
 
+// By "Jesse Good" from SO:
+// http://stackoverflow.com/questions/12811330/c-compile-time-offsetof-inside-a-template?answertab=votes#tab-top
+
+template <typename T, typename M> T GetClassType(M T::*);
+template <typename T, typename M> M GetMemberType(M T::*);
+
+template <typename T, typename R, R T::*M>
+constexpr size_t OffsetOf()
+{
+	return reinterpret_cast<size_t>(&((static_cast<T*>(0))->*M));
+}
+
+#define CROISSANT_OFFSET_OF(type, member) OffsetOf<decltype(GetClassType(&type::member)), decltype(GetMemberType(&type::member)), &type::member>()
+
 namespace Croissant
 {
 	namespace DBlock
@@ -236,7 +258,7 @@ namespace Croissant
 
 					if (log.empty())
 					{
-						m_log.Write("Une erreur est survenue lors de l'�tape de linkage du programme.");
+						m_log.Write("Une erreur est survenue lors de l'<étape de linkage du programme.");
 					}
 					else
 					{
@@ -246,8 +268,51 @@ namespace Croissant
 					return false;
 				}
 
-				// TODO supprimer les shaders ?
+				// TODO supprimer les shaders 
+
+				auto planNode = std::make_shared<Core::Node>();
+				// plan index buffer
+				m_planIndexBuffer = std::make_shared<Core::IndexBuffer>(m_renderer.CreateBuffer(sizeof(planIndexes), Core::BufferTypeEnum::Index));
+				auto address = m_planIndexBuffer->Map(Core::BufferAccessEnum::Write);
+				memcpy(address, planIndexes, planIndexesSize);
+				m_planIndexBuffer->Unmap();
+				address = nullptr;
+
+				// plan vertex buffer descriptor
+				Core::VertexBufferDescriptor planVertexDescriptor{};
+
+				planVertexDescriptor.Activate(Core::VertexComponentEnum::Position, CROISSANT_OFFSET_OF(vertexProp2, Position), sizeof(vertexProp2::Position));
+				planVertexDescriptor.Activate(Core::VertexComponentEnum::Color, CROISSANT_OFFSET_OF(vertexProp2, Color), sizeof(vertexProp2::Color));
+
+				auto planVertexBuffer = std::make_shared<Core::VertexBuffer>(planVertexDescriptor, sizeof(planVertices), m_renderer.CreateBuffer(sizeof(planVertices), Core::BufferTypeEnum::Vertex));
+				{
+					Core::BufferAccessor<Core::VertexBuffer, vertexProp2> accessor{ *planVertexBuffer, Core::BufferAccessEnum::Write };
+					auto maxElement = accessor.GetSize();
+					for (size_t i = 0; i < maxElement; ++i)
+					{
+						auto& vertex = accessor[i];
+						auto& pos = planVertices[i].m_coord;
+						auto& col = planVertices[i].m_color;
+						
+						vertex.Position.X() = pos[0];
+						vertex.Position.Y() = pos[1];
+						vertex.Position.Z() = pos[2];
+						vertex.Color.X(col[0]);
+						vertex.Color.Y(col[1]);
+						vertex.Color.Z(col[2]);
+						vertex.Color.W(1);
+					}
+				}
+
+				auto planMesh = std::make_shared<Core::Mesh>(planVertexBuffer, m_planIndexBuffer);
+				planNode->AddMesh(planMesh);
+
+
 				
+				//descriptor.Activate(reinterpret_cast<size_t>(&((static_cast<vertexProp*>(0))->*m_coord)), sizeof(vertexProp::m_coord));
+
+				// plan vertex buffer
+
 
 
 				opengl.GenBuffers(1, &m_verticesBufferId);
@@ -269,12 +334,6 @@ namespace Croissant
 				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, 0);
 				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, 0);
 
-				// plan index buffer
-				m_planIndexBuffer = std::make_shared<Core::IndexBuffer>(m_renderer.CreateBuffer(sizeof(m_planIndexBuffer), Core::BufferTypeEnum::Index));
-				auto address = m_planIndexBuffer->Map(Core::BufferAccessEnum::Write);
-				memcpy(address, planIndexes, planIndexesSize);
-				m_planIndexBuffer->Unmap();
-				address = nullptr;
 
 				// point index buffer
 				opengl.GenBuffers(1, &m_pointIndexesBufferId);

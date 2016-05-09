@@ -26,6 +26,7 @@ croissant_files(${PROJECT_NAME} ${ENGINE_SOURCE}
 	Core/Application.cpp
 	Core/IndexBuffer.cpp
 	Core/LogManager.cpp
+	Core/Mesh.cpp
 	Core/Node.cpp
 	Core/VertexBuffer.cpp
 	Debug/MemoryManager.cpp
@@ -66,6 +67,7 @@ croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
 	Core/Enums.hpp
 	Core/IndexBuffer.hpp
 	Core/LogManager.hpp
+	Core/Mesh.hpp
 	Core/Node.hpp
 	Core/VertexBuffer.hpp
 	Core/VertexBufferDescriptor.hpp
