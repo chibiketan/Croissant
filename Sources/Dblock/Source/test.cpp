@@ -307,7 +307,7 @@ namespace Croissant
 				auto planMesh = std::make_shared<Core::Mesh>(planVertexBuffer, m_planIndexBuffer);
 				planNode->AddMesh(planMesh);
 
-
+				m_rootNode = planNode;
 				
 				//descriptor.Activate(reinterpret_cast<size_t>(&((static_cast<vertexProp*>(0))->*m_coord)), sizeof(vertexProp::m_coord));
 
@@ -350,12 +350,12 @@ namespace Croissant
 
 				// initialisation de la caméra
 				m_camNode = std::make_shared<Core::Node>();
-				m_cam.SetNode(m_camNode);
+				m_cam->SetNode(m_camNode);
 
-				m_cam.SetFieldOfViewDegree(90.0f);
-				m_cam.SetAspectRatio(static_cast<float>(m_win.Width()) / static_cast<float>(m_win.Height()));
-				m_cam.SetNearDistance(1.0f);
-				m_cam.SetFarDistance(1000.0f);
+				m_cam->SetFieldOfViewDegree(90.0f);
+				m_cam->SetAspectRatio(static_cast<float>(m_win.Width()) / static_cast<float>(m_win.Height()));
+				m_cam->SetNearDistance(1.0f);
+				m_cam->SetFarDistance(1000.0f);
 				m_camNode->Move(Croissant::Math::Vector4::UnitZ * -5);
 
 				Core::WriteTraceDebug("Fin de OnInitialize");
@@ -484,32 +484,32 @@ namespace Croissant
 				if (m_keys.Up)
 				{
 					// up first if up and down simultaneously set
-					m_camNode->Move(m_cam.GetLookDirection() * secondSincePrevFrame.count());
+					m_camNode->Move(m_cam->GetLookDirection() * secondSincePrevFrame.count());
 				}
 				else if (m_keys.Down)
 				{
-					m_camNode->Move(-m_cam.GetLookDirection() * secondSincePrevFrame.count());
+					m_camNode->Move(-m_cam->GetLookDirection() * secondSincePrevFrame.count());
 				}
 
 				if (m_keys.Right)
 				{
 					// up first if up and down simultaneously set
-					m_camNode->Move(m_cam.GetRightDirection() * secondSincePrevFrame.count());
+					m_camNode->Move(m_cam->GetRightDirection() * secondSincePrevFrame.count());
 				}
 				else if (m_keys.Left)
 				{
-					m_camNode->Move(-m_cam.GetRightDirection() * secondSincePrevFrame.count());
+					m_camNode->Move(-m_cam->GetRightDirection() * secondSincePrevFrame.count());
 				}
 
 				if (m_keys.PageUp)
 				{
 					// up first if up and down simultaneously set
-					m_camNode->Move(-m_cam.GetUpDirection() * secondSincePrevFrame.count());
+					m_camNode->Move(-m_cam->GetUpDirection() * secondSincePrevFrame.count());
 					///cam.Move(cam.UpVector() *  secondSincePrevFrame.count());
 				}
 				else if (m_keys.PageDown)
 				{
-					m_camNode->Move(m_cam.GetUpDirection() * secondSincePrevFrame.count());
+					m_camNode->Move(m_cam->GetUpDirection() * secondSincePrevFrame.count());
 				}
 
 				// force matrix update
@@ -531,8 +531,8 @@ namespace Croissant
 				opengl.EnableVertexAttribArray(1);
 				// définition des constantes
 				//opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, true, cam.GetProjectionViewMatrix());
-				opengl.SetUniformMatrix4f(m_uniformViewMatrix, 1, true, m_cam.GetViewMatrix());
-				opengl.SetUniformMatrix4f(m_uniformProjectionMatrix, 1, true, m_cam.GetProjectionMatrix());
+				opengl.SetUniformMatrix4f(m_uniformViewMatrix, 1, true, m_cam->GetViewMatrix());
+				opengl.SetUniformMatrix4f(m_uniformProjectionMatrix, 1, true, m_cam->GetProjectionMatrix());
 				// définition des attributs des vertex
 				opengl.VertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vertexProp), nullptr);
 				opengl.VertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, true, sizeof(vertexProp), BUFFER_OFFSET(sizeof(planVertices[0].m_coord)));
@@ -595,7 +595,7 @@ namespace Croissant
 				//opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, 0);
 
 
-				m_renderer.Render();
+				m_renderer.Render(m_cam, m_rootNode);
 				return true;
 			}
 
@@ -617,7 +617,8 @@ namespace Croissant
 			int32_t m_uniformViewMatrix;
 			int32_t m_uniformProjectionMatrix;
 			std::shared_ptr<Core::Node> m_camNode;
-			Croissant::Graphic::Camera m_cam;
+			std::shared_ptr<Graphic::Camera> m_cam;
+			std::shared_ptr<Core::Node>	m_rootNode;
 			std::shared_ptr<Core::IndexBuffer>	m_planIndexBuffer;
 		};
 	}

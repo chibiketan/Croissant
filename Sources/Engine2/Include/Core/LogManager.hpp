@@ -89,7 +89,7 @@ namespace Croissant
 		};
 
 #  if defined(CROISSANT_HAS_TRACE)
-		inline void WriteTrace(std::string const& lvl, std::string const& msg)
+		inline void WriteTrace(std::string const& , std::string const& msg)
 		{
 			LogManager::GetLog("Trace", false).Write(msg);
 		}
@@ -122,23 +122,23 @@ namespace Croissant
 #    endif
 		}
 #  else // !defined(CROISSANT_HAS_TRACE)
-		inline void WriteTrace(std::string const& lvl, std::string const& msg)
+		inline void WriteTrace(std::string const& , std::string const& )
 		{
 		}
 
-		inline void WriteTraceDebug(std::string const& msg)
+		inline void WriteTraceDebug(std::string const& )
 		{
 		}
 
-		inline void WriteTraceInfo(std::string const& msg)
+		inline void WriteTraceInfo(std::string const& )
 		{
 		}
 
-		inline void WriteTraceWarn(std::string const& msg)
+		inline void WriteTraceWarn(std::string const& )
 		{
 		}
 
-		inline void WriteTraceError(std::string const& msg)
+		inline void WriteTraceError(std::string const& )
 		{
 		}
 #  endif

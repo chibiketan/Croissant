@@ -21,11 +21,12 @@ namespace Croissant
 
 				DescriptorElement();
 				DescriptorElement(DescriptorElement const&) = default;
-				DescriptorElement(DescriptorElement&&) = delete;
+				DescriptorElement(DescriptorElement&&) noexcept = delete;
 				DescriptorElement&	operator=(DescriptorElement const&) = default;
 				bool		IsActive() const;
 				uint32_t	GetOffset() const;
 				uint32_t	GetSize() const;
+				bool		operator==(DescriptorElement const& right) const;
 
 			private:
 				bool		m_isActive;
@@ -36,6 +37,9 @@ namespace Croissant
 			VertexBufferDescriptor();
 			VertexBufferDescriptor(VertexBufferDescriptor const&) = default;
 			VertexBufferDescriptor(VertexBufferDescriptor&&) = default;
+			VertexBufferDescriptor&	operator=(VertexBufferDescriptor const&) = default;
+			VertexBufferDescriptor&	operator=(VertexBufferDescriptor&&) noexcept = default;
+			bool					operator==(VertexBufferDescriptor const& right) const;
 			DescriptorElement const&	GetDescriptor(VertexComponentEnum component);
 			void						Deactivate(VertexComponentEnum component);
 			void						Activate(VertexComponentEnum component, uint32_t offset, uint32_t size);

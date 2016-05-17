@@ -6,6 +6,7 @@
 #  include "Graphic/OpenGLWrapper.hpp"
 #  include "Graphic/OpenGLSystemInfo.hpp"
 #  include "Core/LogManager.hpp"
+#  include "Core/VertexBufferDescriptor.hpp"
 #  include <memory>
 #  include <string>
 #  include <GL/gl.h>
@@ -17,11 +18,14 @@ namespace Croissant
 {
 	namespace Core
 	{
+		class VertexBuffer;
+		class Node;
 		class AbstractBuffer;
 	}
 
 	namespace Graphic
 	{
+		class Camera;
 		class Window;
 		class OpenGLRenderer;
 		class OpenGLSystemInfo;
@@ -59,13 +63,11 @@ namespace Croissant
 
 		class ENGINE_API OpenGLRenderer
 		{
-			friend class OpenGLBuffer;
-			friend class OpenGLBufferBinding;
-			friend class OpenGLBufferMapping;
 		public:
 			OpenGLRenderer(Window& window);
 			~OpenGLRenderer();
-			void Render();
+			/// <summary>Fait le rendu d'un noeud par rapport à une caméra</summary>
+			void Render(std::shared_ptr<Camera> camera, std::shared_ptr<Core::Node> node);
 			/// <summary>Récupère un objet qui représente les informations sur le contexte OpenGL courant</summary>
 			OpenGLSystemInfo const& GetSystemInfo() const;
 			OpenGLWrapper const& GetOpenGLWrapper() const;
@@ -75,11 +77,17 @@ namespace Croissant
 			void SetupPixelFormat(HDC hdc);
 			void InitializeGL(GLsizei width, GLsizei height);
 			void InitializeGLExtentions();
+			void UpdateCamera(std::shared_ptr<Camera> camera);
+			void UpdateMatrixes();
+			void UpdateVertexDescription(std::shared_ptr<Core::VertexBuffer> vertexBuffer);
 
 			OpenGLWrapper m_wrapper;
 			OpenGLSystemInfo m_systemInfo;
 			Window& m_window;
 			Core::LogManager::Log m_logManager;
+			std::shared_ptr<Camera>	m_camera;
+			Core::VertexBufferDescriptor	m_vertexDescriptor;
+			uint32_t						m_vertexBufferId;
 #if defined(CROISSANT_WINDOWS)
 			HDC m_ghDC;
 			HGLRC m_contextGl;

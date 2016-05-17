@@ -7,9 +7,10 @@
 #include "Core/LogManager.hpp"
 #include "Exception/CroissantException.hpp"
 #include "Graphic/OpenGLBuffer.hpp"
+#include "Graphic/Camera.hpp"
 #include <iostream>
 #include <chrono>
-
+#include <Core/VertexBuffer.hpp>
 
 
 #define BLACK_INDEX     0
@@ -165,8 +166,63 @@ namespace Croissant
 
 		}
 
-		void OpenGLRenderer::Render()
+		void OpenGLRenderer::UpdateCamera(std::shared_ptr<Camera> camera)
 		{
+			if (m_camera == camera)
+			{
+				// no camera change, nothing to do
+				return;
+			}
+
+			// TODO : unregister to camera updates from old camera
+
+			m_camera = camera;
+
+			// TODO : register to camera updates
+			// TODO : Update view/projection matrixes
+		}
+
+		void OpenGLRenderer::UpdateMatrixes()
+		{
+			if (nullptr == m_camera)
+			{
+				Core::WriteTraceWarn("Méthode UpdateMatrixes() appellée sans caméra");
+				return;
+			}
+		}
+
+		void OpenGLRenderer::UpdateVertexDescription(std::shared_ptr<Core::VertexBuffer> vertexBuffer)
+		{
+			if (vertexBuffer->GetDescriptor() == m_vertexDescriptor)
+			{
+				// pas de mise à jour des composant du prochain Vertex
+				return;
+			}
+
+			m_vertexDescriptor = vertexBuffer->GetDescriptor();
+			// TODO : 
+		}
+
+		void OpenGLRenderer::Render(std::shared_ptr<Camera> camera, std::shared_ptr<Core::Node> node)
+		{
+			if (nullptr == camera)
+			{
+				Core::WriteTraceError("Appel de la méthode Render() sans valeur pour la caméra");
+				return;
+			}
+
+			UpdateCamera(camera);
+			UpdateMatrixes();
+			for (auto& mesh : node->GetMeshes())
+			{
+
+			}
+			// TODO : render complete graph ?
+			// TODO : define vertex elements
+			// TODO : render
+
+
+			// TODO : SWAPBUFFER devrait être dans la classe Window et pas dans le renderer
 		    SWAPBUFFERS;
 		}
 

@@ -12,6 +12,11 @@ namespace Croissant
 		{
 		}
 
+		inline bool VertexBufferDescriptor::operator==(VertexBufferDescriptor const& right) const
+		{
+			return m_elements == right.m_elements;
+		}
+
 		inline VertexBufferDescriptor::DescriptorElement const& VertexBufferDescriptor::GetDescriptor(VertexComponentEnum component)
 		{
 			return m_elements[CAST(component)];
@@ -55,6 +60,12 @@ namespace Croissant
 		{
 			return m_size;
 		}
+
+		inline bool VertexBufferDescriptor::DescriptorElement::operator==(DescriptorElement const& right) const
+		{
+			return ::memcmp(this, &right, sizeof(right)) == 0;
+		}
+
 	}
 }
 

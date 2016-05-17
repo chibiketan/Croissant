@@ -18,6 +18,7 @@ namespace Croissant
 			void*		Map(BufferAccessEnum access) const;
 			void		Unmap() const;
 			uint32_t	GetSize() const;
+			VertexBufferDescriptor const&	GetDescriptor() const;
 
 		private:
 			VertexBufferDescriptor			m_descriptor;
@@ -34,6 +35,11 @@ namespace Croissant
 		inline uint32_t VertexBuffer::GetSize() const
 		{
 			return m_size;
+		}
+
+		inline VertexBufferDescriptor const& VertexBuffer::GetDescriptor() const
+		{
+			return m_descriptor;
 		}
 
 	}
