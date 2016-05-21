@@ -14,7 +14,7 @@ namespace Croissant
 		class ENGINE_API File final
 		{
 		public:
-			File(const std::string& path);
+			explicit File(const std::string& path);
 			File(const std::string& path, const Directory& parent);
 			File(const File& ) = delete;
 			File(File&&) noexcept = default;
@@ -30,10 +30,9 @@ namespace Croissant
 			File& operator=(File &&) noexcept = default;
 
 		private:
-			std::string m_fullPath;
-			std::string m_name;
-			std::string m_extension;
-			bool m_exist;
+			class Pimpl;
+
+			Pimpl* m_pimpl;
 		};
 	}
 }

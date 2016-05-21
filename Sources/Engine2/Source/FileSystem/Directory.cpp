@@ -32,6 +32,16 @@ namespace Croissant
 {
 	namespace FileSystem
 	{
+		class Directory::Pimpl
+		{
+		public:
+			Pimpl() : m_fullPath{}, m_name{}, m_exist{ false } {}
+			Pimpl(Pimpl const& right) = default;
+			std::string m_fullPath;
+			std::string m_name;
+			bool m_exist;
+		};
+
 		namespace
 		{
 			std::string GetUpFolder(const std::string& path)
@@ -122,12 +132,13 @@ namespace Croissant
 		}
 		// --------------------------------------------------- implémentation de Directory
 		Directory::Directory(DEFAULT_DIRECTORY mode)
+			: m_pimpl { CROISSANT_NEW Pimpl{} }
 		{
 			if (DEFAULT_DIRECTORY::CURRENT_DIRECTORY == mode)
 			{
 				char* path = GetWorkingDirectory();
 
-				m_fullPath = path;
+				m_pimpl->m_fullPath = path;
 				free(path);
 			}
 			else if (DEFAULT_DIRECTORY::PROGRAM_DIRECTORY == mode)
@@ -135,13 +146,13 @@ namespace Croissant
 				char fullPath[MAX_PATH];
 
 				GetProgramPath(fullPath);
-				m_fullPath = GetUpFolder(fullPath);
+				m_pimpl->m_fullPath = GetUpFolder(fullPath);
 				TRACE("Création d'un objet pour le dossier contenant l'application : ");
 				TRACE(fullPath);
-				TRACE(m_fullPath.c_str());
+				TRACE(m_pimpl->m_fullPath.c_str());
 			}
 
-			m_name = GetName(m_fullPath);
+			m_pimpl->m_name = GetName(m_pimpl->m_fullPath);
 			Refresh();
 		}
 
@@ -150,61 +161,72 @@ namespace Croissant
 		{
 		}
 
+		Directory::Directory(Directory& source)
+		{
+			m_pimpl = CROISSANT_NEW Pimpl{ *(source.m_pimpl) };
+		}
+
 		Directory::Directory(std::string const& path, bool needParent)
-			: m_fullPath { "" }, m_name { "" }, m_exist { false }
+			: m_pimpl { CROISSANT_NEW Pimpl{} }
 		{
 			if (needParent)
 			{
-				m_fullPath = GetUpFolder(path);
+				m_pimpl->m_fullPath = GetUpFolder(path);
 			}
 			else
 			{
-				m_fullPath = RTrimSeparator(NormalizePath(path));
+				m_pimpl->m_fullPath = RTrimSeparator(NormalizePath(path));
 			}
 
-			m_name = GetName(m_fullPath);
+			m_pimpl->m_name = GetName(m_pimpl->m_fullPath);
 			Refresh();
+		}
+
+		Directory::~Directory()
+		{
+			CROISSANT_DELETE(m_pimpl);
+			m_pimpl = nullptr;
 		}
 
 		std::string const& Directory::FullPath() const
 		{
-			return m_fullPath;
+			return m_pimpl->m_fullPath;
 		}
 
 		std::string const& Directory::Name() const
 		{
-			return m_name;
+			return m_pimpl->m_name;
 		}
 
 		bool Directory::Exist() const
 		{
-			return m_exist;
+			return m_pimpl->m_exist;
 		}
 
 		void Directory::Refresh()
 		{
-			m_exist = CheckDirectoryExistence(m_fullPath);
+			m_pimpl->m_exist = CheckDirectoryExistence(m_pimpl->m_fullPath);
 		}
 
 		Directory Directory::Parent() const
 		{
-			return Directory(m_fullPath, true);
+			return Directory(m_pimpl->m_fullPath, true);
 		}
 
 		bool Directory::operator==(Directory const& source) const
 		{
-			return m_fullPath == source.m_fullPath;
+			return m_pimpl->m_fullPath == source.m_pimpl->m_fullPath;
 		}
 
 		Directory::Filelist Directory::Search(std::string const& pattern) const
 		{
 			Filelist result;
 			std::string fileName;
-			auto handle = InitializeSearch(m_fullPath, pattern);
+			auto handle = InitializeSearch(m_pimpl->m_fullPath, pattern);
 
 			while (NextSearch(handle, fileName))
 			{
-				result.emplace_back(m_fullPath + PATH_SEPARATOR + fileName);
+				result.emplace_back(m_pimpl->m_fullPath + PATH_SEPARATOR + fileName);
 			}
 
 			CloseSearch(handle);
@@ -213,14 +235,14 @@ namespace Croissant
 
 		Directory Directory::Child( std::string const& name ) const
 		{
-			return Directory(m_fullPath + PATH_SEPARATOR + name);
+			return Directory(m_pimpl->m_fullPath + PATH_SEPARATOR + name);
 		}
 
 		bool Directory::Create( bool createParent )
 		{
 			TRACE("Début création de dossier pour ");
 			TRACE(FullPath().c_str());
-			if (m_exist)
+			if (m_pimpl->m_exist)
 			{
 				TRACE("dossier existe");
 				return false;

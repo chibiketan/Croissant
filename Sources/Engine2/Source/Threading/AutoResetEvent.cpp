@@ -53,12 +53,14 @@ namespace Croissant
 		// ---------------------------------------- AutoResetEvent
 
 		AutoResetEvent::AutoResetEvent()
-			: m_pimpl { new Pimpl{} }
+			: m_pimpl { CROISSANT_NEW Pimpl{} }
 		{
 		}
 
 		AutoResetEvent::~AutoResetEvent()
 		{
+			CROISSANT_DELETE(m_pimpl);
+			m_pimpl = nullptr;
 		}
 
 		void AutoResetEvent::Wait()

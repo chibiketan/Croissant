@@ -21,7 +21,7 @@ option(CROISSANT_USE_TRACE "Enable trace support into croissant" ON)
 #option(CROISSANT_TRACE_LEVEL "Trace level in Croissant" 3)
 option(CROISSANT_MEMORY_DEBUG "Enable memory debug implementation into croissant" ON)
 option(CROISSANT_OPENGL_ERROR_THROW "Enable OpenGL call to throw when glGetError return error code" ON)
-option(CROISSANT_SHARED_LIB "Enable compile croissant into shared lib" OFF)
+option(CROISSANT_SHARED_LIB "Enable compile croissant into shared lib" ON)
 
 # set the build type to use
 if (NOT CROISSANT_TRACE_LEVEL)
@@ -29,6 +29,11 @@ if (NOT CROISSANT_TRACE_LEVEL)
 endif()
 set_property(CACHE CROISSANT_TRACE_LEVEL PROPERTY STRINGS 0 1 2 3)
 
+
+if (CROISSANT_SHARED_LIB)
+	set( BUILD_SHARED_LIBS ON CACHE BOOL "Always build shared libs" )
+	set( gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll" )
+endif()
 
 
 
@@ -327,25 +332,25 @@ project(CROISSANT C CXX)
 
 croissant_setup()
 
-if (MSVC)
-	# For MSVC, CMake sets certain flags to defaults we want to override.
-	# This replacement code is taken from sample in the CMake Wiki at
-	# http://www.cmake.org/Wiki/CMake_FAQ#Dynamic_Replace.
-	foreach (flag_var
-			 CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-			 CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-		if (NOT CROISSANT_SHARED_LIB)
-			# When Google Test is built as a shared library, it should also use
-			# shared runtime libraries.  Otherwise, it may end up with multiple
-			# copies of runtime library data in different modules, resulting in
-			# hard-to-find crashes. When it is built as a static library, it is
-			# preferable to use CRT as static libraries, as we don't have to rely
-			# on CRT DLLs being available. CMake always defaults to using shared
-			# CRT libraries, so we override that default here.
-			string(REPLACE "/MD" "-MT" ${flag_var} "${${flag_var}}")
-		endif()
-	endforeach()
-endif()
+#if (MSVC)
+#	# For MSVC, CMake sets certain flags to defaults we want to override.
+#	# This replacement code is taken from sample in the CMake Wiki at
+#	# http://www.cmake.org/Wiki/CMake_FAQ#Dynamic_Replace.
+#	foreach (flag_var
+#			 CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+#			 CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+#		if (NOT CROISSANT_SHARED_LIB)
+#			# When Google Test is built as a shared library, it should also use
+#			# shared runtime libraries.  Otherwise, it may end up with multiple
+#			# copies of runtime library data in different modules, resulting in
+#			# hard-to-find crashes. When it is built as a static library, it is
+#			# preferable to use CRT as static libraries, as we don't have to rely
+#			# on CRT DLLs being available. CMake always defaults to using shared
+#			# CRT libraries, so we override that default here.
+#			string(REPLACE "/MD" "-MT" ${flag_var} "${${flag_var}}")
+#		endif()
+#	endforeach()
+#endif()
 
 
 

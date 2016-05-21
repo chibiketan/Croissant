@@ -15,13 +15,17 @@ namespace Croissant
 		class ENGINE_API IndexBuffer final
 		{
 		public:
-			IndexBuffer(std::shared_ptr<AbstractBuffer> internalBuffer);
+			explicit IndexBuffer(std::shared_ptr<AbstractBuffer> internalBuffer);
+			IndexBuffer(IndexBuffer const&) = delete;
+			~IndexBuffer();
 			void*	Map(BufferAccessEnum access) const;
 			void	Unmap() const;
 			uint32_t	GetBufferId() const;
 
 		private:
-			std::shared_ptr<AbstractBuffer> m_internalBuffer;
+			class Pimpl;
+
+			Pimpl*	m_pimpl;
 		};
 
 

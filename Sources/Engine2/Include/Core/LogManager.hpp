@@ -32,31 +32,29 @@ namespace Croissant
 
 		private:
 			class LogFile;
+			class Pimpl;
 			static int ThreadEntry();
 
-			static bool m_run ;
-			static bool m_init;
-			static bool m_exitRequested;
-			static bool m_shuttedDown;
-			static std::map<std::string, std::unique_ptr<LogFile>> m_logs;
-			static Croissant::Threading::AutoResetEvent m_event;
-			static std::unique_ptr<Threading::Thread> m_thread;
-			static std::mutex m_mutex;
+			static Pimpl*	m_pimpl;
 
-			class LogEntry
+			class ENGINE_API LogEntry final
 			{
 			public:
 
 				LogEntry(const std::string& moduleName, const std::string& message);
 				LogEntry(const LogEntry&) = delete;
 				LogEntry(LogEntry&&) = delete;
+				~LogEntry();
+				std::string const&	GetMessage() const;
+				std::string const&	GetModuleName() const;
 
-				const std::string m_message;
-				const std::string m_moduleName;
-				time_t m_time;
+			private:
+				class Pimpl;
+
+				Pimpl*	m_pimpl;
 			};
 
-			class LogFile final
+			class ENGINE_API LogFile final
 			{
 			public:
 				explicit LogFile(std::string const& fileName);
@@ -65,25 +63,25 @@ namespace Croissant
 				void Flush();
 
 			private:
-				std::string m_fileName;
-				std::ofstream m_output;
-				std::mutex m_mutex;
-				FileSystem::File m_file;
-				std::queue<LogEntry> m_queue;
+				class Pimpl;
+
+				Pimpl*	m_pimpl;
 			};
 
 		public:
-			class 	Log
+			class ENGINE_API Log final
 			{
 			public:
 				Log(LogFile& logFile, std::string const& className);
-				Log(const Log&) = default;
+				Log(const Log&);
 				Log(Log&& ref) = default;
+				~Log();
 				void Write(std::string const& message) const;
 
 			private:
-				std::string m_className;
-				LogFile&	m_logFile;
+				class Pimpl;
+
+				Pimpl*	m_pimpl;
 			};
 
 		};

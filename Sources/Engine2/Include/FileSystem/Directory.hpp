@@ -24,10 +24,11 @@ namespace Croissant
 		public:
 			typedef std::list<File> Filelist;
 
-			Directory(DEFAULT_DIRECTORY mode = DEFAULT_DIRECTORY::CURRENT_DIRECTORY);
-			Directory(const std::string& path);
-			Directory(Directory& source) = default;
+			explicit Directory(DEFAULT_DIRECTORY mode = DEFAULT_DIRECTORY::CURRENT_DIRECTORY);
+			explicit Directory(const std::string& path);
+			Directory(Directory& source);
 			Directory(Directory&& source) noexcept = default;
+			~Directory();
 			const std::string& FullPath() const;
 			const std::string& Name() const;
 			bool Exist() const;
@@ -45,11 +46,10 @@ namespace Croissant
 		private:
 
 			friend File;
+			class Pimpl;
 
 			Directory(const std::string& path, bool needParent);
-			std::string m_fullPath;
-			std::string m_name;
-			bool m_exist;
+			Pimpl*	m_pimpl;
 		};
 	}
 }

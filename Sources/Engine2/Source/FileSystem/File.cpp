@@ -15,21 +15,32 @@ namespace Croissant
 {
 	namespace FileSystem
 	{
+		class File::Pimpl
+		{
+		public:
+			Pimpl() : m_fullPath{}, m_name{}, m_extension{}, m_exist{ false } {}
+			~Pimpl() = default;
+			std::string m_fullPath;
+			std::string m_name;
+			std::string m_extension;
+			bool m_exist;
+		};
+
 		File::File(const std::string& path)
-			: m_fullPath(""), m_name(""), m_extension(""), m_exist(false)
+			: m_pimpl{ CROISSANT_NEW Pimpl() }
 		{
 			TRACE("Création d'un objet pour le fichier :");
 			TRACE(path.c_str());
-			m_fullPath = Directory::NormalizePath(path);
+			m_pimpl->m_fullPath = Directory::NormalizePath(path);
 			TRACE("Chemin après normailisation :");
-			TRACE(m_fullPath.c_str());
-			m_name = Directory::GetName(m_fullPath);
-			auto dotIndex = m_name.find_last_of('.');
+			TRACE(m_pimpl->m_fullPath.c_str());
+			m_pimpl->m_name = Directory::GetName(m_pimpl->m_fullPath);
+			auto dotIndex = m_pimpl->m_name.find_last_of('.');
 
 			if (std::string::npos != dotIndex)
 			{
-				m_extension = std::string(m_name).substr(dotIndex + 1);
-				m_name = m_name.substr(0, dotIndex);
+				m_pimpl->m_extension = std::string(m_pimpl->m_name).substr(dotIndex + 1);
+				m_pimpl->m_name = m_pimpl->m_name.substr(0, dotIndex);
 			}
 
 			Refresh();
@@ -42,37 +53,38 @@ namespace Croissant
 
 		File::~File()
 		{
-
+			CROISSANT_DELETE(m_pimpl);
+			m_pimpl = nullptr;
 		}
 
 		bool File::Exist() const
 		{
-			return m_exist;
+			return m_pimpl->m_exist;
 		}
 
 		const std::string& File::FullPath() const
 		{
-			return m_fullPath;
+			return m_pimpl->m_fullPath;
 		}
 
 		const std::string& File::Name() const
 		{
-			return m_name;
+			return m_pimpl->m_name;
 		}
 
 		const std::string& File::Extension() const
 		{
-			return m_extension;
+			return m_pimpl->m_extension;
 		}
 
 		Directory File::Parent() const
 		{
-			return Directory(m_fullPath, true);
+			return Directory(m_pimpl->m_fullPath, true);
 		}
 
 		void File::Refresh()
 		{
-			m_exist = DoFileExist(m_fullPath);
+			m_pimpl->m_exist = DoFileExist(m_pimpl->m_fullPath);
 		}
 	}
 }

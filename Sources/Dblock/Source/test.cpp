@@ -350,6 +350,7 @@ namespace Croissant
 
 				// initialisation de la caméra
 				m_camNode = std::make_shared<Core::Node>();
+				m_cam = std::make_shared<Graphic::Camera>();
 				m_cam->SetNode(m_camNode);
 
 				m_cam->SetFieldOfViewDegree(90.0f);
@@ -629,18 +630,25 @@ namespace Croissant
 
 int main(int, char**)
 {
-	Croissant::Core::LogManager::Init();
-	Croissant::Core::Application<Croissant::DBlock::DBlockApplication> app("DBlock");
+	int32_t result;
 
-	if (!app.Initialize())
+	Croissant::Core::LogManager::Init();
+
 	{
-		return EXIT_FAILURE;
+		Croissant::Core::Application<Croissant::DBlock::DBlockApplication> app("DBlock");
+
+		if (!app.Initialize())
+		{
+			return EXIT_FAILURE;
+		}
+
+		result = app.Run();
+
+		app.Shutdown();
+		std::cout << "Fin de l'application" << std::endl;
 	}
 
-	auto result = app.Run();
-
-	app.Shutdown();
-	std::cout << "Fin de l'application" << std::endl;
+	Croissant::Core::LogManager::Shutdown();
 	return result;
 }
 

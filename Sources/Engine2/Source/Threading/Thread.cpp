@@ -29,7 +29,7 @@ namespace Croissant
 		{
 		public:
 			Pimpl();
-			Pimpl(CallbackType callback);
+			explicit Pimpl(CallbackType callback);
 			~Pimpl();
 
 			void Join();
@@ -81,8 +81,9 @@ namespace Croissant
 		bool Thread::Pimpl::Join(uint32_t waitTime)
 		{
 			TRACE("Thread::Pimpl: Join(waitTime) : begin");
-			return m_thread.Join(waitTime);
+			auto result = m_thread.Join(waitTime);
 			TRACE("Thread::Pimpl: Join(waitTime) : end");
+			return result;
 		}
 
 		void Thread::Pimpl::Terminate()
@@ -95,12 +96,14 @@ namespace Croissant
 		// ------------------------------------------------------------- Thread
 
 		Thread::Thread(CallbackType callback)
-			: m_pimpl { new Pimpl { callback } }
+			: m_pimpl { CROISSANT_NEW Pimpl { callback } }
 		{
 		}
 
 		Thread::~Thread()
 		{
+			CROISSANT_DELETE(m_pimpl);
+			m_pimpl = nullptr;
 		}
 
 		void Thread::Join()

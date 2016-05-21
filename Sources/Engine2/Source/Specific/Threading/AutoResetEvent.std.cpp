@@ -82,9 +82,8 @@ namespace Croissant
 
 			void AutoResetEventImpl::Signal()
 			{
-				TRACE("AutoResetEventImpl: Signal : begin");
-				m_condition.notify_all();
-				TRACE("AutoResetEventImpl: Signal : end");
+				//m_condition.notify_all();
+				m_condition.notify_one();
 			}
 		}
 	}

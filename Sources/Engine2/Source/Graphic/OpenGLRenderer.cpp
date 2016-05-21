@@ -32,6 +32,15 @@ namespace Croissant
 {
 	namespace Graphic
 	{
+		class OpenGLRenderer::Pimpl
+		{
+		public:
+			Pimpl() : m_camera{ nullptr }
+			{}
+
+			std::shared_ptr<Camera>	m_camera;
+		};
+
 		using LogManager = Croissant::Core::LogManager;
 		using string = std::string;
 
@@ -68,7 +77,7 @@ namespace Croissant
 
 		// -------------------------------- OpenGLRenderer::Impl definition
 		OpenGLRenderer::OpenGLRenderer(Window& window)
-			: m_wrapper { }, m_systemInfo { m_wrapper }, m_window{ window }, m_logManager { CROISSANT_GET_LOG(OpenGLRenderer) }
+			: m_pimpl{ CROISSANT_NEW Pimpl{} }, m_wrapper { }, m_systemInfo{ m_wrapper }, m_window{ window }, m_logManager{ CROISSANT_GET_LOG(OpenGLRenderer) }
 		{
 			m_logManager.Write("Initialisation du renderer OpenGL");
 			//serviceProvider.Resolve(m_frameProvider);
@@ -107,6 +116,8 @@ namespace Croissant
 
 		OpenGLRenderer::~OpenGLRenderer()
 		{
+			CROISSANT_DELETE(m_pimpl);
+			m_pimpl = nullptr;
 			m_logManager.Write("Destruction du renderer OpenGL");
 		}
 
@@ -168,7 +179,7 @@ namespace Croissant
 
 		void OpenGLRenderer::UpdateCamera(std::shared_ptr<Camera> camera)
 		{
-			if (m_camera == camera)
+			if (m_pimpl->m_camera == camera)
 			{
 				// no camera change, nothing to do
 				return;
@@ -176,7 +187,7 @@ namespace Croissant
 
 			// TODO : unregister to camera updates from old camera
 
-			m_camera = camera;
+			m_pimpl->m_camera = camera;
 
 			// TODO : register to camera updates
 			// TODO : Update view/projection matrixes
@@ -184,7 +195,7 @@ namespace Croissant
 
 		void OpenGLRenderer::UpdateMatrixes()
 		{
-			if (nullptr == m_camera)
+			if (nullptr == m_pimpl->m_camera)
 			{
 				Core::WriteTraceWarn("Méthode UpdateMatrixes() appellée sans caméra");
 				return;
@@ -200,7 +211,7 @@ namespace Croissant
 			}
 
 			m_vertexDescriptor = vertexBuffer->GetDescriptor();
-			// TODO : 
+			// TODO : finir l'implémentation de la méthode
 		}
 
 		void OpenGLRenderer::Render(std::shared_ptr<Camera> camera, std::shared_ptr<Core::Node> node)

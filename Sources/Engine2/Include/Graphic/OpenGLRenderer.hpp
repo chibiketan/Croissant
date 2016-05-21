@@ -64,7 +64,7 @@ namespace Croissant
 		class ENGINE_API OpenGLRenderer
 		{
 		public:
-			OpenGLRenderer(Window& window);
+			explicit OpenGLRenderer(Window& window);
 			~OpenGLRenderer();
 			/// <summary>Fait le rendu d'un noeud par rapport à une caméra</summary>
 			void Render(std::shared_ptr<Camera> camera, std::shared_ptr<Core::Node> node);
@@ -74,6 +74,7 @@ namespace Croissant
 			std::shared_ptr<Core::AbstractBuffer>	CreateBuffer(uint32_t size, Core::BufferTypeEnum type);
 
 		private:
+			class Pimpl;
 			void SetupPixelFormat(HDC hdc);
 			void InitializeGL(GLsizei width, GLsizei height);
 			void InitializeGLExtentions();
@@ -81,11 +82,11 @@ namespace Croissant
 			void UpdateMatrixes();
 			void UpdateVertexDescription(std::shared_ptr<Core::VertexBuffer> vertexBuffer);
 
+			Pimpl*	m_pimpl;
 			OpenGLWrapper m_wrapper;
 			OpenGLSystemInfo m_systemInfo;
 			Window& m_window;
 			Core::LogManager::Log m_logManager;
-			std::shared_ptr<Camera>	m_camera;
 			Core::VertexBufferDescriptor	m_vertexDescriptor;
 			uint32_t						m_vertexBufferId;
 #if defined(CROISSANT_WINDOWS)

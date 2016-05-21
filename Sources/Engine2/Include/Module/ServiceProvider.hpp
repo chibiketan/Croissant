@@ -23,6 +23,7 @@ namespace Croissant
 			ServiceProvider& operator=(ServiceProvider&&) = delete;
 
 			ServiceProvider(ServiceProviderInternal& sp, const std::string& moduleName);
+			~ServiceProvider();
 
 			template<typename T> void Provide(ServiceProviderInternal::CreatorDelegate creatorFunction)
 			{
@@ -35,8 +36,10 @@ namespace Croissant
 			}
 
 		private:
+			class Pimpl;
+
+			Pimpl*	m_pimpl;
 			ServiceProviderInternal& m_serviceProviderInternal;
-			std::string const m_moduleName;
 		};
 	}
 }
