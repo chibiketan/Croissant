@@ -50,8 +50,6 @@ namespace Croissant
 			float							m_aspectRatio;
 			float							m_nearDistance;
 			float							m_farDistance;
-			mutable Math::Matrix4f			m_projectionMatrix;
-			mutable Math::Matrix4f			m_viewMatrix;
 			mutable bool					m_projectionNeedUpdate;
 			mutable bool					m_viewNeedUpdate;
 		};
@@ -84,26 +82,6 @@ namespace Croissant
 		{
 			m_farDistance = val;
 			m_projectionNeedUpdate = true;
-		}
-
-		inline Math::Matrix4f Camera::GetProjectionViewMatrix() const
-		{
-			OnFrameChange();
-			OnFrustumChange();
-			return m_projectionMatrix * m_viewMatrix;
-		}
-
-		inline Math::Matrix4f const& Camera::GetViewMatrix() const
-		{
-			OnFrameChange();
-			return m_viewMatrix;
-		}
-
-		inline Math::Matrix4f const& Camera::GetProjectionMatrix() const
-		{
-			OnFrustumChange();
-			return m_projectionMatrix;
-			
 		}
 	}
 }

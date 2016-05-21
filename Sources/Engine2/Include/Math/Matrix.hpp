@@ -8,7 +8,7 @@
 namespace Croissant {
 	namespace Math {
 		template<typename Number, size_t size>
-		class ENGINE_API Matrix final {
+		class Matrix final {
 		public:
 			using ArrayType = std::array<Number, size * size>;
 			Matrix();
@@ -82,6 +82,7 @@ namespace Croissant {
 		Matrix<Number, size> operator*(Matrix<Number, size> const& matrix, Number const& scalar);
 
 		// --------------------------------------------------------------------------- Using
+		template class Matrix<float, 4>;
 		using Matrix4f = Matrix<float, 4>;
 	}
 }
@@ -206,7 +207,7 @@ namespace Croissant
 		template <typename Number, size_t size>
 		Matrix<Number, size>::Matrix(std::array<Number, size * size> const& source)
 		{
-			m_data = source;
+			std::memcpy(m_data, source.data(), source.size());
 		}
 
 		template <typename Number, size_t size>

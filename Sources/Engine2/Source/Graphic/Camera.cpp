@@ -10,17 +10,19 @@ namespace Croissant
 		{
 		public:
 			Pimpl(Core::Node::OnUpdateCallback nodeUpdateCallback)
-				: m_node{ nullptr }, m_nodeUpdateCallback{ nodeUpdateCallback }
+				: m_node{ nullptr }, m_nodeUpdateCallback{ nodeUpdateCallback },
+				m_projectionMatrix{}, m_viewMatrix{}
 			{}
 
 			node_ptr						m_node;
 			Core::Node::OnUpdateCallback	m_nodeUpdateCallback;
+			mutable Math::Matrix4f			m_projectionMatrix;
+			mutable Math::Matrix4f			m_viewMatrix;
 		};
 
 		Camera::Camera()
 			: m_pimpl{ CROISSANT_NEW Pimpl{ [this](Core::Node const&, Math::Matrix4f const&) { this->OnNodeUpdate();  } } },
 			m_fieldOfViewDegree{ 0 }, m_aspectRatio{ 0 }, m_nearDistance{ 0 }, m_farDistance{ 0 },
-			m_projectionMatrix{}, m_viewMatrix{},
 			m_projectionNeedUpdate { false }, m_viewNeedUpdate { false }
 		{
 			SetFieldOfViewDegree(90.0f);
@@ -71,7 +73,7 @@ namespace Croissant
 			matrix(2, 3) = -m_nearDistance * m_farDistance / (m_farDistance - m_nearDistance);
 			matrix(3, 2) = 1;
 			matrix(3, 3) = 0;
-			m_projectionMatrix = std::move(matrix);
+			m_pimpl->m_projectionMatrix = std::move(matrix);
 		}
 
 		void Camera::OnFrameChange() const
@@ -99,22 +101,22 @@ namespace Croissant
 			//auto right = Math::Vector4::UnitX;
 			//auto up = Math::Vector4::UnitY;
 			//Math::Point4 position{ 0.0f, 0.0f, 0.0f };
-			m_viewMatrix(0, 0) = right.X();
-			m_viewMatrix(0, 1) = right.Y();
-			m_viewMatrix(0, 2) = right.Z();
-			m_viewMatrix(0, 3) = -position.DotProduct(right);
-			m_viewMatrix(1, 0) = up.X();
-			m_viewMatrix(1, 1) = up.Y();
-			m_viewMatrix(1, 2) = up.Z();
-			m_viewMatrix(1, 3) = -position.DotProduct(up);
-			m_viewMatrix(2, 0) = look.X();
-			m_viewMatrix(2, 1) = look.Y();
-			m_viewMatrix(2, 2) = look.Z();
-			m_viewMatrix(2, 3) = -position.DotProduct(look);
-			m_viewMatrix(3, 0) = 0.0f;
-			m_viewMatrix(3, 1) = 0.0f;
-			m_viewMatrix(3, 2) = 0.0f;
-			m_viewMatrix(3, 3) = 1.0f;
+			m_pimpl->m_viewMatrix(0, 0) = right.X();
+			m_pimpl->m_viewMatrix(0, 1) = right.Y();
+			m_pimpl->m_viewMatrix(0, 2) = right.Z();
+			m_pimpl->m_viewMatrix(0, 3) = -position.DotProduct(right);
+			m_pimpl->m_viewMatrix(1, 0) = up.X();
+			m_pimpl->m_viewMatrix(1, 1) = up.Y();
+			m_pimpl->m_viewMatrix(1, 2) = up.Z();
+			m_pimpl->m_viewMatrix(1, 3) = -position.DotProduct(up);
+			m_pimpl->m_viewMatrix(2, 0) = look.X();
+			m_pimpl->m_viewMatrix(2, 1) = look.Y();
+			m_pimpl->m_viewMatrix(2, 2) = look.Z();
+			m_pimpl->m_viewMatrix(2, 3) = -position.DotProduct(look);
+			m_pimpl->m_viewMatrix(3, 0) = 0.0f;
+			m_pimpl->m_viewMatrix(3, 1) = 0.0f;
+			m_pimpl->m_viewMatrix(3, 2) = 0.0f;
+			m_pimpl->m_viewMatrix(3, 3) = 1.0f;
 		}
 
 		void Camera::OnNodeUpdate() const
@@ -168,6 +170,26 @@ namespace Croissant
 			}
 
 			return result;
+		}
+
+		Math::Matrix4f Camera::GetProjectionViewMatrix() const
+		{
+			OnFrameChange();
+			OnFrustumChange();
+			return m_pimpl->m_projectionMatrix * m_pimpl->m_viewMatrix;
+		}
+
+		Math::Matrix4f const& Camera::GetViewMatrix() const
+		{
+			OnFrameChange();
+			return m_pimpl->m_viewMatrix;
+		}
+
+		Math::Matrix4f const& Camera::GetProjectionMatrix() const
+		{
+			OnFrustumChange();
+			return m_pimpl->m_projectionMatrix;
+
 		}
 	}
 }
