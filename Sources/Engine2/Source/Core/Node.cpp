@@ -16,6 +16,10 @@ namespace Croissant
 		{
 		}
 
+		Node::~Node()
+		{
+		}
+
 		void Node::AddOnUpdate(OnUpdateCallback& callback) const
 		{
 			m_onUpdateListeners.push_back(&callback);

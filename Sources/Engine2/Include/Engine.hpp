@@ -5,6 +5,10 @@
 #  include "defines.hpp"
 
 #  if defined(COMPILER_MSVC)
+// On désactive les warning sur les export
+#    pragma warning(disable: 4251)
+#    pragma warning(disable: 4275)
+
 #    define WIN32_LEAN_AND_MEAN
 #    include <Windows.h>
 #  endif

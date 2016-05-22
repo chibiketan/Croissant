@@ -23,6 +23,9 @@ namespace Croissant
 			using OnUpdateCallback = std::function<void (Node const&, Math::Matrix4f const&)>;
 
 			Node();
+			~Node();
+			Node(Node const&) = delete;
+			Node(Node&&) = default;
 			void						AddOnUpdate(OnUpdateCallback& callback) const;
 			void						RemoveOnUpdate(OnUpdateCallback& callback) const;
 			void						Move(Math::Vector4 const& move);

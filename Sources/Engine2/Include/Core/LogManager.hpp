@@ -43,7 +43,7 @@ namespace Croissant
 			static std::unique_ptr<Threading::Thread> m_thread;
 			static std::mutex m_mutex;
 
-			class LogEntry
+			class ENGINE_API LogEntry
 			{
 			public:
 
@@ -56,7 +56,7 @@ namespace Croissant
 				time_t m_time;
 			};
 
-			class LogFile final
+			class ENGINE_API LogFile final
 			{
 			public:
 				explicit LogFile(std::string const& fileName);
@@ -73,7 +73,7 @@ namespace Croissant
 			};
 
 		public:
-			class 	Log
+			class ENGINE_API Log
 			{
 			public:
 				Log(LogFile& logFile, std::string const& className);
