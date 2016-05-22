@@ -5,6 +5,7 @@
 
 #include "Engine.hpp"
 #include <functional>
+#include <memory>
 
 namespace Croissant
 {
@@ -23,7 +24,7 @@ namespace Croissant
 		private:
 			class Pimpl;
 
-			Pimpl* m_pimpl;
+			std::unique_ptr<Pimpl> m_pimpl;
 		};
 	}
 }

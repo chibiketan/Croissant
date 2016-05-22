@@ -25,8 +25,6 @@ namespace Croissant
 			using node_ptr = std::shared_ptr<Core::Node>;
 
 			Camera();
-			Camera(Camera const&) = delete;
-			~Camera();
 			inline Math::Vector4	GetLookDirection() const;
 			inline Math::Vector4	GetRightDirection() const;
 			inline Math::Vector4	GetUpDirection() const;
@@ -40,20 +38,20 @@ namespace Croissant
 			inline Math::Matrix4f const& GetViewMatrix() const;
 			inline Math::Matrix4f const& GetProjectionMatrix() const;
 		private:
-			class Pimpl;
 			void OnFrustumChange() const;
 			void OnFrameChange() const;
 			void OnNodeUpdate() const;
 
-			Pimpl*							m_pimpl;
 			float							m_fieldOfViewDegree;
 			float							m_aspectRatio;
 			float							m_nearDistance;
 			float							m_farDistance;
 			mutable Math::Matrix4f			m_projectionMatrix;
 			mutable Math::Matrix4f			m_viewMatrix;
+			node_ptr						m_node;
 			mutable bool					m_projectionNeedUpdate;
 			mutable bool					m_viewNeedUpdate;
+			Core::Node::OnUpdateCallback	m_nodeUpdateCallback;
 		};
 	}
 }
@@ -62,6 +60,54 @@ namespace Croissant
 {
 	namespace Graphic
 	{
+		inline Math::Point4 Camera::GetPosition() const
+		{
+			Math::Point4 result{ 0, 0, 0 };
+
+			if (nullptr != m_node)
+			{
+				result = result * m_node->GetModelToWorldMatrix();
+			}
+
+			return result;
+		}
+
+		inline Math::Vector4 Camera::GetLookDirection() const
+		{
+			auto result{ Math::Vector4::UnitZ };
+
+			if (nullptr != m_node)
+			{
+				result = result * m_node->GetModelToWorldMatrix();
+			}
+
+			return result;
+		}
+
+		inline Math::Vector4 Camera::GetRightDirection() const
+		{
+			auto result{ Math::Vector4::UnitX };
+
+			if (nullptr != m_node)
+			{
+				result = result * m_node->GetModelToWorldMatrix();
+			}
+
+			return result;
+		}
+
+		inline Math::Vector4 Camera::GetUpDirection() const
+		{
+			auto result{ Math::Vector4::UnitY };
+
+			if (nullptr != m_node)
+			{
+				result = result * m_node->GetModelToWorldMatrix();
+			}
+
+			return result;
+		}
+	
 		inline void Camera::SetFieldOfViewDegree(float val)
 		{
 			m_fieldOfViewDegree = val;

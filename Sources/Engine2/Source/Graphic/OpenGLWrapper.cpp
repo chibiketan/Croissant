@@ -1175,7 +1175,7 @@ namespace Croissant
 
 		void OpenGLWrapper::SetUniformMatrix4f(int32_t location, int32_t count, bool transpose, Math::Matrix4f const& matrix) const
 		{
-			ext_glUniformMatrix4fv(location, count, (transpose ? GL_TRUE : GL_FALSE), matrix.Data());
+			ext_glUniformMatrix4fv(location, count, (transpose ? GL_TRUE : GL_FALSE), matrix.Data().data());
 			glCheckForError<GLFUNCINDEX_UNIFORM_MATRIX_4FV>(*this);
 		}
 

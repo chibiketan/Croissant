@@ -31,7 +31,6 @@ int main(int argc, char** argv)
 		std::cout << "Nombre d'extension OpenGL supportées : " << std::to_string(info.GetNumExtension()) << std::endl;
 	}
 	// logManager doit être arrêté une fois que tous ses utilisateurs sont détruits
-	Croissant::Core::LogManager::Shutdown();
 
 	std::cout << std::endl << std::endl << "Appuyer sur une touche pour continuer" << std::endl;
 	std::getchar();

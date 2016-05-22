@@ -23,9 +23,6 @@ namespace Croissant
 			using OnUpdateCallback = std::function<void (Node const&, Math::Matrix4f const&)>;
 
 			Node();
-			Node(Node const&) = delete;
-			Node(Node&&) = delete;
-			~Node();
 			void						AddOnUpdate(OnUpdateCallback& callback) const;
 			void						RemoveOnUpdate(OnUpdateCallback& callback) const;
 			void						Move(Math::Vector4 const& move);
@@ -45,9 +42,15 @@ namespace Croissant
 			void						NotifyUpdate() const;
 
 
-			class Pimpl;
-
-			Pimpl*	m_pimpl;
+			std::string								m_name;
+			Node*									m_parent;
+			std::vector<std::unique_ptr<Node>>		m_children;
+			Math::Quaternion						m_rotation;
+			Math::Vector4							m_translation;
+			std::vector<std::shared_ptr<Mesh>>		m_meshes;
+			mutable bool							m_needUpdate;
+			mutable std::list<OnUpdateCallback*>	m_onUpdateListeners;
+			mutable Math::Matrix4f					m_modelToWorldMatrix;
 		};
 	}
 }
@@ -56,6 +59,15 @@ namespace Croissant
 {
 	namespace Core
 	{
+		inline Math::Vector4 const&	Node::GetTranslation() const
+		{
+			return m_translation;
+		}
+
+		inline Math::Quaternion const&	Node::GetRotation() const
+		{
+			return m_rotation;
+		}
 	}
 }
 

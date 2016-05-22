@@ -16,17 +16,15 @@ namespace Croissant
 {
 	namespace Exception
 	{
-		class ENGINE_API CroissantException
+		class ENGINE_API CroissantException : public std::exception
 		{
 		public:
-			explicit CroissantException(std::string const& message);
-			virtual ~CroissantException();
+			CroissantException(std::string const& message);
 
-			char const* what() const noexcept;
+			char const* what() const throw();
 		private:
-			class Pimpl;
 
-			Pimpl*	m_pimpl;
+			const std::string m_message;
 		};
 	}
 }

@@ -1,27 +1,15 @@
 #include "Graphic/Camera.hpp"
 #include "Math/Math.hpp"
-#include "Debug/MemoryManager.hpp"
 
 namespace Croissant
 {
 	namespace Graphic
 	{
-		class Camera::Pimpl
-		{
-		public:
-			Pimpl(Core::Node::OnUpdateCallback nodeUpdateCallback)
-				: m_node{ nullptr }, m_nodeUpdateCallback{ nodeUpdateCallback }
-			{}
-
-			node_ptr						m_node;
-			Core::Node::OnUpdateCallback	m_nodeUpdateCallback;
-		};
-
 		Camera::Camera()
-			: m_pimpl{ CROISSANT_NEW Pimpl{ [this](Core::Node const&, Math::Matrix4f const&) { this->OnNodeUpdate();  } } },
-			m_fieldOfViewDegree{ 0 }, m_aspectRatio{ 0 }, m_nearDistance{ 0 }, m_farDistance{ 0 },
+			: m_fieldOfViewDegree{ 0 }, m_aspectRatio{ 0 }, m_nearDistance{ 0 }, m_farDistance{ 0 },
 			m_projectionMatrix{}, m_viewMatrix{},
-			m_projectionNeedUpdate { false }, m_viewNeedUpdate { false }
+			m_node{ nullptr }, m_projectionNeedUpdate { false }, m_viewNeedUpdate { false },
+			m_nodeUpdateCallback{ [this](Core::Node const&, Math::Matrix4f const&) { this->OnNodeUpdate();  } }
 		{
 			SetFieldOfViewDegree(90.0f);
 			SetAspectRatio(4.0f / 3.0f);
@@ -29,23 +17,17 @@ namespace Croissant
 			SetFarDistance(1000.0f);
 		}
 
-		Camera::~Camera()
-		{
-			CROISSANT_DELETE(m_pimpl);
-			m_pimpl = nullptr;
-		}
-
 		void Camera::SetNode(node_ptr node)
 		{
-			if (nullptr != m_pimpl->m_node)
+			if (nullptr != m_node)
 			{
-				m_pimpl->m_node->RemoveOnUpdate(m_pimpl->m_nodeUpdateCallback);
+				m_node->RemoveOnUpdate(m_nodeUpdateCallback);
 			}
 
-			m_pimpl->m_node = node;
+			m_node = node;
 			if (nullptr != node)
 			{
-				node->AddOnUpdate(m_pimpl->m_nodeUpdateCallback);
+				node->AddOnUpdate(m_nodeUpdateCallback);
 			}
 			
 			m_viewNeedUpdate = true;
@@ -122,52 +104,5 @@ namespace Croissant
 			m_viewNeedUpdate = true;
 		}
 
-		Math::Point4 Camera::GetPosition() const
-		{
-			Math::Point4 result{ 0, 0, 0 };
-
-			if (nullptr != m_pimpl->m_node)
-			{
-				result = result * m_pimpl->m_node->GetModelToWorldMatrix();
-			}
-
-			return result;
-		}
-
-		Math::Vector4 Camera::GetLookDirection() const
-		{
-			auto result{ Math::Vector4::UnitZ };
-
-			if (nullptr != m_pimpl->m_node)
-			{
-				result = result * m_pimpl->m_node->GetModelToWorldMatrix();
-			}
-
-			return result;
-		}
-
-		Math::Vector4 Camera::GetRightDirection() const
-		{
-			auto result{ Math::Vector4::UnitX };
-
-			if (nullptr != m_pimpl->m_node)
-			{
-				result = result * m_pimpl->m_node->GetModelToWorldMatrix();
-			}
-
-			return result;
-		}
-
-		Math::Vector4 Camera::GetUpDirection() const
-		{
-			auto result{ Math::Vector4::UnitY };
-
-			if (nullptr != m_pimpl->m_node)
-			{
-				result = result * m_pimpl->m_node->GetModelToWorldMatrix();
-			}
-
-			return result;
-		}
 	}
 }

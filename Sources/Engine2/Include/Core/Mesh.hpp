@@ -14,14 +14,12 @@ namespace Croissant
 		{
 		public:
 			Mesh(std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<IndexBuffer> indexBuffer);
-			~Mesh();
 			std::shared_ptr<VertexBuffer const>	GetVertexBuffer() const;
 			std::shared_ptr<IndexBuffer const>	GetIndexBuffer() const;
 
 		private:
-			class Pimpl;
-
-			Pimpl*	m_pimpl;
+			std::shared_ptr<VertexBuffer>	m_vertexBuffer;
+			std::shared_ptr<IndexBuffer>		m_indexBuffer;
 		};
 	}
 }
