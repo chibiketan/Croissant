@@ -12,7 +12,7 @@
 #  define DIRECTORY_ROOT "/"
 #  define DIRECTORY_ROOT_NAME ""
 #  define SEPARATOR "/"
-#  define GET_ROOT(dir) String()
+#  define GET_ROOT(dir) std::string()
 #else
 #  define DIRECTORY_EXISTING "C:\\Windows\\System32"
 #  define DIRECTORY_EXISTING_PARENT "C:\\Windows"
@@ -169,6 +169,7 @@ TEST_F(DirectoryTest, CheckParentFromRootIsSamePath)
 TEST_F(DirectoryTest, CheckIfCanGetAllFilesFromDirectory)
 {
 	Croissant::FileSystem::Directory dir(Croissant::FileSystem::DEFAULT_DIRECTORY::CURRENT_DIRECTORY);
+	std::cout << dir.FullPath() << std::endl;
 	{
 		auto fileList = dir.Files();
 

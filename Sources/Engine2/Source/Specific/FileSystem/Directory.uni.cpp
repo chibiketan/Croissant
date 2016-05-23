@@ -74,9 +74,24 @@ namespace Croissant
 				bool IsFirst;
 			};
 
+			std::string TransformPatternToRegex(std::string const& pattern)
+			{
+				std::string result = std::string("^") + pattern + "$";
+
+				int pos = result.find('*');
+
+				while (pos != std::string::npos)
+				{
+					result.replace(pos, 1, ".*");
+					pos = result.find('*', pos + 2);
+				}
+
+				return result;
+			}
+
 			SearchHandle InitializeSearch(std::string const& baseDir, std::string const& pattern)
 			{
-				SearchHandle sh { std::regex { pattern.c_str() }, nullptr, baseDir, true };
+				SearchHandle sh { std::regex { TransformPatternToRegex(pattern) }, nullptr, baseDir, true };
 
 				sh.Handle = opendir(baseDir.c_str());
 				return sh;

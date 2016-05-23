@@ -9,7 +9,7 @@ namespace Croissant
         class WindowInternal
         {
         public:
-            WindowInternal();
+            WindowInternal(Math::Point2 const& position, uint32_t width, uint32_t height);
             ~WindowInternal();
             Window::SystemHandle const&    GetSystemHandle() const;
             void        Resize(uint32_t width, uint32_t height);
@@ -25,7 +25,7 @@ namespace Croissant
             Colormap                m_cmap;
         };
 
-        WindowInternal::WindowInternal()
+        WindowInternal::WindowInternal(Math::Point2 const& position, uint32_t width, uint32_t height)
         {
             m_handle.m_display = XOpenDisplay(nullptr);
             // Get a matching FB config
@@ -114,7 +114,7 @@ namespace Croissant
             swa.event_mask        = StructureNotifyMask;
 
             m_handle.m_window = XCreateWindow( m_handle.m_display, RootWindow( m_handle.m_display, vi->screen ),
-                                        0, 0, 100, 100, 0, vi->depth, InputOutput,
+                                        0, 0, width, height, 0, vi->depth, InputOutput,
                                         vi->visual,
                                         CWBorderPixel|CWColormap|CWEventMask, &swa );
             // Done with the visual info data
