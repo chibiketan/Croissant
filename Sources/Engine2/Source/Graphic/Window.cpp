@@ -32,7 +32,7 @@ namespace Croissant
 		// --------------------------------------------- Window imp
 		Window::Window(uint32_t width, uint32_t height, const std::string& title)
 			: m_title{ title }, m_position{ 0, 0 }, m_width{ width }, m_height{ height }, m_mouseLastPosition{ 0, 0 }
-			  , m_win{ std::make_unique<WindowInternal>() }
+			  , m_win{ std::make_unique<WindowInternal>(m_position, width, height) }
 		{
 			m_win->SetTitle(title);
 			m_win->Position(m_position);

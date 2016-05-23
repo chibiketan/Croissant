@@ -115,7 +115,7 @@ namespace Croissant
 		class WindowInternal
 		{
 		public:
-			WindowInternal();
+			WindowInternal(Math::Point2 position, uint32_t width, uint32_t height);
 			~WindowInternal();
 			Window::SystemHandle const&    GetSystemHandle() const;
 			void        Resize(uint32_t width, uint32_t height);
@@ -129,16 +129,15 @@ namespace Croissant
 		private:
 			Window::SystemHandle    m_handle;
 			char const*				m_className;
-			HWND					m_windowHandle;
 			Math::Point2			m_position;
 			uint32_t				m_width;
 			uint32_t				m_height;
 			Math::Point2			m_mouseLastPosition;
 		};
 
-		inline WindowInternal::WindowInternal()
-			: m_handle{}, m_className{ nullptr }, m_windowHandle{ nullptr }
-			, m_position{ 0, 0 }, m_width{ 100 }, m_height{ 100 }, m_mouseLastPosition{ 0, 0 }
+		inline WindowInternal::WindowInternal(Math::Point2 position, uint32_t width, uint32_t height)
+			: m_handle{}, m_className{ nullptr }, m_position{ position }
+			, m_width{ width }, m_height{ height }, m_mouseLastPosition{ 0, 0 }
 		{
 			m_className = "TutorialWindowClassTest";
 			// Register class
@@ -161,24 +160,24 @@ namespace Croissant
 			}
 
 			// Create window
-			RECT rc = { 0, 0, static_cast<int32_t>(800), static_cast<int32_t>(600) };
+			RECT rc = { position.X(), position.Y(), static_cast<int32_t>(width + position.X()), static_cast<int32_t>(height + position.Y()) };
 			HINSTANCE hinstance = nullptr;
 			AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
-			m_windowHandle = CreateWindow(m_className, "",
+			m_handle = CreateWindow(m_className, "toto",
 				WS_OVERLAPPEDWINDOW,
-				CW_USEDEFAULT, CW_USEDEFAULT, 800, 600, NULL, NULL, hinstance,
+				CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, hinstance,
 				NULL);
-			if (!m_windowHandle)
+			if (!m_handle)
 			{
 				throw Exception::CroissantException("Erreur lors de la création de la fenêtre");
 			}
 
-			UpdateWindowsPlacement(m_windowHandle, m_position, m_width, m_height);
+			UpdateWindowsPlacement(m_handle, m_position, m_width, m_height);
 		}
 
 		inline WindowInternal::~WindowInternal()
 		{
-			DestroyWindow(m_windowHandle);
+			DestroyWindow(m_handle);
 			UnregisterClass(m_className, nullptr);
 		}
 
@@ -191,28 +190,28 @@ namespace Croissant
 		{
 			m_width = width;
 			m_height = height;
-			UpdateWindowsPlacement(m_windowHandle, m_position, m_width, m_height);
+			UpdateWindowsPlacement(m_handle, m_position, m_width, m_height);
 		}
 
 		inline void WindowInternal::Position(Math::Point2 const& position)
 		{
 			m_position = position;
-			UpdateWindowsPlacement(m_windowHandle, m_position, m_width, m_height);
+			UpdateWindowsPlacement(m_handle, m_position, m_width, m_height);
 		}
 
 		inline void WindowInternal::Show() const
 		{
-			ShowWindow(m_windowHandle, 1);
+			ShowWindow(m_handle, 1);
 		}
 
 		inline void WindowInternal::Hide() const
 		{
-			ShowWindow(m_windowHandle, 0);
+			ShowWindow(m_handle, 0);
 		}
 
 		inline void WindowInternal::SetTitle(std::string const& title)
 		{
-			SetWindowText(m_windowHandle, title.c_str());
+			SetWindowText(m_handle, title.c_str());
 		}
 
 		inline void WindowInternal::SetCursorPosition(int x, int y)
