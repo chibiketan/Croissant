@@ -801,6 +801,36 @@ namespace Croissant
 				return reinterpret_cast<Func>(proc);
 			}
 
+
+			void createDummyContext(Display*& display, GLXContext& openGLContext, ::Window& window)
+			{
+				GLint att[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None };
+				XVisualInfo *vi;
+
+				display = XOpenDisplay(NULL);
+
+				if ( !display ) {
+					printf("\n\tcannot connect to X server\n\n");
+					exit(0);
+				}
+
+				window = DefaultRootWindow(display);
+				vi = glXChooseVisual(display, 0, att);
+
+				if (!vi) {
+					printf("\n\tno appropriate visual found\n\n");
+					exit(0);
+				}
+
+				openGLContext = glXCreateContext(display, vi, nullptr, GL_TRUE);
+			}
+
+			void deleteDummyContext(Display*& display, GLXContext& openGLContext, ::Window& window)
+			{
+
+			}
+
+
 #endif
 		} // !namespace anonyme
 
@@ -827,6 +857,12 @@ namespace Croissant
 			HWND windowHandle = { nullptr };
 
 			createDummyContext(ourWindowHandleToDeviceContext, ourOpenGLRenderingContext, windowHandle);
+#elif defined(CROISSANT_LINUX)
+			::Display* display{ nullptr };
+			::GLXContext openGLContext;
+			::Window window;
+
+			createDummyContext(display, openGLContext, window);
 #endif
 
 
@@ -890,6 +926,9 @@ namespace Croissant
 
 
 			//deleteDummyContext(ourWindowHandleToDeviceContext, ourOpenGLRenderingContext, windowHandle);
+#if defined(CROISSANT_LINUX)
+			deleteDummyContext(display, openGLContext, window);
+#endif
 
 			m_logManager.Write("Sortie de OpenGLWrapper constructeur");
 		}
