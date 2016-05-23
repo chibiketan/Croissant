@@ -28,11 +28,11 @@
 #  define SWAPBUFFERS SwapBuffers(m_ghDC)
 #elif defined(CROISSANT_LINUX)
 #  define SWAPBUFFERS glXSwapBuffers(m_window.GetSystemHandle().m_display, m_window.GetSystemHandle().m_window)
+#  define GLX_CONTEXT_MAJOR_VERSION_ARB       0x2091
+#  define GLX_CONTEXT_MINOR_VERSION_ARB       0x2092
+typedef GLXContext(*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
 #endif
 #define BUFFER_OFFSET(val) reinterpret_cast<void*>(val)
-#define GLX_CONTEXT_MAJOR_VERSION_ARB       0x2091
-#define GLX_CONTEXT_MINOR_VERSION_ARB       0x2092
-typedef GLXContext (*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
 
 using OpenGLRendererException = Croissant::Exception::CroissantException;
 

@@ -70,9 +70,6 @@ namespace Croissant
 			uint32_t			m_height;
 			Math::Point2		m_mouseLastPosition;
 			std::unique_ptr<WindowInternal>	m_win;
-#if defined(CROISSANT_WINDOWS)
-			char const*			m_className;
-#endif
 		};
 	}
 }

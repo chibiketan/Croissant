@@ -112,6 +112,11 @@ if (CROISSANT_HOST_LINUX EQUAL 1)
 #    croissant_files(${PROJECT_NAME} ${ENGINE_SOURCE}
 #            Graphic/WindowInternal.Linux.cpp
 #            )
+elseif(CROISSANT_HOST_WINDOWS EQUAL 1)
+    croissant_files(${PROJECT_NAME} ${ENGINE_SOURCE}
+            Graphic/WindowInternal.Windows.inl
+        )
+
 endif()
 
 # Now build our tools

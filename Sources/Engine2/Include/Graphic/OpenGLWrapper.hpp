@@ -34,7 +34,6 @@ namespace Croissant
 
 		// ---------------------------------------- début alias pour OpenGL
 		using glDeleteBuffers_t = void (APIENTRY *)(GLsizei, GLuint const*);
-		using wglSwapIntervalEXT_t = GLboolean(APIENTRY *)(GLint);
 		using glCreateShader_t = GLuint (APIENTRY *)(GLenum);
 		using glCreateProgram_t = GLuint (APIENTRY *)();
 		using glLinkProgram_t = void (APIENTRY *)(GLuint);
@@ -73,7 +72,11 @@ namespace Croissant
 		using glGetProgramInfoLog_t = void (APIENTRY *)(GLuint, GLsizei, GLsizei*, GLchar*);
 		using glGetUniformLocation_t = GLint(APIENTRY *)(GLuint, GLchar const*);
 		using glUniformMatrix4fv_t = void (APIENTRY *)(GLint, GLsizei, GLboolean, GLvoid const*);
+#if defined(CROISSANT_WINDOWS)
+		using wglSwapIntervalEXT_t = GLboolean(APIENTRY *)(GLint);
+#elif defined(CROISSANT_LINUX)
 		using glXSwapIntervalEXT_t = void(APIENTRY *)(Display*, GLXDrawable, int);
+#endif
 
 		// ---------------------------------------- fin alias pour OpenGL
 
