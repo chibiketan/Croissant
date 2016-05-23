@@ -26,6 +26,7 @@ namespace Croissant
 	namespace Graphic
 	{
 		class WindowEvent;
+		class WindowInternal;
 
 		class ENGINE_API Window
 		{
@@ -33,7 +34,15 @@ namespace Croissant
 #if defined(CROISSANT_WINDOWS)
 			using SystemHandle = HWND;
 #elif defined(CROISSANT_LINUX)
-			using SystemHandle = ::Window
+
+			class InternalHandle
+			{
+			public:
+				::Display*	m_display;
+				::Window 	m_window;
+			};
+
+			using SystemHandle = InternalHandle;
 #else
 #error "système non supporté pour les fenêtres"
 #endif
@@ -42,7 +51,7 @@ namespace Croissant
 			~Window();
 
 			std::unique_ptr<WindowEvent const>	PeekEvent();
-			const SystemHandle&					GetSystemHandle() const;
+			SystemHandle const&					GetSystemHandle() const;
 			void								Close();
 			void								Open();
 			void								SetTitle(std::string const& title);
@@ -60,11 +69,9 @@ namespace Croissant
 			uint32_t			m_width;
 			uint32_t			m_height;
 			Math::Point2		m_mouseLastPosition;
+			std::unique_ptr<WindowInternal>	m_win;
 #if defined(CROISSANT_WINDOWS)
 			char const*			m_className;
-#elif defined(CROISSANT_LINUX)
-			Display*			m_display;
-
 #endif
 		};
 	}

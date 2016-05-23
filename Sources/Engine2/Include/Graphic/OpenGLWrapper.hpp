@@ -1,6 +1,6 @@
+#pragma once
 #ifndef CROISSANT_ENGINE_GRAPHIC_OPENGLWRAPPER_HPP_INC
 #  define CROISSANT_ENGINE_GRAPHIC_OPENGLWRAPPER_HPP_INC
-#  pragma once
 
 #  include "Engine.hpp"
 #  include "Core/LogManager.hpp"
@@ -10,6 +10,10 @@
 #  include <GL/glu.h>
 #  include <GL/glext.h>
 #  include <string>
+
+#  if defined(CROISSANT_LINUX)
+#    include <GL/glx.h>
+#  endif
 
 namespace Croissant
 {
@@ -69,6 +73,7 @@ namespace Croissant
 		using glGetProgramInfoLog_t = void (APIENTRY *)(GLuint, GLsizei, GLsizei*, GLchar*);
 		using glGetUniformLocation_t = GLint(APIENTRY *)(GLuint, GLchar const*);
 		using glUniformMatrix4fv_t = void (APIENTRY *)(GLint, GLsizei, GLboolean, GLvoid const*);
+		using glXSwapIntervalEXT_t = void(APIENTRY *)(Display*, GLXDrawable, int);
 
 		// ---------------------------------------- fin alias pour OpenGL
 
@@ -131,7 +136,6 @@ namespace Croissant
 			glBufferData_t					ext_glBufferData = nullptr;
 			glDebugMessageCallbackARB_t		ext_glDebugMessageCallbackARB = nullptr;
 			glDeleteBuffers_t				ext_glDeleteBuffers = nullptr;
-			wglSwapIntervalEXT_t			ext_wglSwapIntervalEXT = nullptr;
 			glCreateShader_t				ext_glCreateShader = nullptr;
 			glCreateProgram_t				ext_glCreateProgram = nullptr;
 			glLinkProgram_t					ext_glLinkProgram = nullptr;
@@ -166,6 +170,11 @@ namespace Croissant
 			glGetProgramInfoLog_t			ext_glGetProgramInfoLog = nullptr;
 			glGetUniformLocation_t			ext_glGetUniformLocation = nullptr;
 			glUniformMatrix4fv_t			ext_glUniformMatrix4fv = nullptr;
+#if defined(CROISSANT_WINDOWS)
+			wglSwapIntervalEXT_t			ext_wglSwapIntervalEXT = nullptr;
+#elif defined(CROISSANT_LINUX)
+			glXSwapIntervalEXT_t			ext_glXSwapIntervalEXT = nullptr;
+#endif
 			static GLenum					s_valueNames[static_cast<int>(OpenGLValueNameEnum::MAX_ELEMENT) + 1];
 			static GLenum					s_shaderIntegerNames[static_cast<int>(OpenGLShaderIntegerNameEnum::MAX_ELEMENT) + 1];
 			static GLenum					s_programIntegerNames[static_cast<int>(OpenGLProgramIntegerNameEnum::MAX_ELEMENT) + 1];

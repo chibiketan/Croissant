@@ -13,10 +13,16 @@
 #include "Exception/CroissantException.hpp"
 #include <Graphic/WindowEventKey.hpp>
 #include <Graphic/WindowMouseMoveEvent.hpp>
-#include <windowsx.h>
+#if defined(CROISSANT_WINDOWS)
+#  include <windowsx.h>
+#elif defined(CROISSANT_LINUX)
+#  include "../../Source/Graphic/WindowInternal.Linux.cpp"
+#endif
 
 using WindowException = Croissant::Exception::CroissantException;
 using string = std::string;
+
+
 
 namespace Croissant
 {
@@ -24,6 +30,7 @@ namespace Croissant
 	{
 		namespace
 		{
+#if defined(CROISSANT_WINDOWS)
 			//--------------------------------------------------------------------------------------
 			// Called every time the application receives a message
 			//--------------------------------------------------------------------------------------
@@ -122,15 +129,19 @@ namespace Croissant
 				return std::unique_ptr<WindowEvent const>(CROISSANT_NEW WindowMouseMoveEvent(deltaX, deltaY));
 			}
 
+#endif
 		}
+		// ------------------------------------------------------------------------------------------------ end windows specific section
 
 		// --------------------------------------------- Window imp
 		Window::Window(uint32_t width, uint32_t height, const std::string& title)
-			: m_windowHandle{ nullptr }, m_title{ title }, m_position{ 0, 0 }, m_width{ width }, m_height{ height }, m_mouseLastPosition{ 0, 0 }
+			: m_title{ title }, m_position{ 0, 0 }, m_width{ width }, m_height{ height }, m_mouseLastPosition{ 0, 0 }
+			  , m_win{ std::make_unique<WindowInternal>() }
 #if defined(CROISSANT_WINDOWS)
 				, m_className { nullptr }
 #endif
 		{
+#if defined(CROISSANT_WINDOWS)
 			m_className = "TutorialWindowClassTest";
 			// Register class
 			WNDCLASSEX wcex;
@@ -174,39 +185,57 @@ namespace Croissant
 				throw WindowException("Erreur lors de la création de la fenêtre");
 			}
 			UpdateWindowsPlacement(m_windowHandle, m_position, m_width, m_height);
+#else
+			m_win->Position(m_position);
+			m_win->Resize(m_width, m_height);
+#endif
 		}
 
 		Window::~Window()
 		{
 			Close();
+#if defined(CROISSANT_WINDOWS)
 			DestroyWindow(m_windowHandle);
 			UnregisterClass(m_className, nullptr);
+#endif
 		}
 
 		void Window::Close()
 		{
+#if defined(CROISSANT_WINDOWS)
 			ShowWindow(m_windowHandle, 0);
+#endif
+            m_win->Hide();
 		}
 
 		void Window::Open()
 		{
+#if defined(CROISSANT_WINDOWS)
 			ShowWindow(m_windowHandle, 1);
+#endif
+            m_win->Show();
 		}
 
 
-		const Window::SystemHandle& Window::GetSystemHandle() const
+		Window::SystemHandle const& Window::GetSystemHandle() const
 		{
-			return m_windowHandle;
+			return m_win->GetSystemHandle();
 		}
 
 		void Window::SetTitle(string const& title) {
+#if defined(CROISSANT_WINDOWS)
 			SetWindowText(m_windowHandle, title.c_str());
+#endif
+			m_win->SetTitle(title);
 		}
 
 		void Window::SetPosition(Math::Point2 const& position)
 		{
 			m_position = position;
+#if defined(CROISSANT_WINDOWS)
 			UpdateWindowsPlacement(m_windowHandle, m_position, m_width, m_height);
+#endif
+            m_win->Position(position);
 		}
 
 		Math::Point2 const& Window::GetPosition() const
@@ -226,18 +255,22 @@ namespace Croissant
 
 		void Window::CenterCursor()
 		{
-			POINT pt;
-			pt.x = m_position.X() + (m_width / 2.0f);
-			pt.y = m_position.Y() + (m_height / 2.0f);
+			int x, y;
+			x = m_position.X() + (m_width / 2.0f);
+			y = m_position.Y() + (m_height / 2.0f);
 //			ClientToScreen(m_windowHandle, &pt);
 			//SetCursorPos(m_position.X() + 50, m_position.Y() + 50);
-			m_mouseLastPosition.X(pt.x);
-			m_mouseLastPosition.Y(pt.y);
-			SetCursorPos(pt.x, pt.y);
+			m_mouseLastPosition.X(x);
+			m_mouseLastPosition.Y(y);
+#if defined(CROISSANT_WINDOWS)
+			SetCursorPos(x, y);
+#endif
+			m_win->SetCursorPosition(x, y);
 		}
 
 		std::unique_ptr<WindowEvent const> Window::PeekEvent()
 		{
+#if defined(CROISSANT_WINDOWS)
 			auto hnd = GetSystemHandle();
 
 			MSG msgTest;
@@ -291,6 +324,8 @@ namespace Croissant
 
 			return std::make_unique<WindowEventNone const>();
 			//return std::unique_ptr<WindowEvent const>(CROISSANT_NEW WindowEventNone());
+#endif
+			return m_win->PeekEvent();
 		}
 	}
 }

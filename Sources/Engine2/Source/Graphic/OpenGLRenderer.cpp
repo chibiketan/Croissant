@@ -1,8 +1,7 @@
-#include "..\..\Include\Graphic\OpenGLRenderer.hpp"
+#include "Graphic/OpenGLRenderer.hpp"
 // http://www.irit.fr/~Mathias.Paulin/M2IM/RenduTempsReel/VBO.html
 
 #include "Debug/MemoryManager.hpp"
-#include "Graphic/OpenGLRenderer.hpp"
 #include "Graphic/Window.hpp"
 #include "Core/LogManager.hpp"
 #include "Exception/CroissantException.hpp"
@@ -11,6 +10,9 @@
 #include <iostream>
 #include <chrono>
 #include <Core/VertexBuffer.hpp>
+#if defined(CROISSANT_LINUX)
+#  include <GL/glx.h>
+#endif
 
 
 #define BLACK_INDEX     0
@@ -21,8 +23,16 @@
 #define GLOBE    1
 #define CYLINDER 2
 #define CONE     3
-#define SWAPBUFFERS SwapBuffers(m_ghDC)
+
+#if defined(CROISSANT_WINDOWS)
+#  define SWAPBUFFERS SwapBuffers(m_ghDC)
+#elif defined(CROISSANT_LINUX)
+#  define SWAPBUFFERS glXSwapBuffers(m_window.GetSystemHandle().m_display, m_window.GetSystemHandle().m_window)
+#endif
 #define BUFFER_OFFSET(val) reinterpret_cast<void*>(val)
+#define GLX_CONTEXT_MAJOR_VERSION_ARB       0x2091
+#define GLX_CONTEXT_MINOR_VERSION_ARB       0x2092
+typedef GLXContext (*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
 
 using OpenGLRendererException = Croissant::Exception::CroissantException;
 
@@ -73,6 +83,7 @@ namespace Croissant
 			m_logManager.Write("Initialisation du renderer OpenGL");
 			//serviceProvider.Resolve(m_frameProvider);
 
+#if defined(CROISSANT_WINDOWS)
 			auto hwnd = m_window.GetSystemHandle();
 	        m_ghDC = GetDC(hwnd);
 	        if (NULL == m_ghDC)
@@ -99,6 +110,119 @@ namespace Croissant
 	        GetClientRect(hwnd, &rect);
 	        InitializeGLExtentions();
 	        InitializeGL(rect.right, rect.bottom);
+#elif defined(CROISSANT_LINUX)
+            auto hwnd = m_window.GetSystemHandle();
+			// Get a matching FB config
+			static int visual_attribs[] =
+					{
+							GLX_X_RENDERABLE    , True,
+							GLX_DRAWABLE_TYPE   , GLX_WINDOW_BIT,
+							GLX_RENDER_TYPE     , GLX_RGBA_BIT,
+							GLX_X_VISUAL_TYPE   , GLX_TRUE_COLOR,
+							GLX_RED_SIZE        , 8,
+							GLX_GREEN_SIZE      , 8,
+							GLX_BLUE_SIZE       , 8,
+							GLX_ALPHA_SIZE      , 8,
+							GLX_DEPTH_SIZE      , 24,
+							GLX_STENCIL_SIZE    , 8,
+							GLX_DOUBLEBUFFER    , True,
+							//GLX_SAMPLE_BUFFERS  , 1,
+							//GLX_SAMPLES         , 4,
+							None
+					};
+
+			int glx_major, glx_minor;
+
+			// FBConfigs were added in GLX version 1.3.
+			if ( !glXQueryVersion( hwnd.m_display, &glx_major, &glx_minor ) ||
+				 ( ( glx_major == 1 ) && ( glx_minor < 3 ) ) || ( glx_major < 1 ) )
+			{
+				printf("Invalid GLX version");
+				exit(1);
+			}
+
+			printf( "Getting matching framebuffer configs\n" );
+			int fbcount;
+			GLXFBConfig* fbc = glXChooseFBConfig(hwnd.m_display, DefaultScreen(hwnd.m_display), visual_attribs, &fbcount);
+			if (!fbc)
+			{
+				printf( "Failed to retrieve a framebuffer config\n" );
+				exit(1);
+			}
+			printf( "Found %d matching FB configs.\n", fbcount );
+
+			// Pick the FB config/visual with the most samples per pixel
+			printf( "Getting XVisualInfos\n" );
+			int best_fbc = -1, worst_fbc = -1, best_num_samp = -1, worst_num_samp = 999;
+
+			int i;
+			for (i=0; i<fbcount; ++i)
+			{
+				XVisualInfo *vi = glXGetVisualFromFBConfig( hwnd.m_display, fbc[i] );
+				if ( vi )
+				{
+					int samp_buf, samples;
+					glXGetFBConfigAttrib( hwnd.m_display, fbc[i], GLX_SAMPLE_BUFFERS, &samp_buf );
+					glXGetFBConfigAttrib( hwnd.m_display, fbc[i], GLX_SAMPLES       , &samples  );
+
+					printf( "  Matching fbconfig %d, visual ID 0x%2x: SAMPLE_BUFFERS = %d,"
+									" SAMPLES = %d\n",
+							i, vi -> visualid, samp_buf, samples );
+
+					if ( best_fbc < 0 || samp_buf && samples > best_num_samp )
+						best_fbc = i, best_num_samp = samples;
+					if ( worst_fbc < 0 || !samp_buf || samples < worst_num_samp )
+						worst_fbc = i, worst_num_samp = samples;
+				}
+				XFree( vi );
+			}
+
+			GLXFBConfig bestFbc = fbc[ best_fbc ];
+
+			// Be sure to free the FBConfig list allocated by glXChooseFBConfig()
+			XFree( fbc );
+
+			// Get a visual
+			//XVisualInfo *vi = glXGetVisualFromFBConfig( hwnd, bestFbc );
+			//printf( "Chosen visual ID = 0x%x\n", vi->visualid );
+
+
+			// NOTE: It is not necessary to create or make current to a context before
+			// calling glXGetProcAddressARB
+			glXCreateContextAttribsARBProc glXCreateContextAttribsARB = 0;
+			glXCreateContextAttribsARB = (glXCreateContextAttribsARBProc)
+					glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
+
+			int context_attribs[] =
+					{
+							GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
+							GLX_CONTEXT_MINOR_VERSION_ARB, 0,
+							//GLX_CONTEXT_FLAGS_ARB        , GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
+							None
+					};
+
+			printf( "Creating context\n" );
+			m_contextGl = glXCreateContextAttribsARB( hwnd.m_display, bestFbc, 0,
+											  True, context_attribs );
+
+			// Sync to ensure any errors generated are processed.
+			XSync( hwnd.m_display, False );
+
+			// Verifying that context is a direct context
+			if ( ! glXIsDirect ( hwnd.m_display, m_contextGl ) )
+			{
+				printf( "Indirect GLX rendering context obtained\n" );
+			}
+			else
+			{
+				printf( "Direct GLX rendering context obtained\n" );
+			}
+
+			printf( "Making context current\n" );
+			glXMakeCurrent( hwnd.m_display, hwnd.m_window, m_contextGl );
+
+#endif
+
 
 			//serviceProvider.Resolve(m_eventManager);
 			//m_eventManager->RegisterListener("Frame::Render", m_renderDelegate);
@@ -110,6 +234,7 @@ namespace Croissant
 			m_logManager.Write("Destruction du renderer OpenGL");
 		}
 
+#if defined(CROISSANT_WINDOWS)
 		void OpenGLRenderer::SetupPixelFormat(HDC hdc)
 		{
 		    PIXELFORMATDESCRIPTOR pfd, *ppfd;
@@ -140,6 +265,7 @@ namespace Croissant
 		    	throw OpenGLRendererException("Erreur lors de la création du renrerer OpenGL : SetPixelFormat failed");
 		    }
 		}
+#endif
 
 		void OpenGLRenderer::InitializeGL(GLsizei width, GLsizei height)
 		{

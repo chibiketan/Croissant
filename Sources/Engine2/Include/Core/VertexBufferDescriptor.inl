@@ -1,6 +1,9 @@
+#pragma once
 #ifndef CROISSANT_ENGINE_CORE_VERTEXBUFFERDESCRIPTOR_INL_INC
 #  define CROISSANT_ENGINE_CORE_VERTEXBUFFERDESCRIPTOR_INL_INC
-#  pragma once
+
+#  include "Core/VertexBufferDescriptor.hpp"
+#  include <cstring>
 
 namespace Croissant
 {
@@ -63,7 +66,7 @@ namespace Croissant
 
 		inline bool VertexBufferDescriptor::DescriptorElement::operator==(DescriptorElement const& right) const
 		{
-			return ::memcmp(this, &right, sizeof(right)) == 0;
+			return std::memcmp(this, &right, sizeof(right)) == 0;
 		}
 
 	}

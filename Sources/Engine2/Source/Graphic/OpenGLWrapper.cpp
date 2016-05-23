@@ -9,11 +9,15 @@
 #include "Graphic/OpenGLWrapper.hpp"
 #include "Exception/CroissantException.hpp"
 #include "Core/LogManager.hpp"
-#include <gl/gl.h>
-#include <gl/glu.h>
-#include <gl/glext.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glext.h>
 
-#include <windows.h>
+#if defined(CROISSANT_WINDOWS)
+#  include <windows.h>
+#elif defined(CROISSANT_LINUX)
+#  include <GL/glx.h>
+#endif
 
 #define CAST(p) static_cast<size_t>(p)
 #define DUMMY_WINDOW_CLASS_NAME             "oglversionchecksample"
@@ -676,6 +680,7 @@ namespace Croissant
 			using LogManager = Core::LogManager;
 			using string = std::string;
 
+#if defined(CROISSANT_WINDOWS)
 			template <typename Func>
 			Func LoadGLSymbol(string const& ext, bool throwIfNotFound = true)
 			{
@@ -782,7 +787,23 @@ namespace Croissant
 				UnregisterClass(DUMMY_WINDOW_CLASS_NAME, nullptr);
 			}
 
+#elif defined(CROISSANT_LINUX)
+			template <typename Func>
+			Func LoadGLSymbol(string const& ext, bool throwIfNotFound = true)
+			{
+				auto proc = glXGetProcAddressARB(reinterpret_cast<GLubyte const*>(ext.c_str()));
+
+				if (nullptr == proc && throwIfNotFound)
+				{
+					throw OpenGLRendererException(string("Impossible de trouver l'extension : ") + ext);
+				}
+
+				return reinterpret_cast<Func>(proc);
+			}
+
+#endif
 		} // !namespace anonyme
+
 
 		template<unsigned int funcIndex>
 		inline bool glCheckForError(const OpenGLWrapper& wrapper)
@@ -800,11 +821,14 @@ namespace Croissant
 		OpenGLWrapper::OpenGLWrapper()
 			: m_logManager{ CROISSANT_GET_LOG(OpenGLWrapper) }
 		{
+#if defined(CROISSANT_WINDOWS)
 			HDC ourWindowHandleToDeviceContext = { nullptr };
 			HGLRC ourOpenGLRenderingContext = { nullptr };
 			HWND windowHandle = { nullptr };
 
 			createDummyContext(ourWindowHandleToDeviceContext, ourOpenGLRenderingContext, windowHandle);
+#endif
+
 
 			m_logManager.Write("Entrée dans OpenGLWrapper constructeur");
 			ext_glDebugMessageCallbackARB = LoadGLSymbol<glDebugMessageCallbackARB_t>("glDebugMessageCallbackARB", false);
@@ -812,7 +836,6 @@ namespace Croissant
 			ext_glGenBuffers = LoadGLSymbol<glGenBuffers_t>("glGenBuffers");
 			ext_glBufferData = LoadGLSymbol<glBufferData_t>("glBufferData");
 			ext_glDeleteBuffers = LoadGLSymbol<glDeleteBuffers_t>("glDeleteBuffers");
-			ext_wglSwapIntervalEXT = LoadGLSymbol<wglSwapIntervalEXT_t>("wglSwapIntervalEXT");
 			ext_glCreateShader = LoadGLSymbol<glCreateShader_t>("glCreateShader");
 			ext_glCreateProgram = LoadGLSymbol<glCreateProgram_t>("glCreateProgram");
 			ext_glLinkProgram = LoadGLSymbol<glLinkProgram_t>("glLinkProgram");
@@ -847,6 +870,11 @@ namespace Croissant
 			ext_glGetProgramInfoLog = LoadGLSymbol<glGetProgramInfoLog_t>("glGetProgramInfoLog");
 			ext_glGetUniformLocation = LoadGLSymbol<glGetUniformLocation_t>("glGetUniformLocation");
 			ext_glUniformMatrix4fv = LoadGLSymbol<glUniformMatrix4fv_t>("glUniformMatrix4fv");
+#if defined(CROISSANT_WINDOWS)
+			ext_wglSwapIntervalEXT = LoadGLSymbol<wglSwapIntervalEXT_t>("wglSwapIntervalEXT");
+#elif defined(CROISSANT_LINUX)
+			ext_glXSwapIntervalEXT = LoadGLSymbol<glXSwapIntervalEXT_t>("glXSwapIntervalEXT");
+#endif
 
 			int NumberOfExtensions;
 			glGetIntegerv(GL_NUM_EXTENSIONS, &NumberOfExtensions);
@@ -982,10 +1010,21 @@ namespace Croissant
 				val = 1;
 			}
 
+#if defined(CROISSANT_WINDOWS)
 			auto ret = ext_wglSwapIntervalEXT(val);
+#elif defined(CROISSANT_LINUX)
+			auto ret = 0;
+			auto dpy = glXGetCurrentDisplay();
+			auto drawable = glXGetCurrentDrawable();
+
+			if (drawable) {
+				ext_glXSwapIntervalEXT(dpy, drawable, val);
+				ret = 1;
+			}
+#endif
 
 			glCheckForError<GLFUNCINDEX_SWAP_INTERVAL>(*this);
-			return ret == TRUE;
+			return ret == 1;
 		}
 
 		void OpenGLWrapper::ClearIndex(GLfloat colorIndex) const

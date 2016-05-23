@@ -27,7 +27,7 @@ namespace Croissant
 			void Refresh();
 
 			File& operator=(File const&) = delete;
-			File& operator=(File &&) noexcept = default;
+			File& operator=(File &&) = default;
 
 		private:
 			std::string m_fullPath;

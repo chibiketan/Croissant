@@ -104,6 +104,16 @@ croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
 	Threading/Thread.hpp
 )
 
+if (CROISSANT_HOST_LINUX EQUAL 1)
+#    croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
+#            Graphic/WindowInternal.Linux.hpp
+#            )
+
+#    croissant_files(${PROJECT_NAME} ${ENGINE_SOURCE}
+#            Graphic/WindowInternal.Linux.cpp
+#            )
+endif()
+
 # Now build our tools
 
 if (${CROISSANT_SHARED_LIB})
@@ -122,9 +132,15 @@ target_include_directories(${PROJECT_NAME}
 	PUBLIC ${CROISSANT_ENGINE_ROOT_DIR}/Include
 )
 
-target_link_libraries(${PROJECT_NAME}
-	PUBLIC opengl32 glu32 gdi32
-)
+if(CROISSANT_HOST_WINDOWS EQUAL 1)
+    target_link_libraries(${PROJECT_NAME}
+        PUBLIC opengl32 glu32 gdi32
+    )
+elseif(CROISSANT_HOST_LINUX EQUAL 1)
+    target_link_libraries(${PROJECT_NAME}
+        PUBLIC GL X11
+    )
+endif()
 
 #target_compile_features(${PROJECT_NAME}
 #	PUBLIC

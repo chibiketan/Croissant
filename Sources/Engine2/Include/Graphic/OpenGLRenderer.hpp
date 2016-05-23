@@ -13,6 +13,9 @@
 #  include <GL/glu.h>
 #  include <GL/glext.h>
 #  include <map>
+#  if defined(CROISSANT_LINUX)
+#    include <GL/glx.h>
+#  endif
 
 namespace Croissant
 {
@@ -74,7 +77,9 @@ namespace Croissant
 			std::shared_ptr<Core::AbstractBuffer>	CreateBuffer(uint32_t size, Core::BufferTypeEnum type);
 
 		private:
+#if defined(CROISSANT_WINDOWS)
 			void SetupPixelFormat(HDC hdc);
+#endif
 			void InitializeGL(GLsizei width, GLsizei height);
 			void InitializeGLExtentions();
 			void UpdateCamera(std::shared_ptr<Camera> camera);
@@ -92,7 +97,7 @@ namespace Croissant
 			HDC m_ghDC;
 			HGLRC m_contextGl;
 #elif defined(CROISSANT_LINUX)
-			
+			GLXContext m_contextGl;
 #endif
 
 
