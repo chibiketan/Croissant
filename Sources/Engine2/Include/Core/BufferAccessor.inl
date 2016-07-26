@@ -29,7 +29,8 @@ namespace Croissant
 		template <typename TBuffer, typename TData>
 		size_t BufferAccessor<TBuffer, TData>::GetSize() const
 		{
-			return m_buffer.GetSize() / sizeof(TData);
+			//return m_buffer.GetSize() / sizeof(TData);
+			return m_buffer.GetNumElement();
 		}
 
 		template <typename TBuffer, typename TData>

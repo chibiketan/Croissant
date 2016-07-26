@@ -5,8 +5,8 @@ namespace Croissant
 {
 	namespace Core
 	{
-		IndexBuffer::IndexBuffer(std::shared_ptr<AbstractBuffer> internalBuffer)
-			: m_internalBuffer { internalBuffer }
+		IndexBuffer::IndexBuffer(uint32_t numElement, std::shared_ptr<AbstractBuffer> internalBuffer)
+			: m_internalBuffer { internalBuffer }, m_numElement(numElement)
 		{
 		}
 
@@ -23,6 +23,16 @@ namespace Croissant
 		uint32_t IndexBuffer::GetBufferId() const
 		{
 			return m_internalBuffer->GetBufferId();
+		}
+
+		uint32_t IndexBuffer::GetSize() const
+		{
+			return m_internalBuffer->GetSize();
+		}
+
+		uint32_t IndexBuffer::GetNumElement() const
+		{
+			return m_numElement;
 		}
 	}
 }

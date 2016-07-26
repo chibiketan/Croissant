@@ -41,6 +41,8 @@
 #include <Core/IndexBuffer.hpp>
 #include <Core/Mesh.hpp>
 
+#include <stack>
+
 using Clock = std::chrono::high_resolution_clock;
 using Time = Clock::time_point;
 using durationSecond = std::chrono::duration<float>;
@@ -64,24 +66,26 @@ auto vertexShaderContent = std::string(R"(
 #version 140
 
 /********************Entrant********************/
-in vec3 VertexPosition;
-in vec3 VertexColor;
+in vec4 VertexPosition;
+/*in vec4 VertexColor;*/
 
 /********************Uniformes********************/
-uniform mat4 WorldViewProjMatrix;
+/*uniform mat4 WorldViewProjMatrix;
 uniform mat4 ModelWorldMatrix;
 uniform mat4 ViewMatrix;
-uniform mat4 ProjectionMatrix;
+uniform mat4 ProjectionMatrix;*/
 
 /********************Fonctions********************/
-out vec3 vcolor;
+out vec4 vcolor;
 
 void main()
 {
-	gl_Position = ProjectionMatrix * ViewMatrix * ModelWorldMatrix * vec4(VertexPosition, 1.0);
+	/*gl_Position = ProjectionMatrix * ViewMatrix * ModelWorldMatrix * vec4(VertexPosition.xyz, 1.0);*/
 	/*gl_Position = WorldViewProjMatrix * vec4(VertexPosition, 1.0);*/
 	/*gl_Position = matrix * vec4(VertexPosition, 1.0);*/
-	vcolor = VertexColor;
+	/*vcolor = VertexColor;*/
+	gl_Position = vec4(VertexPosition.xyz, 1.0);
+	vcolor = vec4(255.0, 0.0, 0.0, 1.0);
 }
 )");
 
@@ -89,27 +93,27 @@ auto fragmentShaderContent = std::string(R"(
 #version 140
 
 /********************Entrant********************/
-in vec3 vcolor;
+in vec4 vcolor;
 /********************Sortant********************/
 /*out vec4 RenderTarget0;*/
 /********************Uniformes********************/
-uniform vec4 Color;
+/*uniform vec4 Color;*/
 
 /********************Fonctions********************/
 void main()
 {
-	gl_FragColor = vec4(vcolor, 1.0);
+	gl_FragColor = vcolor;
 /*	RenderTarget0 = Color;*/
 }
 )");
 
-vertexProp planVertices[] = {
-	vertexProp{ { 0.0f, 0.0f, 0.0f },{ 0xFF, 0x00, 0x00 } }, // X
-	vertexProp{ { 1.0f, 0.0f, 0.0f },{ 0xFF, 0x00, 0x00 } }, // X
-	vertexProp{ { 0.0f, 0.0f, 0.0f },{ 0x00, 0xFF, 0x00 } }, // Y
-	vertexProp{ { 0.0f, 1.0f, 0.0f },{ 0x00, 0xFF, 0x00 } }, // Y
-	vertexProp{ { 0.0f, 0.0f, 0.0f },{ 0x00, 0x00, 0xFF } }, // Z
-	vertexProp{ { 0.0f, 0.0f, 1.0f },{ 0x00, 0x00, 0xFF } }, // Z
+vertexProp2 planVertices[] = {
+	vertexProp2{ { 0.0f, 0.0f, 0.0f, 0.0f },{ 0xFF, 0x00, 0x00, 0x00 } }, // X
+	vertexProp2{ { 1.0f, 0.0f, 0.0f, 0.0f },{ 0xFF, 0x00, 0x00, 0x00 } }, // X
+	vertexProp2{ { 0.0f, 0.0f, 0.0f, 0.0f },{ 0x00, 0xFF, 0x00, 0x00 } }, // Y
+	vertexProp2{ { 0.0f, 1.0f, 0.0f, 0.0f },{ 0x00, 0xFF, 0x00, 0x00 } }, // Y
+	vertexProp2{ { 0.0f, 0.0f, 0.0f, 0.0f },{ 0x00, 0x00, 0xFF, 0x00 } }, // Z
+	vertexProp2{ { 0.0f, 0.0f, 1.0f, 0.0f },{ 0x00, 0x00, 0xFF, 0x00 } }, // Z
 };
 
 vertexProp vertices[] = {
@@ -192,6 +196,11 @@ namespace Croissant
 
 		class DBlockApplication
 		{
+			const int32_t m_vertexAttributeIndexes[static_cast<std::size_t>(Core::VertexComponentEnum::MAX_ELEMENT) + 1]{
+				0,	// Position
+				1	// Color
+			};
+
 		public:
 			DBlockApplication()
 				: m_log{ CROISSANT_GET_LOG_WITH_FILE(DBlockApplication) }, m_keys{}, m_win{ 1024, 768, "test titre" },
@@ -241,8 +250,9 @@ namespace Croissant
 				}
 
 				// on associe à chaque nom de variable des shader un index pour y faire référence plus tard à partir du vertexbuffer 
-				opengl.BindAttribLocation(m_programId, 0, "VertexPosition");
-				opengl.BindAttribLocation(m_programId, 1, "VertexColor");
+
+				opengl.BindAttribLocation(m_programId, m_vertexAttributeIndexes[static_cast<std::size_t>(Core::VertexComponentEnum::Position)], "VertexPosition");
+				opengl.BindAttribLocation(m_programId, m_vertexAttributeIndexes[static_cast<std::size_t>(Core::VertexComponentEnum::Color)], "VertexColor");
 
 				// on marque les shader comme à attacher au programme
 				opengl.AttachShader(m_programId, fragmentShaderId);
@@ -272,46 +282,95 @@ namespace Croissant
 
 				auto planNode = std::make_shared<Core::Node>();
 				// plan index buffer
-				m_planIndexBuffer = std::make_shared<Core::IndexBuffer>(m_renderer.CreateBuffer(sizeof(planIndexes), Core::BufferTypeEnum::Index));
-				auto address = m_planIndexBuffer->Map(Core::BufferAccessEnum::Write);
-				memcpy(address, planIndexes, planIndexesSize);
-				m_planIndexBuffer->Unmap();
-				address = nullptr;
+				//m_planIndexBuffer = std::make_shared<Core::IndexBuffer>(sizeof(planIndexes), m_renderer.CreateBuffer(sizeof(planIndexes), Core::BufferTypeEnum::Index));
+				//auto address = m_planIndexBuffer->Map(Core::BufferAccessEnum::Write);
+				//memcpy(address, planIndexes, planIndexesSize);
+				//m_planIndexBuffer->Unmap();
+				//address = nullptr;
 
 				// plan vertex buffer descriptor
+				//Core::VertexBufferDescriptor planVertexDescriptor{};
+
+				//planVertexDescriptor.Activate(Core::VertexComponentEnum::Position, Core::VertexComponentTypeEnum::Float3, 0, 3);
+				////planVertexDescriptor.Activate(Core::VertexComponentEnum::Color, Core::VertexComponentTypeEnum::Color, CROISSANT_OFFSET_OF(vertexProp2, Color), sizeof(vertexProp2::Color) / sizeof(std::uint8_t));
+				//planVertexDescriptor.SetStride(3);
+
+				//auto planVertexBuffer = std::make_shared<Core::VertexBuffer>(planVertexDescriptor, 6, m_renderer.CreateBuffer(3 * 6, Core::BufferTypeEnum::Vertex));
+				//{
+				//	Core::BufferAccessor<Core::VertexBuffer, float[3]> accessor{ *planVertexBuffer, Core::BufferAccessEnum::Write };
+				//	auto maxElement = accessor.GetSize();
+				//	for (size_t i = 0; i < maxElement; ++i)
+				//	{
+				//		auto& vertex = accessor[i];
+				//		
+				//		vertex[0] = 1.0f;
+				//		vertex[1] = i + 0.0f;
+				//		vertex[2] = 1.0f;
+				//	}
+				//}
+
+				//// plan vertex buffer
+				//auto planIndexBuffer = std::make_shared<Core::IndexBuffer>(6, m_renderer.CreateBuffer(6 * sizeof(uint32_t), Core::BufferTypeEnum::Index));
+				//{
+				//	Core::BufferAccessor<Core::IndexBuffer, uint32_t> accessor{ *planIndexBuffer, Core::BufferAccessEnum::Write };
+				//	auto maxElement = accessor.GetSize();
+
+				//	for (size_t i = 0; i < maxElement; ++i)
+				//	{
+				//		accessor[i] = planIndexes[i];
+				//	}
+				//}
+
 				Core::VertexBufferDescriptor planVertexDescriptor{};
 
-				planVertexDescriptor.Activate(Core::VertexComponentEnum::Position, CROISSANT_OFFSET_OF(vertexProp2, Position), sizeof(vertexProp2::Position));
-				planVertexDescriptor.Activate(Core::VertexComponentEnum::Color, CROISSANT_OFFSET_OF(vertexProp2, Color), sizeof(vertexProp2::Color));
+				planVertexDescriptor.Activate(Core::VertexComponentEnum::Position, Core::VertexComponentTypeEnum::Float4, CROISSANT_OFFSET_OF(vertexProp2, Position), sizeof(vertexProp2::Position) / sizeof(float));
+				planVertexDescriptor.Activate(Core::VertexComponentEnum::Color, Core::VertexComponentTypeEnum::Color, CROISSANT_OFFSET_OF(vertexProp2, Color), sizeof(vertexProp2::Color) / sizeof(std::uint8_t));
+				// TODO utilisation pour l'instant de 3 en dur
+				//planVertexDescriptor.Activate(Core::VertexComponentEnum::Position, Core::VertexComponentTypeEnum::Float3, CROISSANT_OFFSET_OF(vertexProp2, Position), 3);
+				//planVertexDescriptor.Activate(Core::VertexComponentEnum::Color, Core::VertexComponentTypeEnum::Color, CROISSANT_OFFSET_OF(vertexProp2, Color), 3);
+				planVertexDescriptor.SetStride(sizeof(vertexProp2));
 
-				auto planVertexBuffer = std::make_shared<Core::VertexBuffer>(planVertexDescriptor, sizeof(planVertices), m_renderer.CreateBuffer(sizeof(planVertices), Core::BufferTypeEnum::Vertex));
+				auto planVertexBuffer = std::make_shared<Core::VertexBuffer>(planVertexDescriptor, sizeof(planVertices) / sizeof(planVertices[0]), m_renderer.CreateBuffer(sizeof(planVertices), Core::BufferTypeEnum::Vertex));
 				{
 					Core::BufferAccessor<Core::VertexBuffer, vertexProp2> accessor{ *planVertexBuffer, Core::BufferAccessEnum::Write };
 					auto maxElement = accessor.GetSize();
 					for (size_t i = 0; i < maxElement; ++i)
 					{
 						auto& vertex = accessor[i];
-						auto& pos = planVertices[i].m_coord;
-						auto& col = planVertices[i].m_color;
-						
-						vertex.Position.X() = pos[0];
-						vertex.Position.Y() = pos[1];
-						vertex.Position.Z() = pos[2];
-						vertex.Color.X(col[0]);
-						vertex.Color.Y(col[1]);
-						vertex.Color.Z(col[2]);
-						vertex.Color.W(1);
+						auto& pos = planVertices[i].Position;
+						auto& col = planVertices[i].Color;
+
+						vertex.Position = pos;
+						vertex.Color = col;
+						//vertex.Position.X() = pos.X();
+						//vertex.Position.Y() = pos.Y();
+						//vertex.Position.Z() = pos.Z();
+						//vertex.Color.X(col.X());
+						//vertex.Color.Y(col.Y());
+						//vertex.Color.Z(col.Z());
+						//vertex.Color.W(col.W());
 					}
 				}
 
-				auto planMesh = std::make_shared<Core::Mesh>(planVertexBuffer, m_planIndexBuffer);
-				planNode->AddMesh(planMesh);
 
-				m_rootNode = planNode;
-				
 				//descriptor.Activate(reinterpret_cast<size_t>(&((static_cast<vertexProp*>(0))->*m_coord)), sizeof(vertexProp::m_coord));
 
 				// plan vertex buffer
+				auto planIndexBuffer = std::make_shared<Core::IndexBuffer>(sizeof(planIndexes) / sizeof(planIndexes[0]), m_renderer.CreateBuffer(sizeof(planIndexes), Core::BufferTypeEnum::Index));
+				{
+					Core::BufferAccessor<Core::IndexBuffer, uint32_t> accessor{ *planIndexBuffer, Core::BufferAccessEnum::Write };
+					auto maxElement = accessor.GetSize();
+
+					for (size_t i = 0; i < maxElement; ++i)
+					{
+						accessor[i] = planIndexes[i];
+					}
+				}
+
+				auto planMesh = std::make_shared<Core::Mesh>(planVertexBuffer, planIndexBuffer);
+				planNode->AddMesh(planMesh);
+
+				m_rootNode = planNode;
 
 
 
@@ -319,9 +378,9 @@ namespace Croissant
 				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, m_verticesBufferId);
 				opengl.BufferData(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, sizeof(vertices), vertices, Graphic::OpenGLBufferUsageEnum::StaticDraw);
 
-				opengl.GenBuffers(1, &m_planVerticesBufferId);
-				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, m_planVerticesBufferId);
-				opengl.BufferData(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, sizeof(planVertices), planVertices, Graphic::OpenGLBufferUsageEnum::StaticDraw);
+				//opengl.GenBuffers(1, &m_planVerticesBufferId);
+				//opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, m_planVerticesBufferId);
+				//opengl.BufferData(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, sizeof(planVertices), planVertices, Graphic::OpenGLBufferUsageEnum::StaticDraw);
 
 				opengl.GenBuffers(1, &m_pointVerticesBufferId);
 				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, m_pointVerticesBufferId);
@@ -526,26 +585,96 @@ namespace Croissant
 				// render
 
 				// render plan
-				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, m_planVerticesBufferId);
-				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, m_planIndexBuffer->GetBufferId());
-				opengl.EnableVertexAttribArray(0);
-				opengl.EnableVertexAttribArray(1);
-				// définition des constantes
-				//opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, true, cam.GetProjectionViewMatrix());
-				opengl.SetUniformMatrix4f(m_uniformViewMatrix, 1, true, m_cam->GetViewMatrix());
-				opengl.SetUniformMatrix4f(m_uniformProjectionMatrix, 1, true, m_cam->GetProjectionMatrix());
-				// définition des attributs des vertex
-				opengl.VertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vertexProp), nullptr);
-				opengl.VertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, true, sizeof(vertexProp), BUFFER_OFFSET(sizeof(planVertices[0].m_coord)));
-				// dessin effectif
-				opengl.SetUniformMatrix4f(m_uniformModelWorldMatrix, 1, true, Croissant::Math::Matrix4f::Identity());
-				opengl.DrawElements(GL_LINES, static_cast<GLsizei>(planIndexesSize), GL_UNSIGNED_INT, nullptr);
-				// desactivation des attributs de vertex
-				opengl.DisableVertexAttribArray(0);
-				opengl.DisableVertexAttribArray(1);
-				// suppression du binding sur les buffers
-				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, 0);
-				opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, 0);
+				std::stack<Core::NodeCPtr> nodeToRender;
+				nodeToRender.push(m_rootNode);
+				do
+				{
+					auto node = nodeToRender.top();
+					nodeToRender.pop();
+
+					for (auto& mesh : node->GetMeshes())
+					{
+						auto vBuf = mesh->GetVertexBuffer();
+						auto iBuf = mesh->GetIndexBuffer();
+						auto descriptors = vBuf->GetDescriptor();
+
+						// on assigne les buffers
+						opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, vBuf->GetBufferId());
+						opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, iBuf->GetBufferId());
+
+						// mise à jour des attributs utilisés
+						for (std::size_t i = 0; i <= static_cast<std::size_t>(Core::VertexComponentEnum::MAX_ELEMENT); ++i)
+						{
+							auto descriptor = descriptors.GetDescriptor(static_cast<Core::VertexComponentEnum>(i));
+
+							if (descriptor.IsActive())
+							{
+								opengl.EnableVertexAttribArray(m_vertexAttributeIndexes[i]);
+								switch (descriptor.GetType())
+								{
+								case Core::VertexComponentTypeEnum::Color:
+									opengl.VertexAttribPointer(m_vertexAttributeIndexes[i],
+										descriptor.GetSize(),
+										GL_UNSIGNED_BYTE,
+										true,
+										descriptors.GetStride(),
+										BUFFER_OFFSET(descriptor.GetOffset()));
+									break;
+								case Core::VertexComponentTypeEnum::Float1:
+								case Core::VertexComponentTypeEnum::Float2:
+								case Core::VertexComponentTypeEnum::Float3:
+								case Core::VertexComponentTypeEnum::Float4:
+									opengl.VertexAttribPointer(m_vertexAttributeIndexes[i],
+										descriptor.GetSize(),
+										GL_FLOAT,
+										false,
+										descriptors.GetStride(),
+										BUFFER_OFFSET(descriptor.GetOffset()));
+									break;
+								default:
+									Core::WriteTraceError("Type de composant du vertex buffer inconnu");
+								}
+							}
+							else
+							{
+								opengl.DisableVertexAttribArray(m_vertexAttributeIndexes[i]);
+							}
+						}
+
+						// TODO mettre à jour les uniforms
+
+						auto arrayBuff = opengl.GetInteger(Graphic::OpenGLValueNameEnum::ArrayBufferBinding);
+						auto elArrayBuff = opengl.GetInteger(Graphic::OpenGLValueNameEnum::ElementArrayBufferBinding);
+
+						// draw
+						// TODO remove debug uniform
+						//opengl.SetUniformMatrix4f(m_uniformViewMatrix, 1, true, m_cam->GetViewMatrix());
+						//opengl.SetUniformMatrix4f(m_uniformProjectionMatrix, 1, true, m_cam->GetProjectionMatrix());
+						//opengl.SetUniformMatrix4f(m_uniformModelWorldMatrix, 1, true, Croissant::Math::Matrix4f::Identity());
+						// Le nombre est le nombre d'élément à dessiner, pas le nombre d'élément dans l'index buffer ><
+						opengl.DrawElements(GL_LINES, static_cast<GLsizei>(vBuf->GetNumElement()), GL_UNSIGNED_INT, nullptr);
+
+					}
+					// TODO itérer sur tous les noeuds
+				} while (!nodeToRender.empty());
+				//opengl.EnableVertexAttribArray(0);
+				//opengl.EnableVertexAttribArray(1);
+				//// définition des constantes
+				////opengl.SetUniformMatrix4f(uniformWorldViewProjMatrix, 1, true, cam.GetProjectionViewMatrix());
+				//opengl.SetUniformMatrix4f(m_uniformViewMatrix, 1, true, m_cam->GetViewMatrix());
+				//opengl.SetUniformMatrix4f(m_uniformProjectionMatrix, 1, true, m_cam->GetProjectionMatrix());
+				//// définition des attributs des vertex
+				//opengl.VertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vertexProp), nullptr);
+				//opengl.VertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, true, sizeof(vertexProp), BUFFER_OFFSET(sizeof(planVertices[0].Position)));
+				//// dessin effectif
+				//opengl.SetUniformMatrix4f(m_uniformModelWorldMatrix, 1, true, Croissant::Math::Matrix4f::Identity());
+				//opengl.DrawElements(GL_LINES, static_cast<GLsizei>(planIndexesSize), GL_UNSIGNED_INT, nullptr);
+				//// desactivation des attributs de vertex
+				//opengl.DisableVertexAttribArray(0);
+				//opengl.DisableVertexAttribArray(1);
+				//// suppression du binding sur les buffers
+				//opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ElementArrayBuffer, 0);
+				//opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, 0);
 
 
 				//			// render cube
@@ -610,7 +739,7 @@ namespace Croissant
 
 			uint32_t m_verticesBufferId;
 			uint32_t m_indexesBufferId;
-			uint32_t m_planVerticesBufferId;
+			//uint32_t m_planVerticesBufferId;
 			uint32_t m_pointVerticesBufferId;
 			uint32_t m_pointIndexesBufferId;
 			int32_t m_uniformWorldViewProjMatrix;

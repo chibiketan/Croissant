@@ -14,15 +14,17 @@ namespace Croissant
 		class ENGINE_API VertexBuffer final
 		{
 		public:
-			explicit VertexBuffer(VertexBufferDescriptor descriptor, uint32_t size, std::shared_ptr<AbstractBuffer> internalBuffer);
+			explicit VertexBuffer(VertexBufferDescriptor descriptor, uint32_t numElement, std::shared_ptr<AbstractBuffer> internalBuffer);
 			void*		Map(BufferAccessEnum access) const;
 			void		Unmap() const;
 			uint32_t	GetSize() const;
+			uint32_t	GetBufferId() const;
+			uint32_t	GetNumElement() const;
 			VertexBufferDescriptor const&	GetDescriptor() const;
 
 		private:
 			VertexBufferDescriptor			m_descriptor;
-			uint32_t						m_size;
+			std::uint32_t					m_numElement;
 			std::shared_ptr<AbstractBuffer>	m_internalBuffer;
 		};
 	}
@@ -32,11 +34,6 @@ namespace Croissant
 {
 	namespace Core
 	{
-		inline uint32_t VertexBuffer::GetSize() const
-		{
-			return m_size;
-		}
-
 		inline VertexBufferDescriptor const& VertexBuffer::GetDescriptor() const
 		{
 			return m_descriptor;

@@ -33,6 +33,17 @@ namespace Croissant
 			Color,
 			MAX_ELEMENT = Color
 		};
+
+		enum class VertexComponentTypeEnum
+		{
+			None,
+			Float1,
+			Float2,
+			Float3,
+			Float4,
+			Color,
+			MAX_ELEMENT = Color
+		};
 	}
 }
 

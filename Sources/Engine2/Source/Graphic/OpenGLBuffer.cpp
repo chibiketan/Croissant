@@ -15,7 +15,7 @@ namespace Croissant
 		};
 
 		OpenGLBuffer::OpenGLBuffer(OpenGLWrapper& m_wrapper, uint32_t bufferSize, OpenGLBufferTargetEnum target, OpenGLBufferUsageEnum usage)
-			: m_wrapper{ m_wrapper }, m_bufferId{ std::numeric_limits<uint32_t>::max() },
+			: AbstractBuffer(bufferSize), m_wrapper{ m_wrapper }, m_bufferId{ std::numeric_limits<uint32_t>::max() },
 			m_target { target }
 		{
 			
@@ -34,8 +34,8 @@ namespace Croissant
 
 		void OpenGLBuffer::Unmap() const
 		{
-			m_wrapper.BindBuffer(m_target, m_bufferId);
 			m_wrapper.UnmapBuffer(m_target);
+			m_wrapper.BindBuffer(m_target, 0);
 		}
 	}
 }

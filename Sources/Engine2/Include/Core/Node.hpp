@@ -55,6 +55,9 @@ namespace Croissant
 			mutable std::list<OnUpdateCallback*>	m_onUpdateListeners;
 			mutable Math::Matrix4f					m_modelToWorldMatrix;
 		};
+
+		using NodePtr = std::shared_ptr<Node>;
+		using NodeCPtr = std::shared_ptr<Node const>;
 	}
 }
 

@@ -15,12 +15,16 @@ namespace Croissant
 		public:
 			Mesh(std::shared_ptr<VertexBuffer> vertexBuffer, std::shared_ptr<IndexBuffer> indexBuffer);
 			std::shared_ptr<VertexBuffer const>	GetVertexBuffer() const;
-			std::shared_ptr<IndexBuffer const>	GetIndexBuffer() const;
+			IndexBufferCPtr	GetIndexBuffer() const;
+			void								SetIndexBuffer(IndexBufferPtr const& indexBuffer);
 
 		private:
 			std::shared_ptr<VertexBuffer>	m_vertexBuffer;
-			std::shared_ptr<IndexBuffer>		m_indexBuffer;
+			IndexBufferPtr					m_indexBuffer;
 		};
+
+		using MeshPtr = std::shared_ptr<Mesh>;
+
 	}
 }
 

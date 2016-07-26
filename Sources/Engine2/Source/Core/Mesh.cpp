@@ -14,9 +14,14 @@ namespace Croissant
 			return m_vertexBuffer;
 		}
 
-		std::shared_ptr<IndexBuffer const> Mesh::GetIndexBuffer() const
+		IndexBufferCPtr Mesh::GetIndexBuffer() const
 		{
 			return m_indexBuffer;
+		}
+
+		void Mesh::SetIndexBuffer(IndexBufferPtr const& indexBuffer)
+		{
+			m_indexBuffer = indexBuffer;
 		}
 	}
 }

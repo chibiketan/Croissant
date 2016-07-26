@@ -23,15 +23,17 @@ namespace Croissant
 				DescriptorElement(DescriptorElement const&) = default;
 				DescriptorElement(DescriptorElement&&) noexcept = delete;
 				DescriptorElement&	operator=(DescriptorElement const&) = default;
-				bool		IsActive() const;
-				uint32_t	GetOffset() const;
-				uint32_t	GetSize() const;
+				bool					IsActive() const;
+				uint32_t				GetOffset() const;
+				uint32_t				GetSize() const;
+				VertexComponentTypeEnum	GetType() const;
 				bool		operator==(DescriptorElement const& right) const;
 
 			private:
-				bool		m_isActive;
-				uint32_t	m_offset;
-				uint32_t	m_size;
+				bool					m_isActive;
+				uint32_t				m_offset;
+				uint32_t				m_size;
+				VertexComponentTypeEnum	m_type;
 			};
 
 			VertexBufferDescriptor();
@@ -42,10 +44,14 @@ namespace Croissant
 			bool					operator==(VertexBufferDescriptor const& right) const;
 			DescriptorElement const&	GetDescriptor(VertexComponentEnum component);
 			void						Deactivate(VertexComponentEnum component);
-			void						Activate(VertexComponentEnum component, uint32_t offset, uint32_t size);
+			void						Activate(VertexComponentEnum component, VertexComponentTypeEnum type, uint32_t offset, uint32_t size);
+			uint32_t					GetStride() const;
+			void						SetStride(uint32_t stride);
 
 		private:
 			std::array<DescriptorElement, CAST(VertexComponentEnum::MAX_ELEMENT) + 1>	m_elements;
+			uint32_t																	m_stride;
+
 
 		};
 	}
