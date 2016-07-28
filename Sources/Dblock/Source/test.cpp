@@ -67,25 +67,24 @@ auto vertexShaderContent = std::string(R"(
 
 /********************Entrant********************/
 in vec4 VertexPosition;
-/*in vec4 VertexColor;*/
+in vec4 VertexColor;
 
 /********************Uniformes********************/
-/*uniform mat4 WorldViewProjMatrix;
+uniform mat4 WorldViewProjMatrix;
 uniform mat4 ModelWorldMatrix;
 uniform mat4 ViewMatrix;
-uniform mat4 ProjectionMatrix;*/
+uniform mat4 ProjectionMatrix;
 
 /********************Fonctions********************/
 out vec4 vcolor;
 
 void main()
 {
-	/*gl_Position = ProjectionMatrix * ViewMatrix * ModelWorldMatrix * vec4(VertexPosition.xyz, 1.0);*/
+	gl_Position = ProjectionMatrix * ViewMatrix * ModelWorldMatrix * vec4(VertexPosition.xyz, 1.0);
 	/*gl_Position = WorldViewProjMatrix * vec4(VertexPosition, 1.0);*/
 	/*gl_Position = matrix * vec4(VertexPosition, 1.0);*/
-	/*vcolor = VertexColor;*/
-	gl_Position = vec4(VertexPosition.xyz, 1.0);
-	vcolor = vec4(255.0, 0.0, 0.0, 1.0);
+	vcolor = VertexColor;
+	/*gl_Position = vec4(VertexPosition.xyz, 1.0);*/
 }
 )");
 
@@ -325,9 +324,6 @@ namespace Croissant
 
 				planVertexDescriptor.Activate(Core::VertexComponentEnum::Position, Core::VertexComponentTypeEnum::Float4, CROISSANT_OFFSET_OF(vertexProp2, Position), sizeof(vertexProp2::Position) / sizeof(float));
 				planVertexDescriptor.Activate(Core::VertexComponentEnum::Color, Core::VertexComponentTypeEnum::Color, CROISSANT_OFFSET_OF(vertexProp2, Color), sizeof(vertexProp2::Color) / sizeof(std::uint8_t));
-				// TODO utilisation pour l'instant de 3 en dur
-				//planVertexDescriptor.Activate(Core::VertexComponentEnum::Position, Core::VertexComponentTypeEnum::Float3, CROISSANT_OFFSET_OF(vertexProp2, Position), 3);
-				//planVertexDescriptor.Activate(Core::VertexComponentEnum::Color, Core::VertexComponentTypeEnum::Color, CROISSANT_OFFSET_OF(vertexProp2, Color), 3);
 				planVertexDescriptor.SetStride(sizeof(vertexProp2));
 
 				auto planVertexBuffer = std::make_shared<Core::VertexBuffer>(planVertexDescriptor, sizeof(planVertices) / sizeof(planVertices[0]), m_renderer.CreateBuffer(sizeof(planVertices), Core::BufferTypeEnum::Vertex));
@@ -342,18 +338,8 @@ namespace Croissant
 
 						vertex.Position = pos;
 						vertex.Color = col;
-						//vertex.Position.X() = pos.X();
-						//vertex.Position.Y() = pos.Y();
-						//vertex.Position.Z() = pos.Z();
-						//vertex.Color.X(col.X());
-						//vertex.Color.Y(col.Y());
-						//vertex.Color.Z(col.Z());
-						//vertex.Color.W(col.W());
 					}
 				}
-
-
-				//descriptor.Activate(reinterpret_cast<size_t>(&((static_cast<vertexProp*>(0))->*m_coord)), sizeof(vertexProp::m_coord));
 
 				// plan vertex buffer
 				auto planIndexBuffer = std::make_shared<Core::IndexBuffer>(sizeof(planIndexes) / sizeof(planIndexes[0]), m_renderer.CreateBuffer(sizeof(planIndexes), Core::BufferTypeEnum::Index));
@@ -583,6 +569,9 @@ namespace Croissant
 				opengl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				opengl.UseProgram(m_programId);
 				// render
+				// set caam uniform
+				opengl.SetUniformMatrix4f(m_uniformViewMatrix, 1, true, m_cam->GetViewMatrix());
+				opengl.SetUniformMatrix4f(m_uniformProjectionMatrix, 1, true, m_cam->GetProjectionMatrix());
 
 				// render plan
 				std::stack<Core::NodeCPtr> nodeToRender;
@@ -642,16 +631,9 @@ namespace Croissant
 						}
 
 						// TODO mettre à jour les uniforms
-
-						auto arrayBuff = opengl.GetInteger(Graphic::OpenGLValueNameEnum::ArrayBufferBinding);
-						auto elArrayBuff = opengl.GetInteger(Graphic::OpenGLValueNameEnum::ElementArrayBufferBinding);
+						opengl.SetUniformMatrix4f(m_uniformModelWorldMatrix, 1, true, Croissant::Math::Matrix4f::Identity());
 
 						// draw
-						// TODO remove debug uniform
-						//opengl.SetUniformMatrix4f(m_uniformViewMatrix, 1, true, m_cam->GetViewMatrix());
-						//opengl.SetUniformMatrix4f(m_uniformProjectionMatrix, 1, true, m_cam->GetProjectionMatrix());
-						//opengl.SetUniformMatrix4f(m_uniformModelWorldMatrix, 1, true, Croissant::Math::Matrix4f::Identity());
-						// Le nombre est le nombre d'élément à dessiner, pas le nombre d'élément dans l'index buffer ><
 						opengl.DrawElements(GL_LINES, static_cast<GLsizei>(vBuf->GetNumElement()), GL_UNSIGNED_INT, nullptr);
 
 					}
