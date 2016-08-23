@@ -1,0 +1,3 @@
+[submodule "Sources/3rdparty/DevIL"]
+	path = Sources/3rdparty/DevIL
+	url = https://github.com/DentonW/DevIL.git
