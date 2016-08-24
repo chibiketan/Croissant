@@ -1,3 +1,6 @@
 [submodule "Sources/3rdparty/DevIL"]
 	path = Sources/3rdparty/DevIL
 	url = https://github.com/DentonW/DevIL.git
+[submodule "Sources/3rdparty/libjpeg"]
+	path = Sources/3rdparty/libjpeg
+	url = https://github.com/LuaDist/libjpeg.git
