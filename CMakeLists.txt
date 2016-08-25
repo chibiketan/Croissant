@@ -361,8 +361,8 @@ message(STATUS "CMAKE_CXX_FLAGS : ${CMAKE_CXX_FLAGS}")
 # E.g. if using the C++ header files
 # you will need to enable C++11 support
 # for your compiler.
-
 set(ENGINE_ROOT_DIR ${CROISSANT_ROOT_DIR}/Sources/Engine2)
+
 
 add_subdirectory(${CROISSANT_ROOT_DIR}/Sources/3rdparty/gtest)
 
@@ -372,9 +372,10 @@ add_subdirectory(${CROISSANT_ROOT_DIR}/Sources/Engine2)
 
 add_subdirectory(${CROISSANT_ROOT_DIR}/Sources/GetConfig)
 
-include_directories(${ENGINE_ROOT_DIR}/../DBlock//Include)
-
 add_subdirectory(${CROISSANT_ROOT_DIR}/Sources/UnitTestGTest)
+
+include_directories(${ENGINE_ROOT_DIR}/../DBlock//Include)
+include_directories(${DEVIL_INCLUDE})
 
 add_executable(DBlock
 	${ENGINE_ROOT_DIR}/../Dblock/Source/test.cpp
@@ -382,6 +383,7 @@ add_executable(DBlock
 
 target_link_libraries(DBlock
 	PUBLIC ENGINE
+	${DEVIL_LIBRARIES}
 )
 
 

@@ -737,11 +737,20 @@ namespace Croissant
 }
 
 
-
+#include "IL/il.h"
 
 int main(int, char**)
 {
 	int32_t result;
+
+	ilInit();
+	auto imageId = ilGenImage();
+	ilActiveImage(imageId);
+	auto res = ilLoadImage("D:\\croissant_work\\Croissant\\Sources\\Dblock\\Ressources\\test.png");
+
+	ilDeleteImage(imageId);
+
+	return 0;
 
 	Croissant::Core::LogManager::Init();
 
