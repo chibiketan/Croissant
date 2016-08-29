@@ -374,8 +374,10 @@ add_subdirectory(${CROISSANT_ROOT_DIR}/Sources/GetConfig)
 
 add_subdirectory(${CROISSANT_ROOT_DIR}/Sources/UnitTestGTest)
 
+find_package(DevIL REQUIRED)
+
 include_directories(${ENGINE_ROOT_DIR}/../DBlock//Include)
-include_directories(${DEVIL_INCLUDE})
+include_directories(${IL_INCLUDE_DIR})
 
 add_executable(DBlock
 	${ENGINE_ROOT_DIR}/../Dblock/Source/test.cpp
@@ -383,7 +385,7 @@ add_executable(DBlock
 
 target_link_libraries(DBlock
 	PUBLIC ENGINE
-	${DEVIL_LIBRARIES}
+	${IL_LIBRARIES}
 )
 
 

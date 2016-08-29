@@ -737,7 +737,7 @@ namespace Croissant
 }
 
 
-#include "IL/il.h"
+#include "il.h"
 
 int main(int, char**)
 {
