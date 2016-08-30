@@ -738,6 +738,7 @@ namespace Croissant
 
 
 #include "il.h"
+#include "FileSystem/Directory.hpp"
 
 int main(int, char**)
 {
@@ -746,7 +747,7 @@ int main(int, char**)
 	ilInit();
 	auto imageId = ilGenImage();
 	ilActiveImage(imageId);
-	auto res = ilLoadImage("D:\\croissant_work\\Croissant\\Sources\\Dblock\\Ressources\\test.png");
+	auto res = ilLoadImage(Croissant::FileSystem::File("test.png", Croissant::FileSystem::Directory(Croissant::FileSystem::DEFAULT_DIRECTORY::PROGRAM_DIRECTORY).Child("Resources").Child("Images")).FullPath().c_str());
 
 	ilDeleteImage(imageId);
 

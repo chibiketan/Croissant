@@ -390,3 +390,16 @@ target_link_libraries(DBlock
 
 
 set_target_properties(DBlock PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CROISSANT_ROOT_DIR}/Bin)
+
+# https://cmake.org/cmake/help/v3.6/command/add_custom_command.html?highlight=add_custom_command
+# https://cmake.org/cmake/help/v3.2/manual/cmake.1.html#command-line-tool-mode
+add_custom_command(TARGET DBlock POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:DBlock>/Resources"
+				   COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:DBlock>/Resources/Images"
+				   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ENGINE_ROOT_DIR}/../Dblock/Ressources/test.png" "$<TARGET_FILE_DIR:DBlock>/Resources/Images/test.png"
+)
+
+#				   add_custom_command(TARGET MyTest POST_BUILD
+#    COMMAND ${CMAKE_COMMAND} -E copy_directory
+#        "${PROJECT_SOURCE_DIR}/libs"
+#        $<TARGET_FILE_DIR:MyTest>)
