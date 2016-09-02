@@ -62,50 +62,6 @@ struct vertexProp2
 
 #define BUFFER_OFFSET(val) reinterpret_cast<void*>(val)
 
-auto vertexShaderContent = std::string(R"(
-#version 140
-
-/********************Entrant********************/
-in vec4 VertexPosition;
-in vec4 VertexColor;
-
-/********************Uniformes********************/
-uniform mat4 WorldViewProjMatrix;
-uniform mat4 ModelWorldMatrix;
-uniform mat4 ViewMatrix;
-uniform mat4 ProjectionMatrix;
-
-/********************Fonctions********************/
-out vec4 vcolor;
-
-void main()
-{
-	gl_Position = ProjectionMatrix * ViewMatrix * ModelWorldMatrix * vec4(VertexPosition.xyz, 1.0);
-	/*gl_Position = WorldViewProjMatrix * vec4(VertexPosition, 1.0);*/
-	/*gl_Position = matrix * vec4(VertexPosition, 1.0);*/
-	vcolor = VertexColor;
-	/*gl_Position = vec4(VertexPosition.xyz, 1.0);*/
-}
-)");
-
-auto fragmentShaderContent = std::string(R"(
-#version 140
-
-/********************Entrant********************/
-in vec4 vcolor;
-/********************Sortant********************/
-/*out vec4 RenderTarget0;*/
-/********************Uniformes********************/
-/*uniform vec4 Color;*/
-
-/********************Fonctions********************/
-void main()
-{
-	gl_FragColor = vcolor;
-/*	RenderTarget0 = Color;*/
-}
-)");
-
 vertexProp2 planVertices[] = {
 	vertexProp2{ { 0.0f, 0.0f, 0.0f, 0.0f },{ 0xFF, 0x00, 0x00, 0x00 } }, // X
 	vertexProp2{ { 1.0f, 0.0f, 0.0f, 0.0f },{ 0xFF, 0x00, 0x00, 0x00 } }, // X
@@ -179,10 +135,31 @@ constexpr size_t OffsetOf()
 
 #define CROISSANT_OFFSET_OF(type, member) OffsetOf<decltype(GetClassType(&type::member)), decltype(GetMemberType(&type::member)), &type::member>()
 
+using Directory = Croissant::FileSystem::Directory;
+using File = Croissant::FileSystem::File;
+
+#include <fstream>
+#include "FileSystem/Directory.hpp"
+
 namespace Croissant
 {
 	namespace DBlock
 	{
+		std::string getContentOfFile(File const& file)
+		{
+			std::ifstream stream = std::ifstream(file.FullPath());
+			std::string line;
+			std::string result;
+			std::string newLine = "\r\n";
+
+			while (std::getline(stream, line))
+			{
+				result += line + newLine;
+			}
+
+			return result;
+		}
+
 		struct PressedKeys
 		{
 			bool Up = false;
@@ -227,7 +204,7 @@ namespace Croissant
 				// see exemple code in http://docs.gl/gl3/glCompileShader
 				m_programId = opengl.CreateProgram();
 				auto vertexShaderId = opengl.CreateShader(GL_VERTEX_SHADER);
-				opengl.ShaderSource(vertexShaderId, vertexShaderContent);
+				opengl.ShaderSource(vertexShaderId,  getContentOfFile(File("Resources/Shaders/main.vert", Directory(FileSystem::DEFAULT_DIRECTORY::PROGRAM_DIRECTORY))));
 				opengl.CompileShader(vertexShaderId);
 				auto vertexShaderResult = opengl.GetShaderInteger(vertexShaderId, Croissant::Graphic::OpenGLShaderIntegerNameEnum::CompileStatus);
 
@@ -238,7 +215,7 @@ namespace Croissant
 				}
 
 				auto fragmentShaderId = opengl.CreateShader(GL_FRAGMENT_SHADER);
-				opengl.ShaderSource(fragmentShaderId, fragmentShaderContent);
+				opengl.ShaderSource(fragmentShaderId, getContentOfFile(File("Resources/Shaders/main.frag", Directory(FileSystem::DEFAULT_DIRECTORY::PROGRAM_DIRECTORY))));
 				opengl.CompileShader(fragmentShaderId);
 				auto fragmentShaderResult = opengl.GetShaderInteger(fragmentShaderId, Croissant::Graphic::OpenGLShaderIntegerNameEnum::CompileStatus);
 
@@ -491,40 +468,40 @@ namespace Croissant
 					}
 				}
 
-				if (evt->GetType() == Croissant::Graphic::WindowEventType::MOUSEMOVE)
-				{
-					auto& mouseMoveEvt = static_cast<Croissant::Graphic::WindowMouseMoveEvent const&>(*evt);
+				// TODO activer de nouveau le contrôle à la souris
+				//if (evt->GetType() == Croissant::Graphic::WindowEventType::MOUSEMOVE)
+				//{
+				//	auto& mouseMoveEvt = static_cast<Croissant::Graphic::WindowMouseMoveEvent const&>(*evt);
 
-					// TODO : Utiliser des angles d'Euler plutôt qu'essayer de créer un quaternion
-					Croissant::Math::EulerAngle rotAngle{
-						-mouseMoveEvt.DeltaX() * 0.3f,
-						mouseMoveEvt.DeltaY() * 0.3f,
-						0
-					};
+				//	Croissant::Math::EulerAngle rotAngle{
+				//		-mouseMoveEvt.DeltaX() * 0.3f,
+				//		mouseMoveEvt.DeltaY() * 0.3f,
+				//		0
+				//	};
 
-					//cam.Rotate(rotAngle);
-					m_camNode->Rotate(Croissant::Math::ToQuaternion(rotAngle));
-					//std::cout << "camNode rotation : " << camNode->GetRotation() << std::endl;
+				//	//cam.Rotate(rotAngle);
+				//	m_camNode->Rotate(Croissant::Math::ToQuaternion(rotAngle));
+				//	//std::cout << "camNode rotation : " << camNode->GetRotation() << std::endl;
 
-					//Croissant::Math::Quaternion tmpQuat{ Croissant::Math::Vector4::Zero, 1.0f };
+				//	//Croissant::Math::Quaternion tmpQuat{ Croissant::Math::Vector4::Zero, 1.0f };
 
-					//if (mouseMoveEvt.DeltaX() != 0)
-					//{
-					//	tmpQuat *= Croissant::Math::Quaternion{Croissant::Math::Vector4::UnitY, (mouseMoveEvt.DeltaX() / 100.0f) * (PI / 180.0f) };
-					//}
+				//	//if (mouseMoveEvt.DeltaX() != 0)
+				//	//{
+				//	//	tmpQuat *= Croissant::Math::Quaternion{Croissant::Math::Vector4::UnitY, (mouseMoveEvt.DeltaX() / 100.0f) * (PI / 180.0f) };
+				//	//}
 
-					//if (mouseMoveEvt.DeltaY() != 0)
-					//{
-					//	tmpQuat *= Croissant::Math::Quaternion{Croissant::Math::Vector4::UnitX, (mouseMoveEvt.DeltaY() / 100.0f) * (PI / 180.0f) };
-					//}
+				//	//if (mouseMoveEvt.DeltaY() != 0)
+				//	//{
+				//	//	tmpQuat *= Croissant::Math::Quaternion{Croissant::Math::Vector4::UnitX, (mouseMoveEvt.DeltaY() / 100.0f) * (PI / 180.0f) };
+				//	//}
 
-					//cam.Rotate(tmpQuat);
-					//std::cout << "delta [" << mouseMoveEvt.DeltaX() << ", " << mouseMoveEvt.DeltaY() << "], " << rotAngle << std::endl;
-					m_win.CenterCursor();
-					//std::cout << "MouseMove : deltaX = " << mouseMoveEvt.DeltaX() << std::endl;
-					//std::cout << "MouseMove : deltaY = " << mouseMoveEvt.DeltaY() << std::endl;
-					//Croissant::Math::Vector4 rotAxe{ 0.0f, 0.0f, 0.0f };
-				}
+				//	//cam.Rotate(tmpQuat);
+				//	//std::cout << "delta [" << mouseMoveEvt.DeltaX() << ", " << mouseMoveEvt.DeltaY() << "], " << rotAngle << std::endl;
+				//	m_win.CenterCursor();
+				//	//std::cout << "MouseMove : deltaX = " << mouseMoveEvt.DeltaX() << std::endl;
+				//	//std::cout << "MouseMove : deltaY = " << mouseMoveEvt.DeltaY() << std::endl;
+				//	//Croissant::Math::Vector4 rotAxe{ 0.0f, 0.0f, 0.0f };
+				//}
 
 				// move camera
 				if (m_keys.Up)
@@ -738,7 +715,6 @@ namespace Croissant
 
 
 #include "il.h"
-#include "FileSystem/Directory.hpp"
 
 int main(int, char**)
 {
@@ -751,8 +727,8 @@ int main(int, char**)
 
 	ilDeleteImage(imageId);
 
-	return 0;
 
+	// --------------------------------------------- REAL START
 	Croissant::Core::LogManager::Init();
 
 	{

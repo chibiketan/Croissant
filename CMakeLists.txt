@@ -396,7 +396,10 @@ set_target_properties(DBlock PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CROISSANT_ROO
 add_custom_command(TARGET DBlock POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:DBlock>/Resources"
 				   COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:DBlock>/Resources/Images"
+                   COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:DBlock>/Resources/Shaders"
 				   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ENGINE_ROOT_DIR}/../Dblock/Ressources/test.png" "$<TARGET_FILE_DIR:DBlock>/Resources/Images/test.png"
+				   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ENGINE_ROOT_DIR}/../Dblock/Ressources/Shaders/main.vert" "$<TARGET_FILE_DIR:DBlock>/Resources/Shaders/main.vert"
+				   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ENGINE_ROOT_DIR}/../Dblock/Ressources/Shaders/main.frag" "$<TARGET_FILE_DIR:DBlock>/Resources/Shaders/main.frag"
 )
 
 #				   add_custom_command(TARGET MyTest POST_BUILD
