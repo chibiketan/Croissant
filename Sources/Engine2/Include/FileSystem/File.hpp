@@ -16,7 +16,7 @@ namespace Croissant
 		public:
 			File(const std::string& path);
 			File(const std::string& path, const Directory& parent);
-			File(const File& ) = delete;
+			File(const File& ) = default;
 			File(File&&) noexcept = default;
 			~File();
 			bool Exist() const;
@@ -26,7 +26,7 @@ namespace Croissant
 			Directory Parent() const;
 			void Refresh();
 
-			File& operator=(File const&) = delete;
+			File& operator=(File const&) = default;
 			File& operator=(File &&) = default;
 
 		private:
