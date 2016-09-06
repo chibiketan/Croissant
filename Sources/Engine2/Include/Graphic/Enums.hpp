@@ -267,6 +267,12 @@ namespace Croissant
 
 			MAX_ELEMENT = ReadWrite
 		};
+	
+		enum class OpenGLShaderTypeEnum
+		{
+			Vertex,
+			Fragment
+		};
 	}
 }
 

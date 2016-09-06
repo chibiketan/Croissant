@@ -36,6 +36,7 @@ croissant_files(${PROJECT_NAME} ${ENGINE_SOURCE}
 	Graphic/Camera.cpp
 	Graphic/OpenGLBuffer.cpp
 	Graphic/OpenGLRenderer.cpp
+	Graphic/OpenGLShaderLoader.cpp
 	Graphic/OpenGLSystemInfo.cpp
 	Graphic/OpenGLWrapper.cpp
 	Graphic/Window.cpp
@@ -80,6 +81,7 @@ croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
 	Graphic/Enums.hpp
 	Graphic/OpenGLBuffer.hpp
 	Graphic/OpenGLRenderer.hpp
+	Graphic/OpenGLShaderLoader.hpp
 	Graphic/OpenGLSystemInfo.hpp
 	Graphic/OpenGLWrapper.hpp
 	Graphic/Window.hpp

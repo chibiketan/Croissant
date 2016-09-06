@@ -42,6 +42,7 @@
 #include <Core/Mesh.hpp>
 
 #include <stack>
+#include "Graphic/OpenGLShaderLoader.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
 using Time = Clock::time_point;
@@ -563,6 +564,11 @@ namespace Croissant
 						auto vBuf = mesh->GetVertexBuffer();
 						auto iBuf = mesh->GetIndexBuffer();
 						auto descriptors = vBuf->GetDescriptor();
+
+						// TODO on crée l'application dans OpenGL si nécessaire
+						auto shaderLoader = Graphic::OpenGLShaderLoader(Graphic::OpenGLShaderTypeEnum::Vertex, File("Resources/Shaders/main.vert", Directory(FileSystem::DEFAULT_DIRECTORY::PROGRAM_DIRECTORY)));
+						std::string content;
+						shaderLoader.GetContent(content, descriptors);
 
 						// on assigne les buffers
 						opengl.BindBuffer(Graphic::OpenGLBufferTargetEnum::ArrayBuffer, vBuf->GetBufferId());
