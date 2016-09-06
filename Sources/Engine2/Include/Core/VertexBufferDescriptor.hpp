@@ -42,7 +42,7 @@ namespace Croissant
 			VertexBufferDescriptor&	operator=(VertexBufferDescriptor const&) = default;
 			VertexBufferDescriptor&	operator=(VertexBufferDescriptor&&) noexcept = default;
 			bool					operator==(VertexBufferDescriptor const& right) const;
-			DescriptorElement const&	GetDescriptor(VertexComponentEnum component);
+			DescriptorElement const&	GetDescriptor(VertexComponentEnum component) const;
 			void						Deactivate(VertexComponentEnum component);
 			void						Activate(VertexComponentEnum component, VertexComponentTypeEnum type, uint32_t offset, uint32_t size);
 			uint32_t					GetStride() const;

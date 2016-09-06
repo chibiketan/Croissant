@@ -20,7 +20,7 @@ namespace Croissant
 			return m_elements == right.m_elements;
 		}
 
-		inline VertexBufferDescriptor::DescriptorElement const& VertexBufferDescriptor::GetDescriptor(VertexComponentEnum component)
+		inline VertexBufferDescriptor::DescriptorElement const& VertexBufferDescriptor::GetDescriptor(VertexComponentEnum component) const
 		{
 			return m_elements[CAST(component)];
 		}
