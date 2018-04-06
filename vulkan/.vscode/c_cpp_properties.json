@@ -51,7 +51,9 @@
                 "C:/Program Files (x86)/Windows Kits/10/Include/10.0.16299.0/um",
                 "C:/Program Files (x86)/Windows Kits/10/Include/10.0.16299.0/ucrt",
                 "C:/Program Files (x86)/Windows Kits/10/Include/10.0.16299.0/shared",
-                "C:/Program Files (x86)/Windows Kits/10/Include/10.0.16299.0/winrt"
+                "C:/Program Files (x86)/Windows Kits/10/Include/10.0.16299.0/winrt",
+                "C:/VulkanSDK/1.1.70.1/Include",
+                "C:/Users/gcompte/.conan/data/glfw/3.2.1/bincrafters/stable/package/6cc50b139b9c3d27b3e9042d5f5372d327b3a9f7/include"
             ],
             "defines": [
                 "_DEBUG",
@@ -67,7 +69,9 @@
                     "C:/Program Files (x86)/Windows Kits/10/Include/10.0.16299.0/um",
                     "C:/Program Files (x86)/Windows Kits/10/Include/10.0.16299.0/ucrt",
                     "C:/Program Files (x86)/Windows Kits/10/Include/10.0.16299.0/shared",
-                    "C:/Program Files (x86)/Windows Kits/10/Include/10.0.16299.0/winrt"
+                    "C:/Program Files (x86)/Windows Kits/10/Include/10.0.16299.0/winrt",
+                    "C:/VulkanSDK/1.1.70.1/Include",
+                    "C:/Users/gcompte/.conan/data/glfw/3.2.1/bincrafters/stable/package/6cc50b139b9c3d27b3e9042d5f5372d327b3a9f7/include"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""

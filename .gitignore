@@ -29,5 +29,8 @@
 .idea
 /Bin/*
 
+# Build directories
+**/build/
+
 # generated files
 /Sources/Engine2/Include/defines.hpp
