@@ -11,4 +11,4 @@ conan_basic_setup()
 
 add_executable(vulkan main.cpp)
 target_include_directories(vulkan PUBLIC ${Vulkan_INCLUDE_DIRS})
-target_link_libraries(vulkan ${CONAN_LIBS})
+target_link_libraries(vulkan ${CONAN_LIBS} ${Vulkan_LIBRARY})
