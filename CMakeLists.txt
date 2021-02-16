@@ -8,6 +8,7 @@ get_filename_component(CROISSANT_ROOT_DIR "." ABSOLUTE)
 message("compilation root directory : ${CROISSANT_ROOT_DIR}")
 
 find_package(PythonInterp REQUIRED)
+
 #-------------------------------------------------------------------------------
 #   define top-level options for the whole project
 #-------------------------------------------------------------------------------
@@ -20,6 +21,7 @@ option(CROISSANT_USE_THREAD "Enable thread support into croissant" ON)
 option(CROISSANT_USE_TRACE "Enable trace support into croissant" ON)
 #option(CROISSANT_TRACE_LEVEL "Trace level in Croissant" 3)
 option(CROISSANT_MEMORY_DEBUG "Enable memory debug implementation into croissant" OFF)
+option(CROISSANT_VULKAN_VALIDATION_LAYER "Enable validation layer into vulkan into croissant" ON)
 option(CROISSANT_OPENGL_ERROR_THROW "Enable OpenGL call to throw when glGetError return error code" ON)
 option(CROISSANT_SHARED_LIB "Enable compile croissant into shared lib" ON)
 
@@ -103,7 +105,7 @@ macro(croissant_setup)
 	set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS Debug Release)
 
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14")
+		#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14")
 	endif()
 
 	# ---------------------------
@@ -253,7 +255,13 @@ macro(croissant_setup)
         # add_definitions(-DORYOL_ALLOCATOR_DEBUG=0)
     endif()
 
-    if (CROISSANT_OPENGL_ERROR_THROW)
+	if (CROISSANT_VULKAN_VALIDATION_LAYER)
+		list(APPEND CROISSANT_PLATFORM_DEFINES -DCROISSANT_VULKAN_VALIDATION_LAYER)
+	else()
+		# add_definitions(-DORYOL_ALLOCATOR_DEBUG=0)
+	endif()
+
+	if (CROISSANT_OPENGL_ERROR_THROW)
     	list(APPEND CROISSANT_PLATFORM_DEFINES -DCROISSANT_OPENGL_ERROR_THROW)
 	endif()
 
@@ -269,8 +277,9 @@ macro(croissant_setup)
     if (CROISSANT_USE_THREAD)
 		# TODO test thread capabilities
 		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-			list(APPEND CMAKE_REQUIRED_FLAGS "-std=c++14")
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+			#list(APPEND CMAKE_REQUIRED_FLAGS "-std=c++14")
+			#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 		endif()
 		
 		include(CheckCXXSourceCompiles)
@@ -373,6 +382,8 @@ add_subdirectory(${CROISSANT_ROOT_DIR}/Sources/Engine2)
 add_subdirectory(${CROISSANT_ROOT_DIR}/Sources/GetConfig)
 
 add_subdirectory(${CROISSANT_ROOT_DIR}/Sources/UnitTestGTest)
+
+add_subdirectory(${CROISSANT_ROOT_DIR}/vulkan)
 
 find_package(DevIL REQUIRED)
 
