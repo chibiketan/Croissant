@@ -29,6 +29,7 @@ public:
     , m_window(glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr))
     , m_instanceVulkan(new VkInstance(nullptr))
     , m_debugMessenger(new VkDebugUtilsMessengerEXT(nullptr), [&](VkDebugUtilsMessengerEXT* item) { this->releaseDebugUtilsMessenger(*item); })
+    , m_device{nullptr}
     {
 
     }
@@ -42,6 +43,7 @@ public:
     {
         initVulkan();
         setupDebudLayer();
+        pickPhysicalDevice();
     }
 
     void run()
@@ -59,6 +61,7 @@ private:
     std::unique_ptr<GLFWwindow, GlfwWindowDestructor> m_window;
     std::unique_ptr<VkInstance, VulkanInstanceDestructor> m_instanceVulkan;
     std::unique_ptr<VkDebugUtilsMessengerEXT, std::function<void (VkDebugUtilsMessengerEXT*)>> m_debugMessenger;
+    VkPhysicalDevice m_device;
 #ifdef CROISSANT_VULKAN_VALIDATION_LAYER
     constexpr static bool enableValidationLayer = true;
 #else
@@ -206,6 +209,37 @@ private:
         auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*m_instanceVulkan, "vkDestroyDebugUtilsMessengerEXT");
         if (nullptr != func) {
             func(*m_instanceVulkan, messenger, nullptr);
+        }
+    }
+
+    bool isDeviceSuitable(VkPhysicalDevice const device) {
+        VkPhysicalDeviceProperties deviceProperties{};
+        vkGetPhysicalDeviceProperties(device, &deviceProperties);
+        VkPhysicalDeviceFeatures deviceFeatures{};
+        vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
+        return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && deviceFeatures.geometryShader;
+    }
+
+    void pickPhysicalDevice() {
+        uint32_t deviceCount {0};
+
+        vkEnumeratePhysicalDevices(*m_instanceVulkan, &deviceCount, nullptr);
+        if (0 == deviceCount) {
+            throw std::runtime_error("No physical device found supporting Vulkan");
+        }
+
+        std::vector<VkPhysicalDevice> devices{deviceCount};
+        vkEnumeratePhysicalDevices(*m_instanceVulkan, &deviceCount, devices.data());
+        for (auto const& device : devices) {
+            if (isDeviceSuitable(device)) {
+                m_device = device;
+                break;
+            }
+        }
+
+        if (nullptr == m_device) {
+            throw std::runtime_error("No suitable device found.");
         }
     }
 
