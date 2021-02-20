@@ -7,6 +7,7 @@
 #include <string>
 #include <memory>
 #include <functional>
+#include <optional>
 
 struct GlfwWindowDestructor {
     void operator()(GLFWwindow* window) {
@@ -212,13 +213,48 @@ private:
         }
     }
 
-    bool isDeviceSuitable(VkPhysicalDevice const device) {
+    static bool isDeviceSuitable(VkPhysicalDevice device) {
         VkPhysicalDeviceProperties deviceProperties{};
         vkGetPhysicalDeviceProperties(device, &deviceProperties);
         VkPhysicalDeviceFeatures deviceFeatures{};
         vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+        auto indices = findQueueFamilies(device);
 
-        return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && deviceFeatures.geometryShader;
+        return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
+            && deviceFeatures.geometryShader
+            && indices.isComplete();
+    }
+
+    struct QueueFamilyIndices {
+        std::optional<uint32_t> graphicsFamily;
+
+        bool isComplete() {
+            return graphicsFamily.has_value();
+        }
+    };
+
+    static QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
+        // Code servant à trouver la famille de queue "graphique"
+        QueueFamilyIndices indices{};
+        uint32_t queueFamilyCount;
+        vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+        std::vector<VkQueueFamilyProperties> queueFamilies{ queueFamilyCount };
+        vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+        int i = 0;
+        for (auto const& queueFamily : queueFamilies) {
+            if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+                indices.graphicsFamily = i;
+            }
+
+            if (indices.isComplete()) {
+                break;
+            }
+
+            ++i;
+        }
+
+        return indices;
     }
 
     void pickPhysicalDevice() {
