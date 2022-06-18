@@ -253,10 +253,34 @@ private:
         VkPhysicalDeviceFeatures deviceFeatures{};
         vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
         auto indices = this->findQueueFamilies(device);
+        auto extensionsSupported = checkDeviceExtensionSupport(device);
+        auto swapChainAdequate = false;
+
+        if (extensionsSupported) {
+            auto swapChainSupportDetails = querySwapChainSupport(device);
+            swapChainAdequate = !swapChainSupportDetails.presentModes.empty() && !swapChainSupportDetails.formats.empty();
+        }
 
         return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
             && deviceFeatures.geometryShader
-            && indices.isComplete();
+            && indices.isComplete() && extensionsSupported
+            && swapChainAdequate;
+    }
+
+    static bool checkDeviceExtensionSupport(VkPhysicalDevice physicalDevice) {
+        uint32_t extensionCount;
+        vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr);
+        std::vector<VkExtensionProperties> availableExtensions{extensionCount};
+        vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, availableExtensions.data());
+
+        auto physicalDeviceExtensions = getDeviceExtensions();
+        std::set<std::string> requiredExtensions{physicalDeviceExtensions.begin(), physicalDeviceExtensions.end()};
+
+        for (auto const& extensionProperties: availableExtensions) {
+            requiredExtensions.erase(extensionProperties.extensionName);
+        }
+
+        return requiredExtensions.empty();
     }
 
     struct QueueFamilyIndices {
@@ -267,6 +291,12 @@ private:
             return this->graphicsFamily.has_value()
                 && this->presentFamily.has_value();
         }
+    };
+
+    struct SwapChainSupportDetails {
+        VkSurfaceCapabilitiesKHR capabilities;
+        std::vector<VkSurfaceFormatKHR> formats;
+        std::vector<VkPresentModeKHR> presentModes;
     };
 
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
@@ -298,6 +328,42 @@ private:
         }
 
         return indices;
+    }
+
+    SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice physicalDevice) {
+        SwapChainSupportDetails details{};
+
+        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, *this->m_surface, &details.capabilities);
+
+        uint32_t formatCount;
+        vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, *this->m_surface, &formatCount, nullptr);
+
+        if (formatCount > 0) {
+            details.formats.resize(formatCount);
+            vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, *this->m_surface, &formatCount, details.formats.data());
+        }
+
+        uint32_t presentModeCount;
+        vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, *this->m_surface, &presentModeCount, nullptr);
+
+        if (presentModeCount > 0) {
+            details.presentModes.resize(presentModeCount);
+            vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, *this->m_surface, &presentModeCount, details.presentModes.data());
+        }
+
+        return details;
+    }
+
+    VkSurfaceFormatKHR chooseSwapSurfaceFormat(std::vector<VkSurfaceFormatKHR> const& availableFormats) {
+        auto result = std::find_if(availableFormats.begin(), availableFormats.end(), [] (VkSurfaceFormatKHR format) {
+            return format.format == VK_FORMAT_B8G8R8A8_SRGB && format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+        });
+
+        if (result == availableFormats.end()) {
+            // not found, we use the first one
+            return availableFormats[0];
+        }
+        return *result;
     }
 
     void pickPhysicalDevice() {
@@ -347,8 +413,6 @@ private:
         deviceCreateInfo.queueCreateInfoCount = queueCreateInfos.size();
         deviceCreateInfo.pEnabledFeatures = &physicalDeviceFeatures;
 
-        deviceCreateInfo.enabledExtensionCount = 0; // no extension
-
         std::vector<char const*> neededLayers{};
         if (enableValidationLayer) {
             neededLayers.emplace_back("VK_LAYER_KHRONOS_validation");
@@ -356,6 +420,11 @@ private:
 
         deviceCreateInfo.ppEnabledLayerNames = neededLayers.data();
         deviceCreateInfo.enabledLayerCount = neededLayers.size();
+        // request extensions
+        auto const requiredExtensions = getDeviceExtensions();
+
+        deviceCreateInfo.ppEnabledExtensionNames = requiredExtensions.data();
+        deviceCreateInfo.enabledExtensionCount = requiredExtensions.size();
 
         if (VK_SUCCESS != vkCreateDevice(this->m_physicalDevice, &deviceCreateInfo, nullptr, this->m_device.get())) {
             throw std::runtime_error("Unable to create logical device");
@@ -376,6 +445,14 @@ private:
         std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
 
         return VK_FALSE;
+    }
+
+    static std::vector<char const*> getDeviceExtensions() {
+        std::vector<char const*> extensions{
+            VK_KHR_SWAPCHAIN_EXTENSION_NAME
+        };
+
+        return extensions;
     }
 };
 

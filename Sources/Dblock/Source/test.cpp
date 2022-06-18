@@ -23,6 +23,7 @@
 #include "Math/Matrix.hpp"
 #include "Core/BufferAccessor.hpp"
 #include "Core/VertexBuffer.hpp"
+#include "Graphic/VulkanRenderer.hpp"
 
 #define PI 3.14159265f
 
@@ -716,6 +717,59 @@ namespace Croissant
 			std::shared_ptr<Core::Node>	m_rootNode;
 			std::shared_ptr<Core::IndexBuffer>	m_planIndexBuffer;
 		};
+
+	    class DBlockVulkanApp
+        {
+        public:
+            DBlockVulkanApp() : m_log { CROISSANT_GET_LOG_WITH_FILE(DBlockVulkanApp) }, m_win { 1024, 768, "Test Vulkan" }
+                                , m_renderer { }
+            {
+
+            }
+
+            bool OnInitialize(Core::Application<DBlockVulkanApp>&)
+            {
+                Core::WriteTraceDebug("Début de OnInitialize");
+//                auto vpWidth = 1920;
+//                auto vpHeight = 1080;
+
+//                m_win.SetPosition(Math::Point2{ (vpWidth - m_win.Width()) / 2.0f, (vpHeight - m_win.Height()) / 2.0f });
+                m_win.CenterCursor();
+                m_win.Open();
+                // traite tous les évènements en attente
+                while (m_win.PeekEvent()->GetType() != Croissant::Graphic::WindowEventType::NONE)
+                {
+
+                }
+
+                return true;
+            }
+
+            bool OnFrame(int32_t& returnValue, Core::FrameTime const& lastFrameTime, Core::FrameTime const& currentFrameTime)
+            {
+                auto evt = m_win.PeekEvent();
+
+                if (evt->GetType() == Croissant::Graphic::WindowEventType::CLOSE)
+                {
+                    m_win.Close();
+                    return false;
+                }
+
+                return true;
+            }
+
+            bool OnShutdown(Core::Application<DBlockVulkanApp>&)
+            {
+                return true;
+            }
+
+        protected:
+        private:
+            Core::LogManager::Log m_log;
+            Graphic::Window m_win;
+            Graphic::VulkanRenderer m_renderer;
+            // TODO add renderer
+        };
 	}
 }
 
@@ -724,21 +778,22 @@ namespace Croissant
 
 int main(int, char**)
 {
-	int32_t result;
+    int32_t result;
 
-	ilInit();
-	auto imageId = ilGenImage();
-	ilActiveImage(imageId);
-	auto res = ilLoadImage(Croissant::FileSystem::File("test.png", Croissant::FileSystem::Directory(Croissant::FileSystem::DEFAULT_DIRECTORY::PROGRAM_DIRECTORY).Child("Resources").Child("Images")).FullPath().c_str());
-
-	ilDeleteImage(imageId);
+//    ilInit();
+//    auto imageId = ilGenImage();
+//	ilActiveImage(imageId);
+//	auto res = ilLoadImage(Croissant::FileSystem::File("test.png", Croissant::FileSystem::Directory(Croissant::FileSystem::DEFAULT_DIRECTORY::PROGRAM_DIRECTORY).Child("Resources").Child("Images")).FullPath().c_str());
+//
+//	ilDeleteImage(imageId);
 
 
 	// --------------------------------------------- REAL START
 	Croissant::Core::LogManager::Init();
 
 	{
-		Croissant::Core::Application<Croissant::DBlock::DBlockApplication> app("DBlock");
+		//Croissant::Core::Application<Croissant::DBlock::DBlockApplication> app("DBlock");
+		Croissant::Core::Application<Croissant::DBlock::DBlockVulkanApp> app("DBlockVulkan");
 
 		if (!app.Initialize())
 		{

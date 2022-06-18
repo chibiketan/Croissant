@@ -5,11 +5,41 @@
 
 #include <iostream>
 
+#include "vulkan/vulkan.h"
+
 int main(int argc, char** argv)
 {
 	UNUSED(argc);
 	UNUSED(argv);
+    uint32_t layerCount;
+    vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+    std::vector<VkLayerProperties> layerProperties(layerCount);
+    vkEnumerateInstanceLayerProperties(&layerCount, layerProperties.data());
 
+	uint32_t extensionCount;
+	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+    VkExtensionProperties extensionProperties[extensionCount];
+    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensionProperties);
+
+    std::cout << "============================================================" << std::endl;
+    std::cout << "=                                                          =" << std::endl;
+    std::cout << "=                   Configuration Vulkan                   =" << std::endl;
+    std::cout << "=                                                          =" << std::endl;
+    std::cout << "============================================================" << std::endl;
+    std::cout << "Layer count : " << std::to_string(layerCount) << std::endl;
+    for (const auto layerProperty : layerProperties)
+    {
+        std::cout << "-  " << layerProperty.layerName << " [" << layerProperty.description << "]" << std::endl;
+    }
+
+	std::cout << "Extension count : " << std::to_string(extensionCount) << std::endl;
+	for (uint32_t i = 0; i < extensionCount; ++i)
+    {
+	    std::cout << "-  (" << std::to_string(extensionProperties[i].specVersion) << ") " << extensionProperties[i].extensionName << std::endl;
+    }
+
+
+	return 0;
 	Croissant::Core::LogManager::Init();
 	{
 		Croissant::Graphic::Window win(10U, 10U, "DUMMY");
@@ -28,9 +58,9 @@ int main(int argc, char** argv)
 		std::cout << "Taille maximale pour un tableau d'indices : " << std::to_string(info.GetMaxIndicesArraySize()) << std::endl;
 		std::cout << "Taille maximale pour un tableau de vertex : " << std::to_string(info.GetMaxVertexArraySize()) << std::endl;
 		std::cout << "Taille maximale pour un buffer de rendu : " << std::to_string(info.GetMaxRenderBufferSize()) << std::endl;
-		std::cout << "Nombre d'extension OpenGL supportées : " << std::to_string(info.GetNumExtension()) << std::endl;
+		std::cout << "Nombre d'extension OpenGL supportï¿½es : " << std::to_string(info.GetNumExtension()) << std::endl;
 	}
-	// logManager doit être arrêté une fois que tous ses utilisateurs sont détruits
+	// logManager doit ï¿½tre arrï¿½tï¿½ une fois que tous ses utilisateurs sont dï¿½truits
 	Croissant::Core::LogManager::Shutdown();
 
 	std::cout << std::endl << std::endl << "Appuyer sur une touche pour continuer" << std::endl;

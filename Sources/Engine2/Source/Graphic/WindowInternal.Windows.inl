@@ -83,7 +83,7 @@ namespace Croissant
 			}
 
 			///<summary>
-			///Crée un évènement WindowMouseMoveEvent et modifie la position fourni en paramètre
+			///Crï¿½e un ï¿½vï¿½nement WindowMouseMoveEvent et modifie la position fourni en paramï¿½tre
 			///</summary>
 			std::unique_ptr<const WindowEvent> GenerateMouseMoveEvent(MSG& message, Math::Point2& position)
 			{
@@ -100,7 +100,7 @@ namespace Croissant
 
 				if (0 == deltaX && 0 == deltaY)
 				{
-					// si pas de mouvement, on ne génère pas dévènement
+					// si pas de mouvement, on ne gï¿½nï¿½re pas dï¿½vï¿½nement
 					return nullptr;
 				}
 
@@ -156,11 +156,12 @@ namespace Croissant
 			wcex.hIconSm = nullptr;
 			if (!RegisterClassEx(&wcex))
 			{
-				throw Exception::CroissantException("Erreur lors de l'enregistrement de la classe pour la fenêtre");
+				throw Exception::CroissantException("Erreur lors de l'enregistrement de la classe pour la fenï¿½tre");
 			}
 
 			// Create window
-			RECT rc = { position.X(), position.Y(), static_cast<int32_t>(width + position.X()), static_cast<int32_t>(height + position.Y()) };
+			RECT rc = { static_cast<int32_t>(position.X()), static_cast<int32_t>(position.Y())
+               , static_cast<int32_t>(width + position.X()), static_cast<int32_t>(height + position.Y()) };
 			HINSTANCE hinstance = nullptr;
 			AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 			m_handle = CreateWindow(m_className, "toto",
@@ -169,7 +170,7 @@ namespace Croissant
 				NULL);
 			if (!m_handle)
 			{
-				throw Exception::CroissantException("Erreur lors de la création de la fenêtre");
+				throw Exception::CroissantException("Erreur lors de la crï¿½ation de la fenï¿½tre");
 			}
 
 			UpdateWindowsPlacement(m_handle, m_position, m_width, m_height);

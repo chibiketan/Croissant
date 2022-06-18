@@ -8,8 +8,12 @@ croissant_files(${PROJECT_NAME} ${GETCONFIG_SOURCE}
 	Main.cpp
 )
 
+# TODO remove ?
+find_package(Vulkan REQUIRED)
+
+
 # Put include files here
-croissant_files(${PROJECT_NAME} ${GETCONFIG_INCLUDE}
+croissant_files(${PROJECT_NAME} ${GETCONFIG_INCLUDE} ${Vulkan_INCLUDE}
 )
 
 # Now build our tools
@@ -40,6 +44,7 @@ add_executable(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
 	PUBLIC ENGINE
+		${Vulkan_LIBRARIES}
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CROISSANT_ROOT_DIR}/Bin)

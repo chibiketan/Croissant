@@ -39,6 +39,7 @@ croissant_files(${PROJECT_NAME} ${ENGINE_SOURCE}
 	Graphic/OpenGLShaderLoader.cpp
 	Graphic/OpenGLSystemInfo.cpp
 	Graphic/OpenGLWrapper.cpp
+	Graphic/VulkanRenderer.cpp
 	Graphic/Window.cpp
 	Graphic/WindowEvent.cpp
 	Graphic/WindowEventClose.cpp
@@ -84,6 +85,7 @@ croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
 	Graphic/OpenGLShaderLoader.hpp
 	Graphic/OpenGLSystemInfo.hpp
 	Graphic/OpenGLWrapper.hpp
+	Graphic/VulkanRenderer.hpp
 	Graphic/Window.hpp
 	Graphic/WindowEvent.hpp
 	Graphic/WindowEventClose.hpp
@@ -105,6 +107,10 @@ croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
 	Threading/AutoResetEvent.hpp
 	Threading/Thread.hpp
 )
+
+find_package(Vulkan REQUIRED)
+
+
 
 if (CROISSANT_HOST_LINUX EQUAL 1)
 #    croissant_files(${PROJECT_NAME} ${ENGINE_INCLUDE}
@@ -137,11 +143,13 @@ endif()
 
 target_include_directories(${PROJECT_NAME}
 	PUBLIC ${CROISSANT_ENGINE_ROOT_DIR}/Include
+	${Vulkan_INCLUDES}
 )
 
 if(CROISSANT_HOST_WINDOWS EQUAL 1)
     target_link_libraries(${PROJECT_NAME}
         PUBLIC opengl32 glu32 gdi32
+		${Vulkan_LIBRARIES}
     )
 elseif(CROISSANT_HOST_LINUX EQUAL 1)
     target_link_libraries(${PROJECT_NAME}
