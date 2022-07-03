@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <direct.h>
+#include <string>
 
 #define PATH_SEPARATOR '\\'
 #define SEPARATOR_TEST(chr) ('\\' == (chr) || '/' == (chr))

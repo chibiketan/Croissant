@@ -1,4 +1,5 @@
 #define GLFW_INCLUDE_VULKAN
+#define VK_NO_PROTOTYPES
 #include "defines.hpp"
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -9,6 +10,7 @@
 #include <memory>
 #include <functional>
 #include <optional>
+#include <volk.h>
 
 struct GlfwWindowDestructor {
     void operator()(GLFWwindow* window) {
@@ -181,6 +183,7 @@ private:
             throw std::runtime_error("failed to create instance!");
         }
 
+        volkLoadInstance(*m_instanceVulkan.get());
     }
 
     void setupDebudLayer() {
@@ -458,6 +461,7 @@ private:
 
 int main(int, char** )
 {
+    volkInitialize();
     using namespace std::string_literals;
     // initialisation de la bibliothèque GLFW
     glfwInit();

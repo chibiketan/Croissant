@@ -35,3 +35,9 @@
 
 # generated files
 /Sources/Engine2/Include/defines.hpp
+
+# xmake work directory
+/.xmake/
+
+# ???
+/venv/

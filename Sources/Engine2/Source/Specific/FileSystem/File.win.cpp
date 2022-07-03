@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <string>
 
 #define PATH_SEPARATOR "\\"
 
