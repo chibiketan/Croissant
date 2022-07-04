@@ -1,5 +1,5 @@
 
-add_requires("volk", "glfw")
+add_requires("volk", "glfw =3.3.5")
 set_languages("cxx20")
 
 target("engine")
@@ -20,3 +20,9 @@ target("vulkan_test")
     add_files("vulkan/**.cpp")
     add_deps("engine")
     add_packages("glfw", "volk")
+
+target("get_config")
+    set_kind("binary")
+    add_files("Sources/GetConfig/Source/**.cpp")
+    add_deps("engine")
+    add_packages("volk")
