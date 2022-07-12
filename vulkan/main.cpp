@@ -15,6 +15,7 @@
 
 struct GlfwWindowDestructor {
     void operator()(GLFWwindow* window) {
+        std::cout << "Release Window" << std::endl;
         glfwDestroyWindow(window);
     }
 };
@@ -22,6 +23,7 @@ struct GlfwWindowDestructor {
 struct VulkanInstanceDestructor {
     void operator()(VkInstance* instance) {
         if (*instance != nullptr) {
+            std::cout << "Release vulkan instance" << std::endl;
             vkDestroyInstance(*instance, nullptr);
         }
     }
@@ -30,16 +32,8 @@ struct VulkanInstanceDestructor {
 struct VulkanDeviceDestructor {
     void operator()(VkDevice* device) {
         if (*device != nullptr) {
+            std::cout << "Release Device" << std::endl;
             vkDestroyDevice(*device, nullptr);
-        }
-    }
-};
-
-struct VulkanSwapchainDestructor {
-    void operator()(VkSwapchainKHR* swapchain) {
-        if (*swapchain != nullptr) {
-            // Comment récupérer le device ???
-            vkDestroySwapchainKHR(nullptr, *swapchain, nullptr);
         }
     }
 };
@@ -59,6 +53,10 @@ public:
         , m_swapChain{ new VkSwapchainKHR{nullptr}, [&](VkSwapchainKHR* item) { this->releaseSwapchain(*item); }}
         , m_graphicsQueue{nullptr}
         , m_presentQueue{nullptr}
+        , m_swapChainImageFormat{}
+        , m_swapChainExtent{}
+        , m_swapChainImages{}
+        , m_swapChainImageViews{}
     {
 
     }
@@ -71,11 +69,12 @@ public:
     void initialize()
     {
         this->initVulkan();
-        this->setupDebudLayer();
+        this->setupDebugLayer();
         this->createSurface();
         this->pickPhysicalDevice();
         this->createLogicalDevice();
         this->createSwapChain();
+        this->createImageViews();
     }
 
     void run()
@@ -99,6 +98,10 @@ private:
     std::unique_ptr<VkSwapchainKHR, std::function<void (VkSwapchainKHR*)>> m_swapChain;
     VkQueue m_graphicsQueue;
     VkQueue m_presentQueue;
+    VkFormat m_swapChainImageFormat;
+    VkExtent2D m_swapChainExtent;
+    std::vector<VkImage> m_swapChainImages;
+    std::vector<std::unique_ptr<VkImageView, std::function<void (VkImageView*)>>> m_swapChainImageViews;
 #ifdef CROISSANT_VULKAN_VALIDATION_LAYER
     constexpr static bool enableValidationLayer = true;
 #else
@@ -199,7 +202,7 @@ private:
         volkLoadInstance(*m_instanceVulkan.get());
     }
 
-    void setupDebudLayer() {
+    void setupDebugLayer() {
         if (!enableValidationLayer) {
             // nothing to do
             return;
@@ -248,6 +251,8 @@ private:
             return;
         }
 
+        std::cout << "Release Debug utils messenger" << std::endl;
+
         auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*m_instanceVulkan, "vkDestroyDebugUtilsMessengerEXT");
         if (nullptr != func) {
             func(*m_instanceVulkan, messenger, nullptr);
@@ -259,6 +264,8 @@ private:
             return;
         }
 
+        std::cout << "Release Surface" << std::endl;
+
         vkDestroySurfaceKHR(*this->m_instanceVulkan, surface, nullptr);
     }
 
@@ -267,7 +274,19 @@ private:
             return;
         }
 
+        std::cout << "Release Swapchain" << std::endl;
+
         vkDestroySwapchainKHR(*this->m_device, swapchain, nullptr);
+    }
+
+    void releaseSwapChainImageView(VkImageView imageView) {
+        if (nullptr == imageView) {
+            return;
+        }
+
+        std::cout << "Release Swapchain Image View" << std::endl;
+
+        vkDestroyImageView(*this->m_device, imageView, nullptr);
     }
 
 
@@ -454,6 +473,40 @@ private:
         createInfo.oldSwapchain = VK_NULL_HANDLE;
         if (vkCreateSwapchainKHR(*this->m_device, &createInfo, nullptr, this->m_swapChain.get()) != VK_SUCCESS) {
             throw std::runtime_error("Swapchain creation failed");
+        }
+
+        vkGetSwapchainImagesKHR(*this->m_device, *this->m_swapChain, &imageCount, nullptr);
+        this->m_swapChainImages.resize(imageCount);
+        vkGetSwapchainImagesKHR(*this->m_device, *this->m_swapChain, &imageCount, this->m_swapChainImages.data());
+        this->m_swapChainExtent = extent;
+        this->m_swapChainImageFormat = surfaceFormat.format;
+    }
+
+    void createImageViews() {
+        this->m_swapChainImageViews.resize(this->m_swapChainImages.size());
+
+        for (size_t i = 0; i < this->m_swapChainImages.size(); ++i) {
+            this->m_swapChainImageViews[i] = std::unique_ptr<VkImageView, std::function<void (VkImageView*)>>(new VkImageView{nullptr}, [&](VkImageView* imageView) { this->releaseSwapChainImageView(*imageView); });
+            VkImageViewCreateInfo createInfo{};
+
+            createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+            createInfo.image = this->m_swapChainImages[i];
+            createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+            createInfo.format = this->m_swapChainImageFormat;
+            createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+            createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+            createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+            createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+            createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            createInfo.subresourceRange.baseMipLevel = 0;
+            createInfo.subresourceRange.levelCount = 1;
+            createInfo.subresourceRange.baseArrayLayer = 0;
+            createInfo.subresourceRange.layerCount = 1;
+
+
+            if (vkCreateImageView(*this->m_device, &createInfo, nullptr, this->m_swapChainImageViews[i].get()) != VK_SUCCESS) {
+                throw std::runtime_error("échec de la création d'une image view!");
+            }
         }
     }
 
