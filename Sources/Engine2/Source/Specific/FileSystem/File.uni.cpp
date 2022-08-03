@@ -1,4 +1,5 @@
 #include <sys/stat.h>
+#include <string>
 
 #define PATH_SEPARATOR "/"
 

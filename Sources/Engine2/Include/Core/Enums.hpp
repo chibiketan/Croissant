@@ -36,7 +36,7 @@ namespace Croissant
 
 		enum class VertexComponentTypeEnum
 		{
-			None,
+			Undefined,
 			Float1,
 			Float2,
 			Float3,

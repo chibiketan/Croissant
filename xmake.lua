@@ -12,6 +12,12 @@ target("engine")
         remove_files("Sources/Engine2/Source/**.uni.cpp")
         add_syslinks("opengl32", "glu32", "gdi32")
     end
+    if(is_plat("linux")) then
+        remove_files("Sources/Engine2/Source/**.Windows.cpp")
+        remove_files("Sources/Engine2/Source/**.win.cpp")
+        remove_files("Sources/Engine2/Source/**.Linux.cpp")
+        remove_files("Sources/Engine2/Source/**.uni.cpp")
+    end
     add_packages("volk")
 
 

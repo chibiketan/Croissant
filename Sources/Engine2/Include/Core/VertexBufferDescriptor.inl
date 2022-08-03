@@ -9,7 +9,7 @@ namespace Croissant
 {
 	namespace Core
 	{
-		// ------------------------------------------------- implémentation VertexBufferDescriptor
+		// ------------------------------------------------- implï¿½mentation VertexBufferDescriptor
 		inline VertexBufferDescriptor::VertexBufferDescriptor()
 			: m_elements {}
 		{
@@ -32,7 +32,7 @@ namespace Croissant
 			descriptor.m_isActive = false;
 			descriptor.m_offset = 0;
 			descriptor.m_size = 0;
-			descriptor.m_type = VertexComponentTypeEnum::None;
+			descriptor.m_type = VertexComponentTypeEnum::Undefined;
 		}
 
 		inline void VertexBufferDescriptor::Activate(VertexComponentEnum component, VertexComponentTypeEnum type, uint32_t offset, uint32_t size)
@@ -55,7 +55,7 @@ namespace Croissant
 			m_stride = stride;
 		}
 
-		// ------------------------------------------------- implémentation DescriptorElement
+		// ------------------------------------------------- implï¿½mentation DescriptorElement
 		inline VertexBufferDescriptor::DescriptorElement::DescriptorElement()
 			: m_isActive { false }, m_offset { 0 }, m_size { 0 }
 		{
