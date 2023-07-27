@@ -59,7 +59,12 @@ public:
         , m_swapChainExtent{}
         , m_swapChainImages{}
         , m_swapChainImageViews{}
+        , m_swapChainFramebuffers{}
         , m_pipelineLayout{ new VkPipelineLayout {nullptr}, [&](VkPipelineLayout* item) { this->releasePipelineLayout(*item); }}
+        , m_renderPass{ new VkRenderPass {nullptr}, [&](VkRenderPass* item) { this->releaseRenderPass(*item); }}
+        , m_graphicsPipeline{ new VkPipeline {nullptr}, [&](VkPipeline* item) { this->releasePipeline(*item); }}
+        , m_commandPool{ new VkCommandPool {nullptr}, [&](VkCommandPool* item) { this->releaseCommandPool(*item); }}
+        , m_commandBuffers{}
     {
 
     }
@@ -78,7 +83,11 @@ public:
         this->createLogicalDevice();
         this->createSwapChain();
         this->createImageViews();
+        this->createRenderPass();
         this->createGraphicsPipeline();
+        this->createFramebuffers();
+        this->createCommandPool();
+        this->createCommandBuffer();
     }
 
     void run()
@@ -106,7 +115,12 @@ private:
     VkExtent2D m_swapChainExtent;
     std::vector<VkImage> m_swapChainImages;
     std::vector<std::unique_ptr<VkImageView, std::function<void (VkImageView*)>>> m_swapChainImageViews;
+    std::vector<std::unique_ptr<VkFramebuffer, std::function<void (VkFramebuffer*)>>> m_swapChainFramebuffers;
     std::unique_ptr<VkPipelineLayout, std::function<void (VkPipelineLayout*)>>  m_pipelineLayout;
+    std::unique_ptr<VkRenderPass, std::function<void (VkRenderPass*)>> m_renderPass;
+    std::unique_ptr<VkPipeline, std::function<void (VkPipeline*)>> m_graphicsPipeline;
+    std::unique_ptr<VkCommandPool, std::function<void (VkCommandPool*)>> m_commandPool;
+    std::vector<VkCommandBuffer> m_commandBuffers;
 #ifdef CROISSANT_VULKAN_VALIDATION_LAYER
     constexpr static bool enableValidationLayer = true;
 #else
@@ -263,6 +277,56 @@ private:
         if (vkCreatePipelineLayout(*this->m_device, &pipelineLayoutInfo, nullptr, this->m_pipelineLayout.get()) != VK_SUCCESS) {
             throw std::runtime_error("échec de la création du pipeline layout!");
         }
+
+        // Liaison de tous les éléments de la pipeline ensemble
+        VkGraphicsPipelineCreateInfo pipelineInfo{};
+        pipelineInfo.sType = VkStructureType::VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+        pipelineInfo.stageCount = 2;
+        pipelineInfo.pStages = shaderStages;
+        pipelineInfo.pVertexInputState = &vertexInputInfo;
+        pipelineInfo.pInputAssemblyState = &inputAssembly;
+        pipelineInfo.pViewportState = &viewportState;
+        pipelineInfo.pRasterizationState = &rasterizer;
+        pipelineInfo.pMultisampleState = &multisampling;
+        pipelineInfo.pDepthStencilState = nullptr; // optionnel
+        pipelineInfo.pColorBlendState = &colorBlending;
+        pipelineInfo.pDynamicState = nullptr; // optionnel
+        pipelineInfo.layout = *this->m_pipelineLayout;
+        pipelineInfo.renderPass = *this->m_renderPass;
+        pipelineInfo.subpass = 0;
+        pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optionnel
+        pipelineInfo.basePipelineIndex = -1; // Optionnel
+
+        if (vkCreateGraphicsPipelines(*this->m_device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, this->m_graphicsPipeline.get()) != VK_SUCCESS) {
+            throw std::runtime_error("échec de la création de la pipeline graphique!");
+        }
+    }
+
+    void createCommandPool() {
+        auto queueFamilyIndices = findQueueFamilies(this->m_physicalDevice);
+
+        VkCommandPoolCreateInfo poolInfo{};
+        poolInfo.sType = VkStructureType::VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+        poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
+        poolInfo.flags = 0; // optionnel
+
+        if (vkCreateCommandPool(*this->m_device, &poolInfo, nullptr, this->m_commandPool.get()) != VK_SUCCESS) {
+            throw std::runtime_error("Echec de la création d'une command pool");
+        }
+    }
+
+    void createCommandBuffer() {
+        this->m_commandBuffers.resize(this->m_swapChainFramebuffers.size());
+
+        VkCommandBufferAllocateInfo allocInfo{};
+        allocInfo.sType = VkStructureType::VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        allocInfo.commandPool = *this->m_commandPool;
+        allocInfo.level = VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocInfo.commandBufferCount = (uint32_t)this->m_commandBuffers.size();
+
+        if (vkAllocateCommandBuffers(*this->m_device, &allocInfo, this->m_commandBuffers.data()) != VK_SUCCESS) {
+            throw std::runtime_error("Echec de l'allocation de command buffers !");
+        }
     }
 
     void releaseShaderModule(VkShaderModule shaderModule) {
@@ -281,6 +345,33 @@ private:
 
         std::cout << "Release pipeline layout" << std::endl;
         vkDestroyPipelineLayout(*this->m_device, pipelineLayout, nullptr);
+    }
+
+    void releaseRenderPass(VkRenderPass renderPass) {
+        if (nullptr == renderPass)  {
+            return;
+        }
+
+        std::cout << "Release render pass" << std::endl;
+        vkDestroyRenderPass(*this->m_device, renderPass, nullptr);
+    }
+
+    void releasePipeline(VkPipeline pipeline) {
+        if (nullptr == pipeline) {
+            return;
+        }
+
+        std::cout << "Release pipeline" << std::endl;
+        vkDestroyPipeline(*this->m_device, pipeline, nullptr);
+    }
+
+    void releaseCommandPool(VkCommandPool commandPool) {
+        if (nullptr == commandPool) {
+            return;
+        }
+
+        std::cout << "Release command pool" << std::endl;
+        vkDestroyCommandPool(*this->m_device, commandPool, nullptr);
     }
 
     std::unique_ptr<VkShaderModule, std::function<void (VkShaderModule*)>> createShaderModule(const std::vector<char>& code) {
@@ -313,6 +404,68 @@ private:
         }
 
         return layers;
+    }
+
+    void createRenderPass() {
+        VkAttachmentDescription colorAttachment{};
+
+        colorAttachment.format = m_swapChainImageFormat;
+        colorAttachment.samples = VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT;
+        colorAttachment.loadOp = VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_CLEAR;
+        colorAttachment.storeOp = VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_STORE;
+        colorAttachment.stencilLoadOp = VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        colorAttachment.stencilStoreOp = VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        colorAttachment.initialLayout = VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED;
+        colorAttachment.finalLayout = VkImageLayout::VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+
+        VkAttachmentReference colorAttachmentRef{};
+        colorAttachmentRef.attachment = 0;
+        colorAttachmentRef.layout = VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+
+        VkSubpassDescription subpass{};
+        subpass.pipelineBindPoint = VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS;
+        subpass.colorAttachmentCount = 1;
+        subpass.pColorAttachments = &colorAttachmentRef;
+
+
+        VkRenderPassCreateInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+        renderPassInfo.attachmentCount = 1;
+        renderPassInfo.pAttachments = &colorAttachment;
+        renderPassInfo.subpassCount = 1;
+        renderPassInfo.pSubpasses = &subpass;
+
+        if (vkCreateRenderPass(*this->m_device, &renderPassInfo, nullptr, this->m_renderPass.get()) != VK_SUCCESS) {
+            throw std::runtime_error("échec de la création de la render pass!");
+        }
+    }
+
+    void createFramebuffers() {
+        this->m_swapChainFramebuffers.resize(this->m_swapChainImageViews.size());
+
+        for (size_t i = 0; i < this->m_swapChainImageViews.size(); ++i) {
+            this->m_swapChainFramebuffers[i] = std::unique_ptr<VkFramebuffer, std::function<void(VkFramebuffer*)>>{
+                new VkFramebuffer{nullptr}, [&](VkFramebuffer* item) { this->releaseFramebuffer(*item); }
+            };
+
+            VkImageView attachments[] = {
+                    *this->m_swapChainImageViews[i]
+            };
+            VkFramebufferCreateInfo framebufferInfo{};
+            framebufferInfo.sType = VkStructureType::VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+            framebufferInfo.renderPass = *this->m_renderPass;
+            framebufferInfo.attachmentCount = 1;
+            framebufferInfo.pAttachments = attachments;
+            framebufferInfo.width = this->m_swapChainExtent.width;
+            framebufferInfo.height = this->m_swapChainExtent.height;
+            framebufferInfo.layers = 1;
+
+            if (vkCreateFramebuffer(*this->m_device, &framebufferInfo, nullptr, this->m_swapChainFramebuffers[i].get()) != VK_SUCCESS) {
+                throw std::runtime_error("Echec de la création d'un framebuffer");
+            }
+        }
     }
 
     void initVulkan() {
@@ -476,6 +629,15 @@ private:
         std::cout << "Release Swapchain Image View" << std::endl;
 
         vkDestroyImageView(*this->m_device, imageView, nullptr);
+    }
+
+    void releaseFramebuffer(VkFramebuffer framebuffer) {
+        if (nullptr == framebuffer) {
+            return;
+        }
+
+        std::cout << "Release framebuffer" << std::endl;
+        vkDestroyFramebuffer(*this->m_device, framebuffer, nullptr);
     }
 
 
