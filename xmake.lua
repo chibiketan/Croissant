@@ -1,4 +1,10 @@
 -- xmake f -c -p mingw --mingw=D:/logiciels/msys64/mingw64/ --cc=clang --cxx=clang++
+-- besoin d'installer base-devel : pacman -S base-devel
+-- xmake f -c -p mingw --cc=clang --cxx=clang++
+-- generate cmakefile
+--  xmake project -k cmake
+
+-- MISSING : No generation for defines.hpp for Engine2
 rule("shader.compile")
     set_extensions(".frag", ".vert")
 

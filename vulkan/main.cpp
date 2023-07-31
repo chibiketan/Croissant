@@ -65,6 +65,9 @@ public:
         , m_graphicsPipeline{ new VkPipeline {nullptr}, [&](VkPipeline* item) { this->releasePipeline(*item); }}
         , m_commandPool{ new VkCommandPool {nullptr}, [&](VkCommandPool* item) { this->releaseCommandPool(*item); }}
         , m_commandBuffers{}
+        , m_imageAvailableSemaphore{ new VkSemaphore{nullptr}, [&](VkSemaphore* item) { this->releaseSemaphore(*item); }}
+        , m_renderFinishedSemaphore{ new VkSemaphore{nullptr}, [&](VkSemaphore* item) { this->releaseSemaphore(*item); }}
+        , m_inFlightFence{ new VkFence{nullptr}, [&](VkFence* item) { this->releaseFence(*item); }}
     {
 
     }
@@ -88,12 +91,14 @@ public:
         this->createFramebuffers();
         this->createCommandPool();
         this->createCommandBuffer();
+        this->createSyncObjects();
     }
 
     void run()
     {
         while(!glfwWindowShouldClose(m_window.get())) {
             glfwPollEvents();
+            this->drawFrame();
         }
     }
 
@@ -121,6 +126,9 @@ private:
     std::unique_ptr<VkPipeline, std::function<void (VkPipeline*)>> m_graphicsPipeline;
     std::unique_ptr<VkCommandPool, std::function<void (VkCommandPool*)>> m_commandPool;
     std::vector<VkCommandBuffer> m_commandBuffers;
+    std::unique_ptr<VkSemaphore, std::function<void (VkSemaphore*)>> m_imageAvailableSemaphore;
+    std::unique_ptr<VkSemaphore, std::function<void (VkSemaphore*)>> m_renderFinishedSemaphore;
+    std::unique_ptr<VkFence, std::function<void (VkFence*)>> m_inFlightFence;
 #ifdef CROISSANT_VULKAN_VALIDATION_LAYER
     constexpr static bool enableValidationLayer = true;
 #else
@@ -259,6 +267,7 @@ private:
 
         std::vector<VkDynamicState> dynamicStates = {
                 VK_DYNAMIC_STATE_VIEWPORT,
+                VK_DYNAMIC_STATE_SCISSOR,
                 VK_DYNAMIC_STATE_LINE_WIDTH
         };
 
@@ -290,7 +299,7 @@ private:
         pipelineInfo.pMultisampleState = &multisampling;
         pipelineInfo.pDepthStencilState = nullptr; // optionnel
         pipelineInfo.pColorBlendState = &colorBlending;
-        pipelineInfo.pDynamicState = nullptr; // optionnel
+        pipelineInfo.pDynamicState = &dynamicState; // optionnel
         pipelineInfo.layout = *this->m_pipelineLayout;
         pipelineInfo.renderPass = *this->m_renderPass;
         pipelineInfo.subpass = 0;
@@ -308,7 +317,7 @@ private:
         VkCommandPoolCreateInfo poolInfo{};
         poolInfo.sType = VkStructureType::VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
         poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
-        poolInfo.flags = 0; // optionnel
+        poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; // optionnel
 
         if (vkCreateCommandPool(*this->m_device, &poolInfo, nullptr, this->m_commandPool.get()) != VK_SUCCESS) {
             throw std::runtime_error("Echec de la création d'une command pool");
@@ -327,6 +336,117 @@ private:
         if (vkAllocateCommandBuffers(*this->m_device, &allocInfo, this->m_commandBuffers.data()) != VK_SUCCESS) {
             throw std::runtime_error("Echec de l'allocation de command buffers !");
         }
+    }
+
+    void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex) {
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        beginInfo.flags = 0; // optional
+        beginInfo.pInheritanceInfo = nullptr; // optional
+
+        if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+            throw std::runtime_error("failed to begin recording comand buffer");
+        }
+
+        // starting a render pass
+        VkRenderPassBeginInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = *this->m_renderPass;
+        renderPassInfo.framebuffer = *this->m_swapChainFramebuffers[imageIndex];
+        renderPassInfo.renderArea.offset = {0, 0};
+        renderPassInfo.renderArea.extent = this->m_swapChainExtent;
+
+        VkClearValue clearColor{{{0.0f, 0.0f, 0.0f, 1.0f}}};
+        renderPassInfo.clearValueCount = 1;
+        renderPassInfo.pClearValues = &clearColor;
+
+
+
+        vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        // Basic drawing command
+        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, *this->m_graphicsPipeline);
+        // define viewport and scissor
+        VkViewport viewport{};
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = static_cast<float>(this->m_swapChainExtent.width);
+        viewport.height = static_cast<float>(this->m_swapChainExtent.height);
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+        vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+
+        VkRect2D scissor{};
+        scissor.offset = {0, 0};
+        scissor.extent = this->m_swapChainExtent;
+        vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+
+        // draw triangle
+        vkCmdDraw(commandBuffer, 3, 1, 0, 0);
+
+        // ending render pass
+        vkCmdEndRenderPass(commandBuffer);
+
+        if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+            throw std::runtime_error("failed to record command buffer");
+        }
+    }
+
+    void createSyncObjects() {
+        VkSemaphoreCreateInfo semaphoreInfo{};
+        semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+        VkFenceCreateInfo fenceInfo{};
+        fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+        fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+        if (vkCreateSemaphore(*this->m_device, &semaphoreInfo, nullptr, this->m_imageAvailableSemaphore.get()) != VK_SUCCESS
+            || vkCreateSemaphore(*this->m_device, &semaphoreInfo, nullptr, this->m_renderFinishedSemaphore.get()) != VK_SUCCESS
+            || vkCreateFence(*this->m_device, &fenceInfo, nullptr, this->m_inFlightFence.get()) != VK_SUCCESS) {
+            throw std::runtime_error("Failed to create semaphore ou fence.");
+        }
+    }
+
+    void drawFrame() {
+        vkWaitForFences(*this->m_device, 1, this->m_inFlightFence.get(), VK_TRUE, std::numeric_limits<uint64_t>::max());
+        vkResetFences(*this->m_device, 1, this->m_inFlightFence.get());
+        uint32_t imageIndex;
+        vkAcquireNextImageKHR(*this->m_device, *this->m_swapChain, std::numeric_limits<uint64_t>::max(), *this->m_imageAvailableSemaphore, nullptr, &imageIndex);
+        auto commandBuffer = this->m_commandBuffers.at(imageIndex);
+        vkResetCommandBuffer(commandBuffer, 0);
+        this->recordCommandBuffer(commandBuffer, imageIndex);
+
+        VkSubmitInfo submitInfo{};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+        VkSemaphore waitSemaphores[] = {*this->m_imageAvailableSemaphore};
+        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        submitInfo.waitSemaphoreCount = 1;
+        submitInfo.pWaitSemaphores = waitSemaphores;
+        submitInfo.pWaitDstStageMask = waitStages;
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &commandBuffer;
+
+        VkSemaphore signalSemaphores[] = {*this->m_renderFinishedSemaphore};
+        submitInfo.signalSemaphoreCount = 1;
+        submitInfo.pSignalSemaphores = signalSemaphores;
+
+        if (vkQueueSubmit(this->m_graphicsQueue, 1, &submitInfo, *this->m_inFlightFence) != VK_SUCCESS) {
+            throw std::runtime_error("failed to submit draw command buffer !");
+        }
+
+        VkPresentInfoKHR presentInfo{};
+        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        presentInfo.waitSemaphoreCount = 1;
+        presentInfo.pWaitSemaphores = signalSemaphores;
+
+        VkSwapchainKHR swapChains[] = {*this->m_swapChain};
+        presentInfo.swapchainCount = 1;
+        presentInfo.pSwapchains = swapChains;
+        presentInfo.pImageIndices = &imageIndex;
+        presentInfo.pResults = nullptr; // Optionnal
+
+        vkQueuePresentKHR(this->m_graphicsQueue, &presentInfo);
     }
 
     void releaseShaderModule(VkShaderModule shaderModule) {
@@ -372,6 +492,24 @@ private:
 
         std::cout << "Release command pool" << std::endl;
         vkDestroyCommandPool(*this->m_device, commandPool, nullptr);
+    }
+
+    void releaseSemaphore(VkSemaphore semaphore) {
+        if (nullptr == semaphore) {
+            return;
+        }
+
+        std::cout << "Release semaphore" << std::endl;
+        vkDestroySemaphore(*this->m_device, semaphore, nullptr);
+    }
+
+    void releaseFence(VkFence fence) {
+        if (nullptr == fence) {
+            return;
+        }
+
+        std::cout << "Release fence" << std::endl;
+        vkDestroyFence(*this->m_device, fence, nullptr);
     }
 
     std::unique_ptr<VkShaderModule, std::function<void (VkShaderModule*)>> createShaderModule(const std::vector<char>& code) {
@@ -429,6 +567,15 @@ private:
         subpass.colorAttachmentCount = 1;
         subpass.pColorAttachments = &colorAttachmentRef;
 
+        // add subpass
+        VkSubpassDependency dependency{};
+        dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+        dependency.dstSubpass = 0;
+        dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        dependency.srcAccessMask = 0;
+        dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
 
         VkRenderPassCreateInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
@@ -436,6 +583,8 @@ private:
         renderPassInfo.pAttachments = &colorAttachment;
         renderPassInfo.subpassCount = 1;
         renderPassInfo.pSubpasses = &subpass;
+        renderPassInfo.dependencyCount = 1;
+        renderPassInfo.pDependencies = &dependency;
 
         if (vkCreateRenderPass(*this->m_device, &renderPassInfo, nullptr, this->m_renderPass.get()) != VK_SUCCESS) {
             throw std::runtime_error("échec de la création de la render pass!");
