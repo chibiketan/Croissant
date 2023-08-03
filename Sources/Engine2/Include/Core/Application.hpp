@@ -25,7 +25,7 @@ struct Function##methodName\
 template<typename TType>\
 struct Function##methodName<TType, false>\
 {\
-	template<typename... Args> static methodReturn Execute(TType&, Args&&... args)\
+	template<typename... Args> static methodReturn Execute(TType&, Args&&...)\
 	{\
 		static_assert(HasMethod##methodName<TType>::Has, "La classe de base doit implementer une methode " #methodReturn " " #methodName "(" #__VA_ARGS__ ");");\
 		return methodReturn{};\

@@ -35,23 +35,23 @@ namespace Croissant
 			AutoResetEventImpl::AutoResetEventImpl()
 				: m_mutex {}, m_condition {}, m_lockCount { 0 }
 			{
-				TRACE("AutoResetEventImpl: constructor");
+				//TRACE("AutoResetEventImpl: constructor");
 			}
 
 			AutoResetEventImpl::~AutoResetEventImpl()
 			{
-				TRACE("AutoResetEventImpl: destructor : begin");
+				//TRACE("AutoResetEventImpl: destructor : begin");
 				//while (m_lockCount.load() > 0)
 				while (m_lockCount > 0)
 				{
 					Signal();
 				}
-				TRACE("AutoResetEventImpl: destructor : end");
+				//TRACE("AutoResetEventImpl: destructor : end");
 			}
 
 			void AutoResetEventImpl::Wait()
 			{
-				TRACE("AutoResetEventImpl: Wait : begin");
+				//TRACE("AutoResetEventImpl: Wait : begin");
 				//++m_lockCount;
 				//TRACE("&m_lockCount: " << (void*)&m_lockCount);
 				//std::atomic_fetch_add(&m_lockCount, 1);
@@ -62,12 +62,12 @@ namespace Croissant
 				//--m_lockCount;
 				//std::atomic_fetch_add(&m_lockCount, -1);
 				--m_lockCount;
-				TRACE("AutoResetEventImpl: Wait : end");
+				//TRACE("AutoResetEventImpl: Wait : end");
 			}
 
 			void AutoResetEventImpl::Wait(uint32_t milliseconds)
 			{
-				TRACE("AutoResetEventImpl: Wait(milliseconds) : begin");
+				//TRACE("AutoResetEventImpl: Wait(milliseconds) : begin");
 				//++m_lockCount;
 				//std::atomic_fetch_add(&m_lockCount, 1);
 				std::unique_lock<std::mutex> l(m_mutex);
@@ -77,14 +77,14 @@ namespace Croissant
 				//--m_lockCount;
 				//std::atomic_fetch_add(&m_lockCount, -1);
 				--m_lockCount;
-				TRACE("AutoResetEventImpl: Wait(milliseconds) : end");
+				//TRACE("AutoResetEventImpl: Wait(milliseconds) : end");
 			}
 
 			void AutoResetEventImpl::Signal()
 			{
-				TRACE("AutoResetEventImpl: Signal : begin");
+				//TRACE("AutoResetEventImpl: Signal : begin");
 				m_condition.notify_all();
-				TRACE("AutoResetEventImpl: Signal : end");
+				//TRACE("AutoResetEventImpl: Signal : end");
 			}
 		}
 	}

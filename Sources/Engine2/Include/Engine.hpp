@@ -5,7 +5,7 @@
 #  include "defines.hpp"
 
 #  if defined(COMPILER_MSVC)
-// On désactive les warning sur les export
+// On dÃ©sactive les warning sur les export
 #    pragma warning(disable: 4251)
 #    pragma warning(disable: 4275)
 
@@ -41,5 +41,25 @@
 #  if defined(CROISSANT_HAS_TRACE)
 #    include "Core/LogManager.hpp"
 #  endif
+
+
+
+// TODO move in a more specific file (include only utility ?)
+
+#  define CLASS_NO_COPY(clazz)      \
+public:                             \
+    clazz(clazz const&) = delete;   \
+    clazz& operator=(clazz const&) = delete;
+
+#  define CLASS_NO_MOVE(clazz)  \
+public:                         \
+    clazz(clazz&&) = delete;    \
+    clazz& operator=(clazz&&) = delete;
+
+#  define CLASS_NO_COPY_MOVE(clazz) \
+    CLASS_NO_COPY(clazz)            \
+    CLASS_NO_MOVE(clazz)
+
+
 
 #endif // !CROISSANT_ENGINE_HPP_INC

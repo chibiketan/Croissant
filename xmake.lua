@@ -1,8 +1,12 @@
--- xmake f -c -p mingw --mingw=D:/logiciels/msys64/mingw64/ --cc=clang --cxx=clang++
+-- xmake f -c -p mingw --cc=/mingw64/bin/clang.exe --cxx=/mingw64/bin/clang++.exe --ar=/mingw64/bin/llvm-ar.exe --ld=/mingw64/bin/clang++.exe --engine_static=n
 -- besoin d'installer base-devel : pacman -S base-devel
--- xmake f -c -p mingw --cc=clang --cxx=clang++
+-- xmake f -c -p mingw --cc=clang --cxx=clang++ --mode=debug
 -- generate cmakefile
 --  xmake project -k cmake
+
+-- I looooooooove glfw...
+-- xmake f -c -p mingw --toolchain=clang --ar=/mingw64/bin/llvm-ar.exe --mode=debug --mingw=C:/msys64/mingw64
+
 
 -- MISSING : No generation for defines.hpp for Engine2
 rule("shader.compile")
@@ -28,13 +32,25 @@ rule("shader.compile")
     end)
 rule_end()
 
+option("engine_static", { description = "Build engine as static lib", default = false })
 
-add_requires("volk", "glfw =3.3.5", "glslang")
+add_rules("mode.coverage", "mode.debug", "mode.releasedbg", "mode.release")
+set_allowedmodes("debug", "releasedbg", "release", "coverage")
+set_defaultmode("debug")
+
+add_requires("volk", {configs={header_only=true}})
+add_requires("glfw =3.3.8", "glslang")
 set_languages("cxx20")
 set_warnings("allextra")
 
 target("engine")
-    set_kind("static")
+    if has_config("engine_static") then
+        add_defines("CROISSANT_SHARED_LIB", { public = true })
+        set_kind("shared")
+    else
+        set_kind("static")
+    end
+
     add_files("Sources/Engine2/Source/**.cpp")
     add_includedirs("Sources/Engine2/Include", {public = true})
     if(is_plat("mingw", "windows")) then
@@ -54,7 +70,9 @@ target("engine")
 
 target("vulkan_test")
     set_kind("binary")
-    add_files("vulkan/**.cpp")
+    add_files("vulkan/main.cpp")
+    add_files("vulkan/Source/**.cpp")
+    add_includedirs("vulkan/Include")
     add_deps("engine")
     add_packages("glfw", "volk", "glslang")
     add_rules("shader.compile")
