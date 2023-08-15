@@ -11,7 +11,8 @@ using namespace Croissant::Graphic::Vulkan;
 
 VulkanRenderer::VulkanRenderer(Window& window) :
     m_instance{nullptr},
-    m_surface{nullptr}
+    m_surface{nullptr},
+    m_currentDevice{nullptr}
     {
     if (volkGetLoadedInstance() == VK_NULL_HANDLE) {
         volkInitialize();
@@ -20,40 +21,37 @@ VulkanRenderer::VulkanRenderer(Window& window) :
     this->m_instance = Wrapper::Instance::Create("My super app", "Croissant Engine");
     this->m_surface = Wrapper::Surface::Create(*this->m_instance, window);
     LoadPhysicalDevices();
+    m_currentDevice = &PickPhysicalDevice();
+    TRACE("Picked device : "<<m_currentDevice->m_properties.deviceName);
 }
 
 void VulkanRenderer::LoadPhysicalDevices() {
-    std::vector<VkPhysicalDevice> devices;
+    std::vector <VkPhysicalDevice> devices;
 
     if (!m_instance->GetPhysicalDevices(devices)) {
         throw std::runtime_error("Impossible de récupérer les cartes physiques");
     }
 
-    m_physicalDevices.reserve(devices.size());
-    for (VkPhysicalDevice device : devices)
-    {
-        Wrapper::PhysicalDevice deviceInfo;
-        vkGetPhysicalDeviceQueueFamilyProperties
-        if (!s_instance.GetPhysicalDeviceQueueFamilyProperties(physDevice, &deviceInfo.queueFamilies))
-        {
-            NazaraWarning("Failed to query physical device queue family properties for " + std::string(deviceInfo.properties.deviceName) + " (0x" + NumberToString(deviceInfo.properties.deviceID, 16) + ')');
-            continue;
+    for (VkPhysicalDevice device: devices) {
+        m_physicalDevices.emplace_back(*m_instance, *m_surface, device);
+    }
+}
+
+Wrapper::PhysicalDevice& VulkanRenderer::PickPhysicalDevice() {
+    for (auto& device : m_physicalDevices) {
+        if (IsDeviceSuitable(device)) {
+            return device;
         }
+    }
 
-        deviceInfo.physDevice = physDevice;
+    throw std::runtime_error("No suitable device found.");
+}
 
-        deviceInfo.features         = s_instance.GetPhysicalDeviceFeatures(physDevice);
-        deviceInfo.memoryProperties = s_instance.GetPhysicalDeviceMemoryProperties(physDevice);
-        deviceInfo.properties       = s_instance.GetPhysicalDeviceProperties(physDevice);
+bool VulkanRenderer::IsDeviceSuitable(Wrapper::PhysicalDevice &device) {
+    return device.m_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
+           && device.m_features.geometryShader
+           && device.m_presentQueueIndex.has_value()
+           && device.m_graphicalQueueIndex.has_value()
+           && device.m_supportSwap;
 
-        std::vector<VkExtensionProperties> extensions;
-        if (s_instance.GetPhysicalDeviceExtensions(physDevice, &extensions))
-        {
-            for (auto& extProperty : extensions)
-                deviceInfo.extensions.emplace(extProperty.extensionName);
-        }
-        else
-            NazaraWarning("Failed to query physical device extensions for " + std::string(deviceInfo.properties.deviceName) + " (0x" + NumberToString(deviceInfo.properties.deviceID, 16) + ')');
-
-        s_physDevices.emplace_back(std::move(deviceInfo));
 }

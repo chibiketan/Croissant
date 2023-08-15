@@ -9,7 +9,7 @@
 #  include "Graphic/Vulkan/Utils.hpp"
 #  include "Engine.hpp"
 #  include <vector>
-
+#  include <optional>
 
 namespace Croissant::Graphic::Vulkan::Wrapper {
     /**
@@ -24,6 +24,15 @@ namespace Croissant::Graphic::Vulkan::Wrapper {
         ~Instance();
         inline operator VkInstance();
         bool GetPhysicalDevices(std::vector<VkPhysicalDevice>& deviceList);
+        VkPhysicalDeviceFeatures GetPhysicalDeviceFeatures(VkPhysicalDevice& device);
+        VkPhysicalDeviceMemoryProperties GetPhysicalDeviceMemoryProperties(VkPhysicalDevice& device);
+        VkPhysicalDeviceProperties GetPhysicalDeviceProperties(VkPhysicalDevice& device);
+        bool GetPhysicalDeviceQueueFamilyProperties(VkPhysicalDevice& device, std::vector<VkQueueFamilyProperties>& queueList);
+        bool GetPhysicalDeviceExtensions(VkPhysicalDevice& device, std::vector<VkExtensionProperties>& extensions);
+        bool GetPhysicalDeviceSurfaceSupport(VkPhysicalDevice& device, uint32_t index, VkSurfaceKHR const& surface, bool& presentSupport);
+        std::optional<VkSurfaceCapabilitiesKHR> GetPhysicalDeviceSurfaceCapabilities(VkPhysicalDevice& device, VkSurfaceKHR const& surface);
+        bool GetPhysicalDeviceSurfaceFormats(VkPhysicalDevice& device, VkSurfaceKHR const& surface, std::vector<VkSurfaceFormatKHR>& formats);
+        bool GetPhysicalDeviceSurfacePresentModes(VkPhysicalDevice& device, VkSurfaceKHR const& surface, std::vector<VkPresentModeKHR>& presentModes);
 
     private:
         explicit Instance(VkInstanceCreateInfo const& info, VkAllocationCallbacks *callbacks = nullptr);
@@ -31,6 +40,7 @@ namespace Croissant::Graphic::Vulkan::Wrapper {
         VkInstance m_instance;
         VkAllocationCallbacks* m_allocationCallback;
         mutable VkResult m_lastErrorCode;
+
     };
 }
 

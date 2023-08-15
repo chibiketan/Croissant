@@ -11,20 +11,24 @@
 #  include "Graphic/Vulkan/Wrapper/Instance.hpp"
 #  include "Graphic/Vulkan/Wrapper/Surface.hpp"
 #  include "Graphic/Vulkan/Wrapper/PhysicalDevice.hpp"
+#  include <list>
 
 namespace Croissant::Graphic::Vulkan {
     class VulkanRenderer {
     CLASS_NO_COPY_MOVE(VulkanRenderer)
     public:
-        VulkanRenderer(Window& window);
+        explicit VulkanRenderer(Window& window);
         ~VulkanRenderer() = default;
 
     private:
         void LoadPhysicalDevices();
+        Wrapper::PhysicalDevice& PickPhysicalDevice();
+        bool IsDeviceSuitable(Wrapper::PhysicalDevice& device);
 
         std::unique_ptr<Wrapper::Instance> m_instance;
         std::unique_ptr<Wrapper::Surface> m_surface;
-        std::vector<Wrapper::PhysicalDevice> m_physicalDevices;
+        std::list<Wrapper::PhysicalDevice> m_physicalDevices;
+        Wrapper::PhysicalDevice*    m_currentDevice;
     };
 }
 

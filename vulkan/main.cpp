@@ -87,8 +87,8 @@ public:
         this->initVulkan();
         this->setupDebugLayer();
         this->createSurface();
-        // ^ done
         this->pickPhysicalDevice();
+        // ^ done
         this->createLogicalDevice();
         this->createSwapChain();
         this->createImageViews();
