@@ -12,17 +12,22 @@ using namespace Croissant::Graphic::Vulkan;
 VulkanRenderer::VulkanRenderer(Window& window) :
     m_instance{nullptr},
     m_surface{nullptr},
-    m_currentDevice{nullptr}
+    m_currentDevice{nullptr},
+    m_logicalDevice{nullptr}
     {
     if (volkGetLoadedInstance() == VK_NULL_HANDLE) {
         volkInitialize();
     }
+
+    window.Open();
 
     this->m_instance = Wrapper::Instance::Create("My super app", "Croissant Engine");
     this->m_surface = Wrapper::Surface::Create(*this->m_instance, window);
     LoadPhysicalDevices();
     m_currentDevice = &PickPhysicalDevice();
     TRACE("Picked device : "<<m_currentDevice->m_properties.deviceName);
+    m_logicalDevice = std::make_unique<Wrapper::LogicalDevice>(*m_instance, *m_currentDevice);
+    m_swapChain = std::make_unique<Wrapper::SwapChain>(*m_instance, *m_currentDevice, *m_logicalDevice, window, *m_surface);
 }
 
 void VulkanRenderer::LoadPhysicalDevices() {

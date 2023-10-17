@@ -2,11 +2,10 @@
 // Created by Grego on 04/08/2023.
 //
 
-#include "PhysicalDevice.hpp"
 #include <set>
 
 namespace Croissant::Graphic::Vulkan::Wrapper {
-    inline PhysicalDevice::PhysicalDevice(Instance& instance, Wrapper::Surface& surface, VkPhysicalDevice & device) :
+    inline PhysicalDevice::PhysicalDevice(Instance& instance, Wrapper::Surface& surface, VkPhysicalDevice device) :
         m_features{},
         m_memoryProperties{},
         m_properties{},
@@ -85,5 +84,9 @@ namespace Croissant::Graphic::Vulkan::Wrapper {
         m_supportSwap = !m_presentModes.empty() && !m_surfaceFormats.empty();
 
         return true;
+    }
+
+    inline PhysicalDevice::operator VkPhysicalDevice() {
+        return m_device;
     }
 }

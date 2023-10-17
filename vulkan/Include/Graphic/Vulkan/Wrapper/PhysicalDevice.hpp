@@ -16,7 +16,8 @@ namespace Croissant::Graphic::Vulkan::Wrapper {
     class PhysicalDevice {
     CLASS_NO_COPY_MOVE(PhysicalDevice)
     public:
-        inline explicit PhysicalDevice(Instance& instance, Wrapper::Surface& surface, VkPhysicalDevice& m_device);
+        inline explicit PhysicalDevice(Instance& instance, Wrapper::Surface& surface, VkPhysicalDevice m_device);
+        inline operator VkPhysicalDevice();
         VkPhysicalDeviceFeatures m_features;
         VkPhysicalDeviceMemoryProperties m_memoryProperties;
         VkPhysicalDeviceProperties m_properties;
@@ -34,7 +35,7 @@ namespace Croissant::Graphic::Vulkan::Wrapper {
 
         Instance& m_instance;
         Wrapper::Surface& m_surface;
-        VkPhysicalDevice& m_device;
+        VkPhysicalDevice m_device;
     };
 }
 

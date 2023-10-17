@@ -88,8 +88,8 @@ public:
         this->setupDebugLayer();
         this->createSurface();
         this->pickPhysicalDevice();
-        // ^ done
         this->createLogicalDevice();
+        // ^ done
         this->createSwapChain();
         this->createImageViews();
         this->createRenderPass();
@@ -725,6 +725,7 @@ private:
     }
 
     void createSurface() {
+        // TODO try with Croissant Window instead of glfw
         if (VK_SUCCESS != glfwCreateWindowSurface(*this->m_instanceVulkan, this->m_window.get(), nullptr, this->m_surface.get())) {
             throw std::runtime_error("Unable to create window's surface");
         }
@@ -1120,96 +1121,101 @@ struct CleanOnExit{
     std::function<void()> m_func;
 };
 
-int main(int, char** )
+void runTest()
 {
-//    if (volkGetLoadedInstance() == VK_NULL_HANDLE) {
-//        volkInitialize();
+    if (volkGetLoadedInstance() == VK_NULL_HANDLE) {
+        volkInitialize();
+    }
+    using namespace std::string_literals;
+    // initialisation de la bibliothèque GLFW
+    glfwInit();
+
+    // Création de la fenêtre
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
+    try {
+        auto app = TestVulkan(800, 600, "Test vulkan window"s);
+
+        app.initialize();
+        app.run();
+    } catch (std::exception const& e) {
+        std::cout << "An exception occured : " << e.what() << std::endl;
+    }
+
+
+    //GLFWwindow* window = glfwCreateWindow(800, 600, "Vulkan window", nullptr, nullptr);
+
+    // Récupération du nombre d'extention supportées
+//    uint32_t extensionCount = 0;
+//    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+//
+//    // On itère sur la liste des extentions
+//    auto extentionList = std::vector<VkExtensionProperties>(extensionCount);
+//    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extentionList.data());
+//
+//    std::cout << extensionCount << " extensions supported" << std::endl;
+//    for (auto const extension : extentionList) {
+//        std::cout << "- " << extension.extensionName << std::endl;
 //    }
-//    using namespace std::string_literals;
-//    // initialisation de la bibliothèque GLFW
-//    glfwInit();
+
+    // glm::mat4 matrix;
+    // glm::vec4 vec;
+    // auto test = matrix * vec;
+
+    // Création de l'instance Vulkan
+    // informations sur l'application
+//    VkApplicationInfo appInfo = {};
+//    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+//    appInfo.pApplicationName = "Vulkan test";
+//    appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+//    appInfo.pEngineName = "No Engine";
+//    appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+//    appInfo.apiVersion = VK_API_VERSION_1_0;
 //
-//    // Création de la fenêtre
-//    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-//    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+//    // récupération des extensions nécessaires pour fonctionner
+//    uint32_t glfwExtensionCount = 0;
+//    const char** glfwExtensions;
 //
-//    try {
-//        auto app = TestVulkan(800, 600, "Test vulkan window"s);
-//
-//        app.initialize();
-//        app.run();
-//    } catch (std::exception const& e) {
-//        std::cout << "An exception occured : " << e.what() << std::endl;
-//    }
+//    glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 //
 //
-//    //GLFWwindow* window = glfwCreateWindow(800, 600, "Vulkan window", nullptr, nullptr);
-//
-//    // Récupération du nombre d'extention supportées
-////    uint32_t extensionCount = 0;
-////    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-////
-////    // On itère sur la liste des extentions
-////    auto extentionList = std::vector<VkExtensionProperties>(extensionCount);
-////    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extentionList.data());
-////
-////    std::cout << extensionCount << " extensions supported" << std::endl;
-////    for (auto const extension : extentionList) {
-////        std::cout << "- " << extension.extensionName << std::endl;
-////    }
-//
-//    // glm::mat4 matrix;
-//    // glm::vec4 vec;
-//    // auto test = matrix * vec;
+//    // Informations sur l'instance Vulkan à créer
+//    VkInstanceCreateInfo createInfo = {};
+//    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+//    createInfo.pApplicationInfo = &appInfo;
+//    createInfo.enabledExtensionCount = glfwExtensionCount;
+//    createInfo.ppEnabledExtensionNames = glfwExtensions;
+//    createInfo.enabledLayerCount = 0;
 //
 //    // Création de l'instance Vulkan
-//    // informations sur l'application
-////    VkApplicationInfo appInfo = {};
-////    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-////    appInfo.pApplicationName = "Vulkan test";
-////    appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-////    appInfo.pEngineName = "No Engine";
-////    appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-////    appInfo.apiVersion = VK_API_VERSION_1_0;
-////
-////    // récupération des extensions nécessaires pour fonctionner
-////    uint32_t glfwExtensionCount = 0;
-////    const char** glfwExtensions;
-////
-////    glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-////
-////
-////    // Informations sur l'instance Vulkan à créer
-////    VkInstanceCreateInfo createInfo = {};
-////    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-////    createInfo.pApplicationInfo = &appInfo;
-////    createInfo.enabledExtensionCount = glfwExtensionCount;
-////    createInfo.ppEnabledExtensionNames = glfwExtensions;
-////    createInfo.enabledLayerCount = 0;
-////
-////    // Création de l'instance Vulkan
-////    VkInstance m_instanceVulkan;
-////    VkResult creationResult = vkCreateInstance(&createInfo, nullptr, &m_instanceVulkan);
-////
-////    if (creationResult != VK_SUCCESS) {
-////        std::cout << "failed to create instance!" << std::endl;
-////        throw std::runtime_error("failed to create instance!");
-////    }
+//    VkInstance m_instanceVulkan;
+//    VkResult creationResult = vkCreateInstance(&createInfo, nullptr, &m_instanceVulkan);
 //
-//    // Boucle de la fenêtre
-////    while(!glfwWindowShouldClose(window)) {
-////        glfwPollEvents();
-////    }
-//
-//    // Suppression de l'instance Vulkan
-////    vkDestroyInstance(m_instanceVulkan, nullptr);
-////    // Suppression de la fenêtre
-////    glfwDestroyWindow(window);
-//
-//    // Arrêt propre de GLFW
-//    glfwTerminate();
+//    if (creationResult != VK_SUCCESS) {
+//        std::cout << "failed to create instance!" << std::endl;
+//        throw std::runtime_error("failed to create instance!");
+//    }
 
+    // Boucle de la fenêtre
+//    while(!glfwWindowShouldClose(window)) {
+//        glfwPollEvents();
+//    }
 
+    // Suppression de l'instance Vulkan
+//    vkDestroyInstance(m_instanceVulkan, nullptr);
+//    // Suppression de la fenêtre
+//    glfwDestroyWindow(window);
+
+    // Arrêt propre de GLFW
+    glfwTerminate();
+
+}
+
+int main(int, char** )
+{
+//    runTest();
+//    return 0;
 
     {
         using namespace Croissant::Core;

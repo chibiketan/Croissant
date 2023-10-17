@@ -12,6 +12,8 @@
 #  include "Graphic/Vulkan/Wrapper/Surface.hpp"
 #  include "Graphic/Vulkan/Wrapper/PhysicalDevice.hpp"
 #  include <list>
+#  include "Graphic/Vulkan/Wrapper/LogicalDevice.hpp"
+#  include "Graphic/Vulkan/Wrapper/SwapChain.hpp"
 
 namespace Croissant::Graphic::Vulkan {
     class VulkanRenderer {
@@ -29,6 +31,8 @@ namespace Croissant::Graphic::Vulkan {
         std::unique_ptr<Wrapper::Surface> m_surface;
         std::list<Wrapper::PhysicalDevice> m_physicalDevices;
         Wrapper::PhysicalDevice*    m_currentDevice;
+        std::unique_ptr<Wrapper::LogicalDevice> m_logicalDevice;
+        std::unique_ptr<Wrapper::SwapChain> m_swapChain;
     };
 }
 

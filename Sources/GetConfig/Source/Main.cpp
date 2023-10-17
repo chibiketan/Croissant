@@ -11,32 +11,32 @@ int main(int argc, char** argv)
 {
 	UNUSED(argc);
 	UNUSED(argv);
-    uint32_t layerCount;
-    vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-    std::vector<VkLayerProperties> layerProperties(layerCount);
-    vkEnumerateInstanceLayerProperties(&layerCount, layerProperties.data());
-
-	uint32_t extensionCount;
-	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-    VkExtensionProperties extensionProperties[extensionCount];
-    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensionProperties);
-
-    std::cout << "============================================================" << std::endl;
-    std::cout << "=                                                          =" << std::endl;
-    std::cout << "=                   Configuration Vulkan                   =" << std::endl;
-    std::cout << "=                                                          =" << std::endl;
-    std::cout << "============================================================" << std::endl;
-    std::cout << "Layer count : " << std::to_string(layerCount) << std::endl;
-    for (const auto layerProperty : layerProperties)
-    {
-        std::cout << "-  " << layerProperty.layerName << " [" << layerProperty.description << "]" << std::endl;
-    }
-
-	std::cout << "Extension count : " << std::to_string(extensionCount) << std::endl;
-	for (uint32_t i = 0; i < extensionCount; ++i)
-    {
-	    std::cout << "-  (" << std::to_string(extensionProperties[i].specVersion) << ") " << extensionProperties[i].extensionName << std::endl;
-    }
+//    uint32_t layerCount;
+//    vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+//    std::vector<VkLayerProperties> layerProperties(layerCount);
+//    vkEnumerateInstanceLayerProperties(&layerCount, layerProperties.data());
+//
+//	uint32_t extensionCount;
+//	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+//    VkExtensionProperties extensionProperties[extensionCount];
+//    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensionProperties);
+//
+//    std::cout << "============================================================" << std::endl;
+//    std::cout << "=                                                          =" << std::endl;
+//    std::cout << "=                   Configuration Vulkan                   =" << std::endl;
+//    std::cout << "=                                                          =" << std::endl;
+//    std::cout << "============================================================" << std::endl;
+//    std::cout << "Layer count : " << std::to_string(layerCount) << std::endl;
+//    for (const auto layerProperty : layerProperties)
+//    {
+//        std::cout << "-  " << layerProperty.layerName << " [" << layerProperty.description << "]" << std::endl;
+//    }
+//
+//	std::cout << "Extension count : " << std::to_string(extensionCount) << std::endl;
+//	for (uint32_t i = 0; i < extensionCount; ++i)
+//    {
+//	    std::cout << "-  (" << std::to_string(extensionProperties[i].specVersion) << ") " << extensionProperties[i].extensionName << std::endl;
+//    }
 
     Croissant::Core::LogManager::Init();
 	{
