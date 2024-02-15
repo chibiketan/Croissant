@@ -16,7 +16,7 @@ namespace Croissant::Graphic::Vulkan::Wrapper {
     public:
         LogicalDevice(Instance& instance, PhysicalDevice& device);
         ~LogicalDevice();
-        inline operator VkDevice();
+        inline operator VkDevice() const;
         inline VkQueue GetGraphicQueue() const;
         inline VkQueue GetPresentQueue() const;
 

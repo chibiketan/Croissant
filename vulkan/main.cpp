@@ -89,9 +89,9 @@ public:
         this->createSurface();
         this->pickPhysicalDevice();
         this->createLogicalDevice();
-        // ^ done
         this->createSwapChain();
         this->createImageViews();
+        // ^ done
         this->createRenderPass();
         this->createGraphicsPipeline();
         this->createFramebuffers();

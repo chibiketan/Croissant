@@ -33,6 +33,8 @@ namespace Croissant::Graphic::Vulkan::Wrapper {
         std::optional<VkSurfaceCapabilitiesKHR> GetPhysicalDeviceSurfaceCapabilities(VkPhysicalDevice& device, VkSurfaceKHR const& surface);
         bool GetPhysicalDeviceSurfaceFormats(VkPhysicalDevice& device, VkSurfaceKHR const& surface, std::vector<VkSurfaceFormatKHR>& formats);
         bool GetPhysicalDeviceSurfacePresentModes(VkPhysicalDevice& device, VkSurfaceKHR const& surface, std::vector<VkPresentModeKHR>& presentModes);
+        bool CreateImageView(VkDevice const& device, VkImageViewCreateInfo& info, VkImageView& imageView) const;
+        void DestroyImageView(VkDevice const& device, VkImageView const& imageView) const;
 
     private:
         explicit Instance(VkInstanceCreateInfo const& info, VkAllocationCallbacks *callbacks = nullptr);

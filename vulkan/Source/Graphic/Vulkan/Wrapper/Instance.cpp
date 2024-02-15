@@ -142,4 +142,16 @@ namespace Croissant::Graphic::Vulkan::Wrapper {
         return m_lastErrorCode == VK_SUCCESS || m_lastErrorCode == VK_INCOMPLETE;
     }
 
+    bool Instance::CreateImageView(VkDevice const& device, VkImageViewCreateInfo& info, VkImageView& imageView) const
+    {
+        m_lastErrorCode = vkCreateImageView(device, &info, nullptr, &imageView);
+
+        return m_lastErrorCode == VK_SUCCESS;
+    }
+
+    void Instance::DestroyImageView(const VkDevice &device, const VkImageView &imageView) const
+    {
+        vkDestroyImageView(device, imageView, nullptr);
+    }
+
 }

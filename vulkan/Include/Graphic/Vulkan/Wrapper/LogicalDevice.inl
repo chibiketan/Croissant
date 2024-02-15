@@ -14,7 +14,7 @@ namespace Croissant::Graphic::Vulkan::Wrapper
         return m_presentQueue;
     }
 
-    LogicalDevice::operator VkDevice()
+    LogicalDevice::operator VkDevice() const
     {
         return m_logicalDevice;
     }

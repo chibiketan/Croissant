@@ -2,6 +2,7 @@
 // Created by Grego on 20/08/2023.
 //
 #include "Graphic/Vulkan/Wrapper/SwapChain.hpp"
+#include "Graphic/Vulkan/Wrapper/ImageView.hpp"
 
 namespace Croissant::Graphic::Vulkan::Wrapper
 {
@@ -102,10 +103,26 @@ namespace Croissant::Graphic::Vulkan::Wrapper
         vkGetSwapchainImagesKHR(m_lDevice, m_swapchain, &swapimageCount, this->m_swapImages.data());
         this->m_extent = extent;
         this->m_format = surfaceFormat.format;
+
+        this->initializeImageViews();
     }
 
     SwapChain::~SwapChain()
     {
+        this->m_imageViews.clear();
         vkDestroySwapchainKHR(m_lDevice, m_swapchain, nullptr);
+    }
+
+    void SwapChain::initializeImageViews()
+    {
+        this->m_imageViews.clear();
+        this->m_imageViews.reserve(this->m_swapImages.size());
+
+        auto i = 1;
+        for (auto* image : this->m_swapImages) {
+            std::cout << "[" << i << "/" << this->m_swapImages.size() << "] Creating Image View" << std::endl;
+            this->m_imageViews.push_back(std::make_unique<ImageView>(this->m_instance, image, *this, this->m_lDevice));
+            ++i;
+        }
     }
 }
