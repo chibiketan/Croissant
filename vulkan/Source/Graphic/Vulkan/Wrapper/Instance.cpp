@@ -154,4 +154,17 @@ namespace Croissant::Graphic::Vulkan::Wrapper {
         vkDestroyImageView(device, imageView, nullptr);
     }
 
+    bool Instance::CreateRenderPass(const VkDevice& device, const VkRenderPassCreateInfo& info,
+                                    VkRenderPass& renderPass) const
+    {
+        auto error = m_lastErrorCode = vkCreateRenderPass(device, &info, nullptr, &renderPass);
+
+        return error == VK_SUCCESS;
+    }
+
+    void Instance::DestroyRenderPass(const VkDevice &device, const VkRenderPass &renderPass) const
+    {
+        vkDestroyRenderPass(device, renderPass, nullptr);
+    }
+
 }

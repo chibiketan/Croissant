@@ -13,7 +13,8 @@ VulkanRenderer::VulkanRenderer(Window& window) :
     m_instance{nullptr},
     m_surface{nullptr},
     m_currentDevice{nullptr},
-    m_logicalDevice{nullptr}
+    m_logicalDevice{nullptr},
+    m_renderPass{nullptr}
     {
     if (volkGetLoadedInstance() == VK_NULL_HANDLE) {
         volkInitialize();
@@ -28,6 +29,7 @@ VulkanRenderer::VulkanRenderer(Window& window) :
     TRACE("Picked device : "<<m_currentDevice->m_properties.deviceName);
     m_logicalDevice = std::make_unique<Wrapper::LogicalDevice>(*m_instance, *m_currentDevice);
     m_swapChain = std::make_unique<Wrapper::SwapChain>(*m_instance, *m_currentDevice, *m_logicalDevice, window, *m_surface);
+    this->m_renderPass = std::make_unique<Wrapper::RenderPass>(*this->m_instance, *this->m_logicalDevice, *this->m_swapChain);
 }
 
 void VulkanRenderer::LoadPhysicalDevices() {

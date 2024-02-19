@@ -91,8 +91,8 @@ public:
         this->createLogicalDevice();
         this->createSwapChain();
         this->createImageViews();
-        // ^ done
         this->createRenderPass();
+        // ^ done
         this->createGraphicsPipeline();
         this->createFramebuffers();
         this->createCommandPool();
