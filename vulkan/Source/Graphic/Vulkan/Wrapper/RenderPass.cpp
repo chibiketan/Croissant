@@ -65,4 +65,9 @@ namespace Croissant::Graphic::Vulkan::Wrapper {
             m_renderPass = nullptr;
         }
     }
+
+    RenderPass::operator VkRenderPass() const
+    {
+        return this->m_renderPass;
+    }
 }

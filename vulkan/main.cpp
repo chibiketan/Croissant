@@ -92,8 +92,8 @@ public:
         this->createSwapChain();
         this->createImageViews();
         this->createRenderPass();
-        // ^ done
         this->createGraphicsPipeline();
+        // ^ done
         this->createFramebuffers();
         this->createCommandPool();
         this->createCommandBuffer();

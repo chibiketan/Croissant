@@ -16,6 +16,7 @@ namespace Croissant::Graphic::Vulkan::Wrapper {
     public:
         RenderPass(Instance const& instance, LogicalDevice const& device, SwapChain const& swapChain);
         ~RenderPass();
+        operator VkRenderPass() const;
 
     private:
         Instance const&         m_instance;

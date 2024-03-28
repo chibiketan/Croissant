@@ -37,6 +37,12 @@ namespace Croissant::Graphic::Vulkan::Wrapper {
         void DestroyImageView(VkDevice const& device, VkImageView const& imageView) const;
         bool CreateRenderPass(VkDevice const& device, VkRenderPassCreateInfo const& info, VkRenderPass& renderPass) const;
         void DestroyRenderPass(VkDevice const& device, VkRenderPass const& renderPass) const;
+        bool CreateShaderModule(VkDevice const& device, VkShaderModuleCreateInfo& info, VkShaderModule& shaderModule) const;
+        void DestroyShaderModule(VkDevice const& device, VkShaderModule const& shaderModule) const;
+        bool CreatePipelineLayout(VkDevice const& device, VkPipelineLayoutCreateInfo& info, VkPipelineLayout& pipelineLayout) const;
+        void DestroyPipelineLayout(VkDevice const& device, VkPipelineLayout const& pipelineLayout) const;
+        bool CreateGraphicsPipelines(VkDevice const &device, VkGraphicsPipelineCreateInfo &info, VkPipeline& pipeline) const;
+        void DestroyGraphicsPipeline(VkDevice const& device, VkPipeline const& pipeline) const;
 
     private:
         explicit Instance(VkInstanceCreateInfo const& info, VkAllocationCallbacks *callbacks = nullptr);

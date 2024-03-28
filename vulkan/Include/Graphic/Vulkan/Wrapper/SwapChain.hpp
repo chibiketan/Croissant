@@ -21,7 +21,8 @@ namespace Croissant::Graphic::Vulkan::Wrapper
     public:
         SwapChain(Instance& instance, PhysicalDevice& device, LogicalDevice& lDevice, Window& window, Surface& surface);
         ~SwapChain();
-        inline VkFormat getFormat() const;
+        [[nodiscard]] inline VkFormat getFormat() const;
+        [[nodiscard]] inline VkExtent2D getExtent() const;
 
     private:
         Instance&               m_instance;

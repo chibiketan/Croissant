@@ -6,8 +6,28 @@
 #define VOLK_IMPLEMENTATION
 
 #include "Graphic/Vulkan/VulkanRenderer.hpp"
+#include "Graphic/Vulkan/Wrapper/ShaderModule.hpp"
+
+// TODO on fait quoi de ça ?
+std::vector<char> readFile(const std::string& filename) {
+    std::ifstream file(filename, std::ios::ate | std::ios::binary);
+
+    if (!file.is_open()) {
+        throw std::runtime_error(std::string {"échec de l'ouverture du fichier "} + filename + "!");
+    }
+
+    size_t fileSize = (size_t) file.tellg();
+    std::vector<char> buffer(fileSize);
+    file.seekg(0);
+    file.read(buffer.data(), fileSize);
+    file.close();
+
+    return buffer;
+}
 
 using namespace Croissant::Graphic::Vulkan;
+
+
 
 VulkanRenderer::VulkanRenderer(Window& window) :
     m_instance{nullptr},
@@ -30,6 +50,18 @@ VulkanRenderer::VulkanRenderer(Window& window) :
     m_logicalDevice = std::make_unique<Wrapper::LogicalDevice>(*m_instance, *m_currentDevice);
     m_swapChain = std::make_unique<Wrapper::SwapChain>(*m_instance, *m_currentDevice, *m_logicalDevice, window, *m_surface);
     this->m_renderPass = std::make_unique<Wrapper::RenderPass>(*this->m_instance, *this->m_logicalDevice, *this->m_swapChain);
+
+    // create shaders
+    {
+        auto vertShaderCode = readFile("vulkan/shaders/shader.vert.spv");
+        auto fragShaderCode = readFile("vulkan/shaders/shader.frag.spv");
+
+        Wrapper::ShaderModule vertShaderModule { *m_instance, *m_logicalDevice, vertShaderCode };
+        Wrapper::ShaderModule fragShaderModule { *m_instance, *m_logicalDevice, fragShaderCode };
+
+        //auto m_graphicsPipeline = std::make_unique<Wrapper::GraphicsPipeline>(*m_instance, *m_logicalDevice, *m_renderPass, vertShaderModule, fragShaderModule);
+        auto m_graphicsPipeline = Wrapper::GraphicsPipeline {*m_instance, *m_logicalDevice, *m_renderPass, *m_swapChain, vertShaderModule, fragShaderModule};
+    }
 }
 
 void VulkanRenderer::LoadPhysicalDevices() {

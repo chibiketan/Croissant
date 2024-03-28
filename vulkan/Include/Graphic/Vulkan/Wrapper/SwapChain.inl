@@ -7,4 +7,9 @@ namespace Croissant::Graphic::Vulkan::Wrapper {
     {
         return this->m_format;
     }
+
+    VkExtent2D SwapChain::getExtent() const
+    {
+        return this->m_extent;
+    }
 }

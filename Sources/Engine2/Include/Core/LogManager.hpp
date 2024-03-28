@@ -98,6 +98,7 @@ namespace Croissant
 		{
 #    if CROISSANT_TRACE_LEVEL >= 3
 			WriteTrace("Debug", msg);
+            TRACE(msg);
 #    endif
 		}
 
@@ -105,6 +106,7 @@ namespace Croissant
 		{
 #    if CROISSANT_TRACE_LEVEL >= 2
 			WriteTrace("Info", msg);
+            TRACE(msg);
 #    endif
 		}
 		
@@ -112,6 +114,7 @@ namespace Croissant
 		{
 #    if CROISSANT_TRACE_LEVEL >= 1
 			WriteTrace("Warn", msg);
+            TRACE(msg);
 #    endif
 		}
 
@@ -119,6 +122,7 @@ namespace Croissant
 		{
 #    if CROISSANT_TRACE_LEVEL >= 0
 			WriteTrace("Error", msg);
+            TRACE(msg);
 #    endif
 		}
 #  else // !defined(CROISSANT_HAS_TRACE)

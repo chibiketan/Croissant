@@ -20,7 +20,7 @@ bool Croissant::VulkanTest::VulkanTestApp::OnInitialize(Croissant::Core::Applica
 
 bool Croissant::VulkanTest::VulkanTestApp::OnFrame(int32_t &, const Croissant::VulkanTest::FrameTime &,
                                                    const Croissant::VulkanTest::FrameTime &) {
-    Core::WriteTraceDebug("Croissant::VulkanTest::VulkanTestApp::OnFrame called");
+    //Core::WriteTraceDebug("Croissant::VulkanTest::VulkanTestApp::OnFrame called");
     // TODO : genereate data / step forward world
     // TODO : render frame
     auto event = this->m_window->PeekEvent();

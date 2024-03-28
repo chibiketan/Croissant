@@ -167,4 +167,43 @@ namespace Croissant::Graphic::Vulkan::Wrapper {
         vkDestroyRenderPass(device, renderPass, nullptr);
     }
 
+    bool Instance::CreateShaderModule(VkDevice const& device, VkShaderModuleCreateInfo& info,
+                                      VkShaderModule& shaderModule) const
+    {
+        auto errorCode = m_lastErrorCode = vkCreateShaderModule(device, &info, nullptr, &shaderModule);
+
+        return errorCode == VK_SUCCESS;
+    }
+
+    void Instance::DestroyShaderModule(VkDevice const& device, VkShaderModule const& shaderModule) const
+    {
+        vkDestroyShaderModule(device, shaderModule, nullptr);
+    }
+
+    bool Instance::CreatePipelineLayout(VkDevice const &device, VkPipelineLayoutCreateInfo &info,
+                                        VkPipelineLayout &pipelineLayout) const
+    {
+        auto errorCode = m_lastErrorCode = vkCreatePipelineLayout(device, &info, nullptr, &pipelineLayout);
+
+        return errorCode == VK_SUCCESS;
+    }
+
+    void Instance::DestroyPipelineLayout(VkDevice const& device, VkPipelineLayout const& pipelineLayout) const
+    {
+        vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+    }
+
+    bool Instance::CreateGraphicsPipelines(VkDevice const &device, VkGraphicsPipelineCreateInfo &info,
+                                           VkPipeline &pipeline) const
+    {
+        auto errorCode = m_lastErrorCode = vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &info, nullptr, &pipeline);
+
+        return errorCode == VK_SUCCESS;
+    }
+
+    void Instance::DestroyGraphicsPipeline(const VkDevice &device, const VkPipeline &pipeline) const
+    {
+        vkDestroyPipeline(device, pipeline, nullptr);
+    }
+
 }

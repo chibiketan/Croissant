@@ -15,6 +15,8 @@
 #  include "Graphic/Vulkan/Wrapper/LogicalDevice.hpp"
 #  include "Graphic/Vulkan/Wrapper/SwapChain.hpp"
 #  include "Graphic/Vulkan/Wrapper/RenderPass.hpp"
+#  include "Graphic/Vulkan/Wrapper/GraphicsPipeline.hpp"
+#  include "Graphic/Vulkan/Wrapper/GraphicsPipeline.hpp"
 
 namespace Croissant::Graphic::Vulkan {
     class VulkanRenderer {
